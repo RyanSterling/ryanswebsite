@@ -27,6 +27,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        @media (max-width: 767px) {
+            h1.headline-gradient {
+                font-size: 2.4rem;
+                line-height: 1.1;
+            }
+        }
     </style>
     <script>
         tailwind.config = {
@@ -45,21 +52,19 @@
 </head>
 <body style="background: #111;" class="min-h-screen">
     <main class="max-w-6xl mx-auto px-8 py-24 md:py-32">
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-12">
-            <!-- Portrait (shows first on mobile) -->
-            <div class="flex-shrink-0 order-first md:order-last flex justify-center md:justify-end">
-                <div class="w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden bg-brand-orange">
-                    <img
-                        src="./assets/portrait.png"
-                        alt="Ryan Sterling"
-                        class="w-full h-full object-cover"
-                    >
-                </div>
+        <div class="flex flex-col items-center gap-8">
+            <!-- Portrait -->
+            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-brand-orange">
+                <img
+                    src="./assets/portrait.png"
+                    alt="Ryan Sterling"
+                    class="w-full h-full object-cover"
+                >
             </div>
 
             <!-- Headline Section -->
-            <div class="flex-1">
-                <h1 class="font-soehne text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight headline-gradient">
+            <div class="text-center">
+                <h1 class="font-soehne text-4xl md:text-6xl lg:text-7xl leading-none md:leading-tight tracking-tight headline-gradient">
                     Helping Businesses
                     <br>
                     Make More Money
