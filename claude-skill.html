@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <meta name="username" content="user_38qK27grXHb7Aau7FUK6JqXTegx">
+    <meta name="offer" content="outlier tear down skill">
+    <title>Outlier Tear Down - Free Claude Skill</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'Soehne';
+            src: url('./fonts/Test Söhne/test-soehne-extrafett.woff2') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+        }
+
+        .font-soehne {
+            font-family: 'Soehne', sans-serif;
+        }
+
+        .headline-gradient {
+            background: linear-gradient(78deg, #1398F8 -21.21%, #FF5024 90.36%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @media (max-width: 767px) {
+            h1.headline-gradient {
+                font-size: 2.4rem;
+                line-height: 1.1;
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#1a1a1a',
+                        'brand-orange': '#e86c3a',
+                        'brand-blue': '#5b8a9a',
+                        'brand-mauve': '#a87f8f',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body style="background: #111;" class="min-h-screen">
+    <main class="max-w-2xl mx-auto px-8 py-16 md:py-24">
+
+        <!-- Hero Section -->
+        <section class="text-center mb-12">
+            <div class="mb-6">
+                <div class="w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full overflow-hidden">
+                    <img
+                        src="./assets/portrait.png"
+                        alt="Ryan Sterling"
+                        class="w-full h-full object-cover"
+                    >
+                </div>
+            </div>
+            <h1 class="font-soehne text-4xl md:text-6xl lg:text-7xl leading-none md:leading-tight tracking-tight headline-gradient mb-4">
+                Outlier Tear Down
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl mb-4">
+                A Claude skill that analyzes viral content and teaches you the psychology behind why it worked.
+            </p>
+            <p class="text-gray-500">
+                Stop guessing. Start learning from outliers that actually performed.
+            </p>
+        </section>
+
+        <!-- Email Form -->
+        <section class="max-w-md mx-auto">
+            <form id="download-form" class="space-y-4">
+                <div>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="Enter your email"
+                        class="w-full px-4 py-4 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        style="background: #1D1D1D;"
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    id="submit-btn"
+                    class="w-full text-white font-medium text-lg py-4 hover:opacity-90 transition-opacity"
+                    style="background: #FF5125; border-radius: 19px;"
+                >
+                    Get Free Download
+                </button>
+                <p id="form-error" class="text-red-400 text-center mt-4 hidden">Something went wrong. Try again?</p>
+            </form>
+
+            <!-- Success State with Download -->
+            <div id="form-success" class="hidden text-center py-8">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: #22c55e;">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <p class="text-white text-xl font-semibold mb-2">You're in!</p>
+                <p class="text-gray-400 mb-6">Click below to download the Outlier Tear Down skill.</p>
+
+                <a
+                    id="download-btn"
+                    href="./assets/outlier-teardown.skill"
+                    download
+                    class="inline-flex items-center gap-3 text-white font-medium text-lg px-8 py-4 hover:opacity-90 transition-opacity"
+                    style="background: #FF5125; border-radius: 19px;"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Skill
+                </a>
+            </div>
+        </section>
+
+        <!-- Back Link -->
+        <section class="text-center mt-12">
+            <a
+                href="/"
+                class="text-gray-500 hover:text-gray-400 transition-colors"
+            >
+                &larr; Back to Home
+            </a>
+        </section>
+
+    </main>
+
+    <script>
+        const N8N_FORM_WEBHOOK = 'https://n8n.srv1369832.hstgr.cloud/webhook/b8feefab-43d5-40c5-b8b6-3054af5b624a';
+
+        document.getElementById('download-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const submitBtn = document.getElementById('submit-btn');
+            const successMsg = document.getElementById('form-success');
+            const errorMsg = document.getElementById('form-error');
+
+            // Hide any previous messages
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+
+            // Disable button while submitting
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch(N8N_FORM_WEBHOOK, {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        email,
+                        source: 'outlier-tear-down'
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('download-form').classList.add('hidden');
+                    successMsg.classList.remove('hidden');
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (error) {
+                errorMsg.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Get Free Download';
+            }
+        });
+    </script>
+</body>
+</html>
