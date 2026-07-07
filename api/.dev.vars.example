@@ -1,0 +1,16 @@
+# Copy this file to .dev.vars and fill in your API keys
+# .dev.vars is gitignored and never committed
+
+# OpenAI API key for Whisper transcription
+# Get yours at: https://platform.openai.com/api-keys
+OPENAI_API_KEY=sk-your-openai-key-here
+
+# Anthropic API key for Claude analysis
+# Get yours at: https://console.anthropic.com/
+ANTHROPIC_API_KEY=sk-ant-your-anthropic-key-here
+
+# Apify Instagram Profile Scraper (for bio, followers)
+APIFY_PROFILE_URL=https://api.apify.com/v2/actors/apify~instagram-profile-scraper/run-sync-get-dataset-items?token=your-token-here
+
+# Apify Instagram Reel Scraper (excludes pinned posts, no transcript - we use Whisper)
+APIFY_REEL_URL=https://api.apify.com/v2/actors/apify~instagram-reel-scraper/run-sync-get-dataset-items?token=your-token-here

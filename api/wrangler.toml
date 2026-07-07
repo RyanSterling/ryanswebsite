@@ -1,0 +1,20 @@
+name = "ryan-website-api"
+main = "src/index.ts"
+compatibility_date = "2024-06-20"
+
+# Environment variables (non-secret)
+[vars]
+N8N_EMAIL_WEBHOOK = "https://n8n.srv1369832.hstgr.cloud/webhook/assessment-email"
+
+# KV namespace for storing assessment results
+# Create with: npx wrangler kv namespace create RESULTS_KV
+# For local dev, wrangler creates a local KV automatically
+[[kv_namespaces]]
+binding = "RESULTS_KV"
+id = "661d24cb60814905a5391f8a0e39b52b"
+
+# Secrets are added via: npx wrangler secret put SECRET_NAME
+# Required secrets:
+# - OPENAI_API_KEY (for Whisper transcription)
+# - ANTHROPIC_API_KEY (for Claude analysis)
+# - APIFY_URL (full Apify sync endpoint URL with token)

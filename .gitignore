@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# TypeScript build info
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+
+# Cloudflare
+.wrangler/
+api/.wrangler/
+api/.dev.vars
+api/.dev.vars.save
+
+# Logs
+*.log

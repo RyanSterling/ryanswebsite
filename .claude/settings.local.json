@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial landing page with contact form\n\n- Hero section with gradient headline and portrait\n- Contact form with name, email, industry, and help fields\n- Social media URL inputs for TikTok, Instagram, YouTube\n- Responsive layout \\(portrait above headline on mobile\\)\n- Custom Soehne font\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(python3 -m http.server:*)",
+      "Bash(git log --all --oneline --grep=\"lead\\\\|magnet\\\\|form\\\\|assessment\\\\|quiz\" -i)",
+      "Bash(npm create:*)",
+      "Bash(node --version:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc --noEmit)",
+      "WebFetch(domain:whisperai.com)",
+      "WebFetch(domain:apify.com)"
+    ]
+  }
+}
