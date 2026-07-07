@@ -355,22 +355,6 @@ export default function Results({ result, profile, reels }: Props) {
         {/* Personal Audit Upsell */}
         <AuditPromoCard />
 
-        {/* CTA */}
-        <div className="bg-gradient-to-r from-brand-blue to-brand-orange rounded-2xl p-8 text-center">
-          <h2 className="font-soehne text-2xl md:text-3xl text-white mb-4">
-            Want help fixing this?
-          </h2>
-          <p className="text-white/80 mb-6">
-            Join the 10K Challenge for daily feedback on your hooks, ideas, and growth strategy.
-          </p>
-          <Link
-            to="/challenge"
-            className="inline-block bg-white text-brand-dark font-semibold text-lg px-8 py-4 rounded-xl hover:opacity-90 transition-opacity"
-          >
-            Join the 10K Challenge
-          </Link>
-        </div>
-
         {/* Back to home */}
         <div className="text-center">
           <Link to="/" className="text-gray-400 hover:text-white transition-colors">

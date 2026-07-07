@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AssessmentStepper from '../components/assessment/AssessmentStepper'
 import LoadingState from '../components/assessment/LoadingState'
-import Results from '../components/assessment/Results'
 import NotSuited from '../components/assessment/NotSuited'
 
 export type AssessmentStep =
@@ -98,6 +98,7 @@ export interface AssessmentResponse {
 export type LoadingStep = 'scraping_profile' | 'scraping_reels' | 'transcribing' | 'analyzing'
 
 export default function Assessment() {
+  const navigate = useNavigate()
   const [step, setStep] = useState<AssessmentStep>('email')
   const [data, setData] = useState<AssessmentData>({
     email: '',
@@ -109,7 +110,6 @@ export default function Assessment() {
     outliersLast90Days: '',
     selfDiagnosis: '',
   })
-  const [response, setResponse] = useState<AssessmentResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // SSE streaming progress state
@@ -170,8 +170,8 @@ export default function Assessment() {
                 // Profile data received - show it in loading state
                 setLoadingProfile(event.profile as InstagramProfile)
               } else if (event.type === 'complete') {
-                setResponse(event.data as AssessmentResponse)
-                setStep('results')
+                const resultData = event.data as AssessmentResponse
+                navigate(`/results/${resultData.resultId}`)
                 return
               } else if (event.type === 'error') {
                 throw new Error(event.message || 'Assessment failed')
@@ -197,16 +197,6 @@ export default function Assessment() {
         reelNumber={reelNumber}
         reelsTotal={reelsTotal}
         profile={loadingProfile}
-      />
-    )
-  }
-
-  if (step === 'results' && response) {
-    return (
-      <Results
-        result={response.analysis}
-        profile={response.profile}
-        reels={response.reels}
       />
     )
   }

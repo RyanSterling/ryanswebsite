@@ -4,7 +4,7 @@ compatibility_date = "2024-06-20"
 
 # Environment variables (non-secret)
 [vars]
-N8N_EMAIL_WEBHOOK = "https://n8n.srv1369832.hstgr.cloud/webhook/assessment-email"
+N8N_EMAIL_WEBHOOK = "https://n8n.srv1369832.hstgr.cloud/webhook/growth-audit-results"
 
 # KV namespace for storing assessment results
 # Create with: npx wrangler kv namespace create RESULTS_KV

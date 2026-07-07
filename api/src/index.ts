@@ -216,17 +216,20 @@ app.post('/assess', async (c) => {
     console.log('Transcribing reels with Whisper')
     const transcripts = await transcribeReels(reelsToAnalyze, c.env.OPENAI_API_KEY)
 
-    // Check if all transcripts are empty (text-overlay style content)
-    const validTranscripts = transcripts.filter(t =>
-      t.length > 20 &&
-      !t.startsWith('[') &&
-      !t.toLowerCase().includes('no speech') &&
-      !t.toLowerCase().includes('music')
-    )
+    // Only check for complete transcription failures
+    // Users already confirmed they have spoken content in the stepper
+    const validTranscripts = transcripts.filter(t => {
+      const trimmed = t.trim()
+      // Only filter out our error messages (bracketed)
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) return false
+      // Filter out empty
+      if (trimmed === '') return false
+      return true
+    })
 
     if (validTranscripts.length === 0) {
       return c.json({
-        error: 'This assessment is designed for creators who speak in their content. Your reels appear to use text overlays with trending audio, which we cannot analyze effectively. Try our assessment when you have spoken content to review.'
+        error: 'We couldn\'t transcribe any of your reels. Please make sure your videos have audible speech and try again.'
       }, 400)
     }
 
@@ -361,8 +364,11 @@ app.post('/assess-stream', async (c) => {
               continue
             }
 
+            console.log('Fetching video from:', reel.videoUrl?.substring(0, 100))
             const videoResponse = await fetch(reel.videoUrl)
+            console.log('Video fetch status:', videoResponse.status, 'size:', videoResponse.headers.get('content-length'))
             const videoBlob = await videoResponse.blob()
+            console.log('Video blob size:', videoBlob.size)
 
             const formData = new FormData()
             formData.append('file', videoBlob, 'video.mp4')
@@ -378,30 +384,41 @@ app.post('/assess-stream', async (c) => {
             })
 
             if (!whisperResponse.ok) {
-              console.error('Whisper error:', await whisperResponse.text())
+              const errorText = await whisperResponse.text()
+              console.error('Whisper error status:', whisperResponse.status, 'body:', errorText)
               transcripts.push('[Transcription failed]')
               continue
             }
 
-            transcripts.push(await whisperResponse.text())
+            const transcript = await whisperResponse.text()
+            console.log('Transcript received, length:', transcript.length, 'preview:', transcript.substring(0, 100))
+            transcripts.push(transcript)
           } catch (error) {
             console.error('Transcription error for reel:', error)
             transcripts.push('[Transcription failed]')
           }
         }
 
-        // Check if all transcripts are empty (text-overlay style content)
-        const validTranscripts = transcripts.filter(t =>
-          t.length > 20 &&
-          !t.startsWith('[') &&
-          !t.toLowerCase().includes('no speech') &&
-          !t.toLowerCase().includes('music')
-        )
+        // Debug: Log all transcripts
+        console.log('All transcripts:', JSON.stringify(transcripts))
+
+        // Only check for complete transcription failures
+        // Users already confirmed they have spoken content in the stepper
+        const validTranscripts = transcripts.filter(t => {
+          const trimmed = t.trim()
+          // Only filter out our error messages (bracketed)
+          if (trimmed.startsWith('[') && trimmed.endsWith(']')) return false
+          // Filter out empty
+          if (trimmed === '') return false
+          return true
+        })
+
+        console.log('Valid transcripts count:', validTranscripts.length)
 
         if (validTranscripts.length === 0) {
           sendEvent({
             type: 'error',
-            message: 'This assessment is designed for creators who speak in their content. Your reels appear to use text overlays with trending audio, which we cannot analyze effectively. Try our assessment when you have spoken content to review.'
+            message: 'We couldn\'t transcribe any of your reels. Please make sure your videos have audible speech and try again.'
           })
           controller.close()
           return
