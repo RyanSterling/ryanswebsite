@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 
-const AUDIT_WEBHOOK_URL = import.meta.env.VITE_AUDIT_WEBHOOK_URL || ''
+const AUDIT_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/a4a295f5-4e4a-416b-a2a8-62396e636ad0'
 
 interface FormData {
   name: string
@@ -171,8 +171,8 @@ export default function AuditThankYou() {
                 <p className="text-red-400 mb-2">Something went wrong submitting the form.</p>
                 <p className="text-gray-400 text-sm">
                   If you don't hear from me within 24 hours, email me at{' '}
-                  <a href="mailto:ryan@ryansterlingconsulting.com" className="text-brand-orange hover:underline">
-                    ryan@ryansterlingconsulting.com
+                  <a href="mailto:rsterling20@gmail.com" className="text-brand-orange hover:underline">
+                    rsterling20@gmail.com
                   </a>{' '}
                   with your Instagram handle.
                 </p>
