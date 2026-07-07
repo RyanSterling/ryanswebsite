@@ -14,35 +14,57 @@ export default function ProfileAudit() {
           Personal Profile Audit
         </h1>
         <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
-          A 10-15 minute video breakdown of exactly what's holding back your growth — and how to fix it.
+          I'll personally review your content, tell you exactly what's killing your views, and show you how to fix it.
         </p>
       </section>
 
       {/* What You Get */}
       <section className="mb-16">
-        <h2 className="font-soehne text-2xl md:text-3xl text-white text-center mb-8">What You Get</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-brand-card rounded-2xl p-6">
-            <div className="w-12 h-12 bg-brand-orange/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        <h2 className="font-soehne text-2xl md:text-3xl text-white text-center mb-8">What You'll Walk Away With</h2>
+        <div className="space-y-4">
+          <div className="bg-brand-card rounded-2xl p-6 flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
+            </span>
+            <div>
+              <h3 className="text-white font-semibold mb-1">Real-time reactions to your reels</h3>
+              <p className="text-gray-400">I'll watch your content and tell you exactly what's working, what's not, and what I'd do differently</p>
             </div>
-            <h3 className="text-white font-semibold text-lg mb-2">Personalized Loom Video</h3>
-            <p className="text-gray-400">
-              I'll walk through your profile, bio, and recent content — pointing out what's working, what's not, and exactly what to change.
-            </p>
           </div>
-          <div className="bg-brand-card rounded-2xl p-6">
-            <div className="w-12 h-12 bg-brand-orange/20 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div className="bg-brand-card rounded-2xl p-6 flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
+            </span>
+            <div>
+              <h3 className="text-white font-semibold mb-1">Hook rewrites you can use immediately</h3>
+              <p className="text-gray-400">Specific hooks for YOUR niche that create curiosity and stop the scroll</p>
             </div>
-            <h3 className="text-white font-semibold text-lg mb-2">Written PDF Breakdown</h3>
-            <p className="text-gray-400">
-              A reference doc with all my notes, suggested rewrites, and a prioritized action plan you can keep.
-            </p>
+          </div>
+          <div className="bg-brand-card rounded-2xl p-6 flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <div>
+              <h3 className="text-white font-semibold mb-1">Bio and profile feedback</h3>
+              <p className="text-gray-400">Make sure visitors know exactly what you do and why they should follow — in under 5 seconds</p>
+            </div>
+          </div>
+          <div className="bg-brand-card rounded-2xl p-6 flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <div>
+              <h3 className="text-white font-semibold mb-1">Content strategy direction</h3>
+              <p className="text-gray-400">What types of videos to make, what to double down on, and what to stop doing</p>
+            </div>
           </div>
         </div>
       </section>

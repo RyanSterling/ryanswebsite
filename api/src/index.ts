@@ -591,7 +591,7 @@ async function scrapeReels(handle: string, apifyUrl: string): Promise<InstagramR
     throw new Error('No reels found. Make sure the account has public reels.')
   }
 
-  return results.slice(0, 6).map(r => {
+  return results.slice(0, 4).map(r => {
     // Extract shortCode from URL if not provided directly
     let shortCode = r.shortCode || r.id || ''
     if (!shortCode && r.url) {
