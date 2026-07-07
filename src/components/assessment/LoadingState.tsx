@@ -10,7 +10,8 @@ interface LoadingStateProps {
 // Proxy images through API to bypass Instagram CORS
 function proxyImageUrl(url: string): string {
   if (!url) return ''
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+  const envUrl = import.meta.env.VITE_API_URL
+  const apiUrl = (envUrl && envUrl !== 'undefined') ? envUrl : 'http://localhost:8787'
   return `${apiUrl}/proxy-image?url=${encodeURIComponent(url)}`
 }
 

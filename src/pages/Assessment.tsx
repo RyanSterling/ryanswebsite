@@ -128,7 +128,8 @@ export default function Assessment() {
 
     try {
       // API endpoint - uses local dev server or production Cloudflare Worker
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+      const envUrl = import.meta.env.VITE_API_URL
+      const apiUrl = (envUrl && envUrl !== 'undefined') ? envUrl : 'http://localhost:8787'
       const fetchResponse = await fetch(`${apiUrl}/assess-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
