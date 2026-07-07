@@ -259,7 +259,7 @@ app.post('/assess', async (c) => {
     console.log('Saved result with ID:', resultId)
 
     // Step 6: Send to N8N for email (fire and forget) - include results URL
-    const resultsUrl = `https://ryansterling.com/results/${resultId}`
+    const resultsUrl = `https://ryansterlingconsulting.com/results/${resultId}`
     sendToN8N({
       email: data.email,
       handle: data.handle,
@@ -437,7 +437,7 @@ app.post('/assess-stream', async (c) => {
         console.log('Saved result with ID:', resultId)
 
         // Step 6: Send to N8N for email
-        const resultsUrl = `https://ryansterling.com/results/${resultId}`
+        const resultsUrl = `https://ryansterlingconsulting.com/results/${resultId}`
         try {
           await sendToN8N({
             email: data.email,
