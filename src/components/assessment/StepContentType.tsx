@@ -11,7 +11,7 @@ export default function StepContentType({ onYes, onNo, onBack }: Props) {
         Quick question
       </h1>
       <p className="text-gray-400 mb-8">
-        Do you speak in your reels? We analyze your hooks by transcribing what you say.
+        We transcribe what you say to analyze your messaging and hooks.
       </p>
 
       <div className="space-y-3 mb-8">
@@ -19,13 +19,13 @@ export default function StepContentType({ onYes, onNo, onBack }: Props) {
           onClick={onYes}
           className="w-full bg-brand-orange text-white font-medium text-lg py-4 rounded-xl hover:opacity-90 transition-opacity"
         >
-          Yes, I speak in my content
+          Yes, I speak in my reels
         </button>
         <button
           onClick={onNo}
           className="w-full bg-brand-card text-white font-medium text-lg py-4 rounded-xl hover:bg-gray-700 transition-colors"
         >
-          No, I use text overlays with music
+          No, I don't speak in my content
         </button>
       </div>
 

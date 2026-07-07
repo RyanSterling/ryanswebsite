@@ -11,16 +11,15 @@ export default function NotSuited() {
         </div>
 
         <h1 className="font-soehne text-2xl md:text-3xl text-white mb-4">
-          This audit isn't for you (yet)
+          This audit is best suited for spoken content
         </h1>
 
         <p className="text-gray-400 mb-6 leading-relaxed">
-          Our Growth Audit analyzes your spoken hooks to find what's holding your content back.
-          Since you use text overlays with music, we can't transcribe and analyze your content effectively.
+          Our Growth Audit works by transcribing what you say in your reels, then analyzing your messaging, hooks, and positioning.
         </p>
 
         <p className="text-gray-400 mb-8 leading-relaxed">
-          If you start creating content where you speak, come back and we'll audit your hooks.
+          If you start creating content where you speak on camera, come back and we'll run your audit.
         </p>
 
         <Link
