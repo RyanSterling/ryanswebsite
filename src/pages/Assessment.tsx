@@ -127,9 +127,8 @@ export default function Assessment() {
     setLoadingProfile(null)
 
     try {
-      // API endpoint - uses local dev server or production Cloudflare Worker
-      const envUrl = import.meta.env.VITE_API_URL
-      const apiUrl = (envUrl && envUrl !== 'undefined') ? envUrl : 'http://localhost:8787'
+      // API endpoint
+      const apiUrl = 'https://ryan-website-api.rsterling20.workers.dev'
       const fetchResponse = await fetch(`${apiUrl}/assess-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

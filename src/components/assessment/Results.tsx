@@ -22,8 +22,7 @@ function formatNumber(num: number): string {
 // Proxy images through API to bypass Instagram CORS
 function proxyImageUrl(url: string): string {
   if (!url) return ''
-  const envUrl = import.meta.env.VITE_API_URL
-  const apiUrl = (envUrl && envUrl !== 'undefined') ? envUrl : 'http://localhost:8787'
+  const apiUrl = 'https://ryan-website-api.rsterling20.workers.dev'
   return `${apiUrl}/proxy-image?url=${encodeURIComponent(url)}`
 }
 
