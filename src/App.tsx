@@ -5,6 +5,8 @@ import ChallengeSuccess from './pages/ChallengeSuccess'
 import Assessment from './pages/Assessment'
 import ResultsPage from './pages/ResultsPage'
 import ThankYou from './pages/ThankYou'
+import ProfileAudit from './pages/ProfileAudit'
+import AuditThankYou from './pages/AuditThankYou'
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Route path="/assessment" element={<Assessment />} />
       <Route path="/results/:id" element={<ResultsPage />} />
       <Route path="/thank-you" element={<ThankYou />} />
+      <Route path="/profile-audit" element={<ProfileAudit />} />
+      <Route path="/audit-thank-you" element={<AuditThankYou />} />
     </Routes>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AssessmentResult, InstagramProfile, InstagramReel } from '../../pages/Assessment'
+import AuditPromoCard from '../AuditPromoCard'
 
 interface Props {
   result: AssessmentResult
@@ -350,6 +351,9 @@ export default function Results({ result, profile, reels }: Props) {
             ))}
           </div>
         </div>
+
+        {/* Personal Audit Upsell */}
+        <AuditPromoCard />
 
         {/* CTA */}
         <div className="bg-gradient-to-r from-brand-blue to-brand-orange rounded-2xl p-8 text-center">
