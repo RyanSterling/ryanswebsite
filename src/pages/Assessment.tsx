@@ -2,9 +2,11 @@ import { useState } from 'react'
 import AssessmentStepper from '../components/assessment/AssessmentStepper'
 import LoadingState from '../components/assessment/LoadingState'
 import Results from '../components/assessment/Results'
+import NotSuited from '../components/assessment/NotSuited'
 
 export type AssessmentStep =
   | 'email'
+  | 'contentType'
   | 'handle'
   | 'problem'
   | 'frequency'
@@ -14,6 +16,7 @@ export type AssessmentStep =
   | 'selfDiagnosis'
   | 'loading'
   | 'results'
+  | 'notSuited'
 
 export interface AssessmentData {
   email: string
@@ -206,6 +209,10 @@ export default function Assessment() {
         reels={response.reels}
       />
     )
+  }
+
+  if (step === 'notSuited') {
+    return <NotSuited />
   }
 
   return (

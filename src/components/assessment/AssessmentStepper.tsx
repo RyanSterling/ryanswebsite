@@ -1,5 +1,6 @@
 import { AssessmentStep, AssessmentData } from '../../pages/Assessment'
 import StepEmail from './StepEmail'
+import StepContentType from './StepContentType'
 import StepHandle from './StepHandle'
 import StepProblem from './StepProblem'
 import StepFrequency from './StepFrequency'
@@ -19,6 +20,7 @@ interface Props {
 
 const STEPS: AssessmentStep[] = [
   'email',
+  'contentType',
   'handle',
   'problem',
   'frequency',
@@ -73,6 +75,13 @@ export default function AssessmentStepper({ step, setStep, data, setData, onSubm
         <div className="w-full max-w-xl">
           {step === 'email' && (
             <StepEmail value={data.email} onChange={(v) => updateField('email', v)} onNext={goNext} />
+          )}
+          {step === 'contentType' && (
+            <StepContentType
+              onYes={goNext}
+              onNo={() => setStep('notSuited')}
+              onBack={goBack}
+            />
           )}
           {step === 'handle' && (
             <StepHandle
