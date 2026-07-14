@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
 const N8N_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/ccf6e619-d233-4159-8ea2-9d12acdf505c'
@@ -9,6 +9,28 @@ export default function PromptOptIn() {
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(false)
+  const [title, setTitle] = useState('')
+
+  useEffect(() => {
+    async function fetchTitle() {
+      try {
+        const response = await fetch(`/assets/prompts/${slug}.md`)
+        if (response.ok) {
+          const text = await response.text()
+          const lines = text.split('\n')
+          for (const line of lines) {
+            if (line.startsWith('# ')) {
+              setTitle(line.replace('# ', ''))
+              break
+            }
+          }
+        }
+      } catch {
+        // Fallback to slug if fetch fails
+      }
+    }
+    fetchTitle()
+  }, [slug])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -38,7 +60,7 @@ export default function PromptOptIn() {
     <main className="max-w-xl mx-auto px-8 py-16 md:py-24">
       <section className="text-center mb-8">
         <h1 className="font-soehne text-3xl md:text-4xl font-bold text-white mb-4">
-          Get Your Free Prompt
+          {title || 'Get Your Free Prompt'}
         </h1>
         <p className="text-gray-400 text-lg">
           Enter your email and I'll send it right over.
