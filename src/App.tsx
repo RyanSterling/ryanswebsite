@@ -8,6 +8,7 @@ import ThankYou from './pages/ThankYou'
 import ProfileAudit from './pages/ProfileAudit'
 import AuditThankYou from './pages/AuditThankYou'
 import PromptPage from './pages/PromptPage'
+import PromptOptIn from './pages/PromptOptIn'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/profile-audit" element={<ProfileAudit />} />
       <Route path="/audit-thank-you" element={<AuditThankYou />} />
       <Route path="/prompts/:slug" element={<PromptPage />} />
+      <Route path="/get/:slug" element={<PromptOptIn />} />
     </Routes>
   )
 }
