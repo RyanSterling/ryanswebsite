@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-const N8N_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/prompt-optin'
+const N8N_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/ccf6e619-d233-4159-8ea2-9d12acdf505c'
 
 export default function PromptOptIn() {
   const { slug } = useParams<{ slug: string }>()
