@@ -59,8 +59,9 @@ export default function PromptOptIn() {
   return (
     <main className="max-w-xl mx-auto px-8 py-16 md:py-24">
       <section className="text-center mb-8">
+        <p className="text-brand-orange text-sm font-semibold uppercase tracking-wide mb-2">Free Prompt</p>
         <h1 className="font-soehne text-3xl md:text-4xl font-bold text-white mb-4">
-          {title ? `Get "${title}"` : 'Get Your Free Prompt'}
+          {title || 'Get Your Free Prompt'}
         </h1>
         <p className="text-gray-400 text-lg">
           Enter your email and I'll send it right over.
