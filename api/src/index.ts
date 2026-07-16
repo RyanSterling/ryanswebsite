@@ -1159,20 +1159,18 @@ app.post('/webhooks/stripe', async (c) => {
 
     console.log('Purchase recorded:', { userId, courseId, paymentId })
 
-    // Tag user in ConvertKit for email sequence (V4 API)
+    // Tag user in ConvertKit for email sequence (V3 API)
     const customerEmail = session.customer_email
     if (customerEmail && c.env.CONVERTKIT_API_SECRET && c.env.CONVERTKIT_COURSE_TAG_ID) {
       try {
         const ckResponse = await fetch(
-          `https://api.convertkit.com/v4/tags/${c.env.CONVERTKIT_COURSE_TAG_ID}/subscribers`,
+          `https://api.convertkit.com/v3/tags/${c.env.CONVERTKIT_COURSE_TAG_ID}/subscribe`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${c.env.CONVERTKIT_API_SECRET}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email_address: customerEmail,
+              api_secret: c.env.CONVERTKIT_API_SECRET,
+              email: customerEmail,
             }),
           }
         )

@@ -194,14 +194,14 @@ npm run build
 On successful purchase, the webhook automatically tags the customer in ConvertKit.
 
 ### Configuration
-- **API Secret**: Stored in `CONVERTKIT_API_SECRET` (Cloudflare secret)
+- **API Secret**: Stored in `CONVERTKIT_API_SECRET` (Cloudflare secret) - Get from ConvertKit → Settings → Advanced → API
 - **Tag ID**: Stored in `CONVERTKIT_COURSE_TAG_ID` (Cloudflare secret)
-- **API Version**: V4 (uses Bearer token auth)
+- **API Version**: V3 (uses api_secret in request body)
 
 ### How it works
 1. Stripe webhook fires after successful payment
 2. API extracts customer email from Stripe session
-3. API calls ConvertKit V4 API to add tag to subscriber
+3. API calls ConvertKit V3 API to add tag to subscriber
 4. ConvertKit triggers any automations linked to that tag
 
 ### Updating the tag

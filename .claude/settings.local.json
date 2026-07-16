@@ -35,7 +35,10 @@
       "Bash(bun add:*)",
       "Bash(tree:*)",
       "Bash(npx wrangler secret put:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" ./node_modules/.bin/wrangler secret put:*)"
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" ./node_modules/.bin/wrangler secret put:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" timeout 10 ./node_modules/.bin/wrangler tail:*)",
+      "Bash(curl:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" ./node_modules/.bin/wrangler deploy:*)"
     ]
   }
 }
