@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { supabase, Course, Lesson } from '../lib/supabase'
+import { supabase, Course, LessonPreview } from '../lib/supabase'
 
 export default function CourseLanding() {
   const { slug } = useParams<{ slug: string }>()
@@ -9,7 +9,7 @@ export default function CourseLanding() {
   const { isSignedIn } = useAuth()
 
   const [course, setCourse] = useState<Course | null>(null)
-  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [lessons, setLessons] = useState<LessonPreview[]>([])
   const [loading, setLoading] = useState(true)
   const [alreadyPurchased, setAlreadyPurchased] = useState(false)
 

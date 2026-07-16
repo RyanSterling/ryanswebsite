@@ -29,6 +29,14 @@ export interface Lesson {
   created_at: string
 }
 
+// Partial lesson for curriculum preview (only fetches subset of fields)
+export interface LessonPreview {
+  id: string
+  title: string
+  duration_seconds: number | null
+  order_index: number
+}
+
 export interface Purchase {
   id: string
   user_id: string
