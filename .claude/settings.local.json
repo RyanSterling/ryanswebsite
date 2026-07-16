@@ -33,7 +33,9 @@
       "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
       "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
       "Bash(bun add:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npx wrangler secret put:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" ./node_modules/.bin/wrangler secret put:*)"
     ]
   }
 }

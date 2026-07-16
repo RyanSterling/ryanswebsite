@@ -16,6 +16,9 @@ type Bindings = {
   STRIPE_WEBHOOK_SECRET: string
   SUPABASE_URL: string
   SUPABASE_SERVICE_KEY: string
+  // ConvertKit for email sequences
+  CONVERTKIT_API_SECRET: string
+  CONVERTKIT_COURSE_TAG_ID: string
 }
 
 // Stored result includes everything needed to display the results page
@@ -1155,6 +1158,33 @@ app.post('/webhooks/stripe', async (c) => {
     }
 
     console.log('Purchase recorded:', { userId, courseId, paymentId })
+
+    // Tag user in ConvertKit for email sequence (V4 API)
+    const customerEmail = session.customer_email
+    if (customerEmail && c.env.CONVERTKIT_API_SECRET && c.env.CONVERTKIT_COURSE_TAG_ID) {
+      try {
+        const ckResponse = await fetch(
+          `https://api.convertkit.com/v4/tags/${c.env.CONVERTKIT_COURSE_TAG_ID}/subscribers`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${c.env.CONVERTKIT_API_SECRET}`,
+            },
+            body: JSON.stringify({
+              email_address: customerEmail,
+            }),
+          }
+        )
+        if (ckResponse.ok) {
+          console.log('Tagged user in ConvertKit:', customerEmail)
+        } else {
+          console.error('ConvertKit tagging failed:', await ckResponse.text())
+        }
+      } catch (ckError) {
+        console.error('ConvertKit API error:', ckError)
+      }
+    }
   }
 
   return c.json({ received: true })
