@@ -9,6 +9,7 @@ import ProfileAudit from './pages/ProfileAudit'
 import AuditThankYou from './pages/AuditThankYou'
 import PromptPage from './pages/PromptPage'
 import PromptOptIn from './pages/PromptOptIn'
+import LinkInBio from './pages/LinkInBio'
 
 // Course pages
 import Courses from './pages/Courses'
@@ -24,6 +25,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/link-in-bio" element={<LinkInBio />} />
       <Route path="/challenge" element={<Challenge />} />
       <Route path="/challenge-success" element={<ChallengeSuccess />} />
       <Route path="/assessment" element={<Assessment />} />
