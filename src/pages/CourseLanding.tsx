@@ -6,7 +6,7 @@ import { supabase, Course, LessonPreview } from '../lib/supabase'
 export default function CourseLanding() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, userId } = useAuth()
 
   const [course, setCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<LessonPreview[]>([])
@@ -47,12 +47,13 @@ export default function CourseLanding() {
   // Check if user already purchased this course
   useEffect(() => {
     async function checkPurchase() {
-      if (!isSignedIn || !course) return
+      if (!isSignedIn || !userId || !course) return
 
       const { data } = await supabase
         .from('purchases')
         .select('id')
         .eq('course_id', course.id)
+        .eq('user_id', userId)
         .limit(1)
 
       if (data && data.length > 0) {
@@ -61,7 +62,7 @@ export default function CourseLanding() {
     }
 
     checkPurchase()
-  }, [isSignedIn, course])
+  }, [isSignedIn, userId, course])
 
   const handleBuy = () => {
     if (!isSignedIn) {
