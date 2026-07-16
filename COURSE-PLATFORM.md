@@ -118,9 +118,42 @@ npm run build
 
 ## Common Tasks
 
-### Add a new course
-1. Insert row into `courses` table in Supabase
-2. Add lessons to `lessons` table with matching `course_id`
+### Add a new course (FULL CHECKLIST)
+
+**1. Supabase - Create the course**
+- [ ] Insert row into `courses` table:
+  - `slug`: URL-friendly name (e.g., `instagram-growth-101`)
+  - `title`: Display name
+  - `description`: Sales page description
+  - `price_cents`: Price in cents (e.g., 2900 = $29)
+  - `thumbnail_url`: Course image URL (optional)
+  - `published`: Set to `true` when ready
+
+**2. Supabase - Add lessons**
+- [ ] Insert rows into `lessons` table with matching `course_id`:
+  - `title`: Lesson title
+  - `video_url`: Video embed URL
+  - `order_index`: Sort order (0, 1, 2, ...)
+  - `duration_seconds`: Video length in seconds
+  - `description`: Optional lesson description
+
+**3. ConvertKit - Create email sequence tag**
+- [ ] Go to ConvertKit → Subscribers → Tags
+- [ ] Create a new tag for this course (e.g., "Purchased: Course Name")
+- [ ] Copy the tag ID from the URL (e.g., `https://app.convertkit.com/tags/21232701`)
+- [ ] **If using a different tag per course**: Update `CONVERTKIT_COURSE_TAG_ID` in:
+  - `api/.dev.vars` (local)
+  - Cloudflare secrets: `wrangler secret put CONVERTKIT_COURSE_TAG_ID`
+  - Then redeploy API: `cd api && npm run deploy`
+
+**4. Test the flow**
+- [ ] Visit `/courses/{slug}` - verify landing page shows correctly
+- [ ] Click "Get Instant Access" - should redirect to checkout
+- [ ] Complete purchase with 100% off coupon
+- [ ] Verify purchase appears in Supabase `purchases` table
+- [ ] Verify user is tagged in ConvertKit
+- [ ] Verify course appears in dashboard
+- [ ] Verify course content is accessible
 
 ### Test payments
 1. Create a 100% off coupon in Stripe (Live mode)
@@ -155,6 +188,35 @@ npm run build
    - Handles duplicates gracefully (idempotent)
 
 6. **Dashboard** queries purchases table and shows owned courses
+
+## ConvertKit Integration
+
+On successful purchase, the webhook automatically tags the customer in ConvertKit.
+
+### Configuration
+- **API Secret**: Stored in `CONVERTKIT_API_SECRET` (Cloudflare secret)
+- **Tag ID**: Stored in `CONVERTKIT_COURSE_TAG_ID` (Cloudflare secret)
+- **API Version**: V4 (uses Bearer token auth)
+
+### How it works
+1. Stripe webhook fires after successful payment
+2. API extracts customer email from Stripe session
+3. API calls ConvertKit V4 API to add tag to subscriber
+4. ConvertKit triggers any automations linked to that tag
+
+### Updating the tag
+To change which tag is applied:
+```bash
+cd api
+echo "NEW_TAG_ID" | ./node_modules/.bin/wrangler secret put CONVERTKIT_COURSE_TAG_ID
+./node_modules/.bin/wrangler deploy
+```
+
+### Multiple courses with different tags
+Currently uses a single tag for all courses. To support per-course tags:
+1. Add a `convertkit_tag_id` column to `courses` table
+2. Pass tag ID through Stripe metadata
+3. Update webhook handler to use course-specific tag
 
 ## CORS Configuration
 
