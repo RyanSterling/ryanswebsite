@@ -10,10 +10,15 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
-    title: 'Get Your Personal Growth Audit',
-    description: "I'll review your content and tell you exactly what to fix",
+    title: 'Personal Growth Audit',
+    description: "I'll personally review your content and tell you exactly what to fix",
     to: '/profile-audit',
     featured: true,
+  },
+  {
+    title: 'Free Growth Audit',
+    description: 'Get an instant AI-powered analysis of your content',
+    to: '/assessment',
   },
   // Add more links here as needed:
   // {
