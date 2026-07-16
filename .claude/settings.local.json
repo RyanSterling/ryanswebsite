@@ -17,7 +17,23 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc --noEmit)",
       "WebFetch(domain:whisperai.com)",
-      "WebFetch(domain:apify.com)"
+      "WebFetch(domain:apify.com)",
+      "Bash(/usr/local/bin/npm run deploy)",
+      "Bash(export PATH=\"/usr/local/bin:$PATH\")",
+      "Bash(npm run deploy:*)",
+      "Bash(cd:*)",
+      "Bash(npx wrangler deploy:*)",
+      "Bash(/opt/homebrew/bin/npx wrangler deploy)",
+      "Bash(source ~/.zshrc)",
+      "Bash(npm install:*)",
+      "Bash(netlify deploy:*)",
+      "Bash(netlify link:*)",
+      "Bash(netlify sites:list:*)",
+      "Bash(/opt/homebrew/bin/npm install @tailwindcss/typography)",
+      "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
+      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
+      "Bash(bun add:*)",
+      "Bash(tree:*)"
     ]
   }
 }

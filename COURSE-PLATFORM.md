@@ -162,6 +162,7 @@ API allows requests from:
 - `http://localhost:5173` (local dev)
 - `http://localhost:5174` (local dev alternate port)
 - `https://ryansterling.com`
+- `https://www.ryansterling.com`
 - `https://ryansterlingconsulting.com`
 
 Update in `api/src/index.ts` if deploying to new domains.

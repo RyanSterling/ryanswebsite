@@ -118,7 +118,7 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS for frontend
 app.use('*', cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://ryansterling.com', 'https://ryansterlingconsulting.com'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://ryansterling.com', 'https://www.ryansterling.com', 'https://ryansterlingconsulting.com'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   allowHeaders: ['Content-Type'],
 }))
