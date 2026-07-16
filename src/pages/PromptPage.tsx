@@ -142,8 +142,9 @@ export default function PromptPage() {
       </div>
 
       {/* Prompt Content - Fixed height with scroll */}
-      <section className="bg-brand-card rounded-2xl p-6 md:p-8 mb-12 max-h-[600px] overflow-y-auto">
-        <div className="prose prose-invert max-w-none
+      <section className="relative mb-12">
+        <div className="bg-brand-card rounded-2xl p-6 md:p-8 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500">
+          <div className="prose prose-invert max-w-none
           prose-headings:font-soehne
           prose-h1:text-3xl prose-h1:font-bold prose-h1:text-white prose-h1:mt-8 prose-h1:mb-4 prose-h1:border-b prose-h1:border-gray-700 prose-h1:pb-3
           prose-h2:text-2xl prose-h2:font-semibold prose-h2:text-white prose-h2:mt-8 prose-h2:mb-3
@@ -160,7 +161,10 @@ export default function PromptPage() {
           prose-td:border-gray-700 prose-td:py-2 prose-td:px-4
         ">
           <ReactMarkdown>{body}</ReactMarkdown>
+          </div>
         </div>
+        {/* Bottom fade to indicate scrollable content */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-brand-card to-transparent rounded-b-2xl pointer-events-none"></div>
       </section>
 
       {/* Upsell CTA */}
