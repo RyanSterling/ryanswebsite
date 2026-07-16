@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "^4.4.0"
+    "hono": "^4.4.0",
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.45.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240620.0",

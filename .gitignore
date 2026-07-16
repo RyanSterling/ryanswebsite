@@ -27,3 +27,6 @@ api/.dev.vars.save
 
 # Logs
 *.log
+
+# Local Netlify folder
+.netlify

@@ -1,13 +1,21 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
 type Bindings = {
   OPENAI_API_KEY: string
   ANTHROPIC_API_KEY: string
+  ASSEMBLYAI_API_KEY: string
   APIFY_PROFILE_URL: string
   APIFY_REEL_URL: string
   N8N_EMAIL_WEBHOOK: string
   RESULTS_KV: KVNamespace
+  // Stripe + Supabase for courses
+  STRIPE_SECRET_KEY: string
+  STRIPE_WEBHOOK_SECRET: string
+  SUPABASE_URL: string
+  SUPABASE_SERVICE_KEY: string
 }
 
 // Stored result includes everything needed to display the results page
@@ -190,44 +198,99 @@ app.post('/assess', async (c) => {
 
     console.log('Got profile and', reels.length, 'reels')
 
-    // Step 2: Filter to mature reels (48+ hours old) to ensure reliable view counts
-    const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000
+    // Step 2: Filter to mature reels (12+ hours old) to ensure reliable view counts
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000
     const now = new Date()
 
     const matureReels = reels.filter(reel => {
       const reelAge = now.getTime() - new Date(reel.timestamp).getTime()
-      return reelAge >= FORTY_EIGHT_HOURS
+      return reelAge >= TWELVE_HOURS
     })
 
-    // Use all mature reels, or fall back to the 3 oldest if none are mature enough
-    let reelsToAnalyze: typeof reels
+    // Get candidate reels: mature ones first, or oldest if none mature
+    let candidateReels: typeof reels
     if (matureReels.length > 0) {
-      reelsToAnalyze = matureReels
+      candidateReels = matureReels
     } else {
-      // No mature reels, use the 3 oldest
-      reelsToAnalyze = [...reels]
+      candidateReels = [...reels]
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-        .slice(0, 3)
     }
 
-    console.log('Filtered to', reelsToAnalyze.length, 'mature reels for analysis')
+    console.log('Have', candidateReels.length, 'candidate reels to try')
 
-    // Step 3: Transcribe reels with Whisper
-    console.log('Transcribing reels with Whisper')
-    const transcripts = await transcribeReels(reelsToAnalyze, c.env.OPENAI_API_KEY)
+    // Step 3: Transcribe reels one at a time until we have 3 valid ones
+    console.log('Transcribing reels with AssemblyAI (sequential, stop at 3 valid)')
+    const TARGET_VALID_REELS = 3
+    const MIN_TRANSCRIPT_LENGTH = 50
+    const validPairs: { reel: typeof candidateReels[0]; transcript: string }[] = []
 
-    // Only check for complete transcription failures
-    // Users already confirmed they have spoken content in the stepper
-    const validTranscripts = transcripts.filter(t => {
-      const trimmed = t.trim()
-      // Only filter out our error messages (bracketed)
-      if (trimmed.startsWith('[') && trimmed.endsWith(']')) return false
-      // Filter out empty
-      if (trimmed === '') return false
-      return true
-    })
+    for (let i = 0; i < candidateReels.length && validPairs.length < TARGET_VALID_REELS; i++) {
+      const reel = candidateReels[i]
 
-    if (validTranscripts.length === 0) {
+      try {
+        if (!reel.videoUrl) {
+          console.log('Skipping reel with no video URL')
+          continue
+        }
+
+        console.log(`Transcribing candidate ${i + 1}/${candidateReels.length}, have ${validPairs.length} valid so far`)
+
+        // Submit transcription request
+        const submitResponse = await fetch('https://api.assemblyai.com/v2/transcript', {
+          method: 'POST',
+          headers: {
+            'Authorization': c.env.ASSEMBLYAI_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ audio_url: reel.videoUrl }),
+        })
+
+        if (!submitResponse.ok) {
+          console.error('AssemblyAI submit error:', submitResponse.status)
+          continue
+        }
+
+        const submitData = await submitResponse.json() as { id: string }
+
+        // Poll for completion
+        const maxAttempts = 30
+        let transcript = ''
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, 2000))
+
+          const pollResponse = await fetch(`https://api.assemblyai.com/v2/transcript/${submitData.id}`, {
+            headers: { 'Authorization': c.env.ASSEMBLYAI_API_KEY },
+          })
+
+          const pollData = await pollResponse.json() as { status: string; text?: string; error?: string }
+
+          if (pollData.status === 'completed') {
+            transcript = pollData.text || ''
+            break
+          } else if (pollData.status === 'error') {
+            break
+          }
+        }
+
+        // Validate transcript immediately
+        const trimmed = transcript.trim()
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) continue
+        if (trimmed === '') continue
+        if (trimmed.length < MIN_TRANSCRIPT_LENGTH) continue
+
+        validPairs.push({ reel, transcript: trimmed })
+        console.log(`Now have ${validPairs.length}/${TARGET_VALID_REELS} valid reels`)
+
+      } catch (error) {
+        console.error('Transcription error:', error)
+        continue
+      }
+    }
+
+    const validReels = validPairs.map(p => p.reel)
+    const validTranscripts = validPairs.map(p => p.transcript)
+
+    if (validReels.length === 0) {
       return c.json({
         error: 'We couldn\'t transcribe any of your reels. Please make sure your videos have audible speech and try again.'
       }, 400)
@@ -237,8 +300,8 @@ app.post('/assess', async (c) => {
     console.log('Analyzing with Claude')
     const result = await analyzeWithClaude({
       profile,
-      reels: reelsToAnalyze,
-      transcripts,
+      reels: validReels,
+      transcripts: validTranscripts,
       userInput: data,
     }, c.env.ANTHROPIC_API_KEY)
 
@@ -251,7 +314,7 @@ app.post('/assess', async (c) => {
       createdAt: new Date().toISOString(),
       analysis: result,
       profile: profile,
-      reels: reelsToAnalyze,
+      reels: validReels,
     }
 
     // Store for 90 days (in seconds)
@@ -268,6 +331,14 @@ app.post('/assess', async (c) => {
       handle: data.handle,
       resultsUrl: resultsUrl,
       result,
+      userResponses: {
+        problemTheySolve: data.problemTheySolve,
+        postingFrequency: data.postingFrequency,
+        avgReelLength: data.avgReelLength,
+        avgViews: data.avgViews,
+        outliersLast90Days: data.outliersLast90Days,
+        selfDiagnosis: data.selfDiagnosis,
+      },
     }, c.env.N8N_EMAIL_WEBHOOK).catch(console.error)
 
     // Step 7: Return result to frontend with profile and reel data
@@ -275,7 +346,7 @@ app.post('/assess', async (c) => {
       resultId: resultId,
       analysis: result,
       profile: profile,
-      reels: reelsToAnalyze,
+      reels: validReels,
     }
     return c.json(response)
 
@@ -328,94 +399,129 @@ app.post('/assess-stream', async (c) => {
         const reels = await reelsPromise
         console.log('Got', reels.length, 'reels')
 
-        // Step 2: Filter to mature reels (48+ hours old) to ensure reliable view counts
-        const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000
+        // Step 2: Filter to mature reels (12+ hours old) to ensure reliable view counts
+        const TWELVE_HOURS = 12 * 60 * 60 * 1000
         const now = new Date()
 
         const matureReels = reels.filter(reel => {
           const reelAge = now.getTime() - new Date(reel.timestamp).getTime()
-          return reelAge >= FORTY_EIGHT_HOURS
+          return reelAge >= TWELVE_HOURS
         })
 
-        // Use all mature reels, or fall back to the 3 oldest if none are mature enough
-        let reelsToAnalyze: typeof reels
+        // Get candidate reels: mature ones first, or oldest if none mature
+        let candidateReels: typeof reels
         if (matureReels.length > 0) {
-          reelsToAnalyze = matureReels
+          candidateReels = matureReels
         } else {
-          reelsToAnalyze = [...reels]
+          candidateReels = [...reels]
             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-            .slice(0, 3)
         }
 
-        console.log('Filtered to', reelsToAnalyze.length, 'mature reels for analysis')
+        console.log('Have', candidateReels.length, 'candidate reels to try')
 
-        // Step 3: Transcribe reels with Whisper (with progress updates)
-        console.log('Transcribing reels with Whisper')
-        const transcripts: string[] = []
-        const reelsTotal = reelsToAnalyze.length
+        // Step 3: Transcribe reels one at a time until we have 3 valid ones
+        // This avoids wasting transcription costs on music-only reels
+        console.log('Transcribing reels with AssemblyAI (sequential, stop at 3 valid)')
+        const TARGET_VALID_REELS = 3
+        const MIN_TRANSCRIPT_LENGTH = 50
+        const validPairs: { reel: typeof candidateReels[0]; transcript: string }[] = []
 
-        for (let i = 0; i < reelsToAnalyze.length; i++) {
-          sendEvent({ type: 'progress', step: 'transcribing', reelNumber: i + 1, reelsTotal })
-          const reel = reelsToAnalyze[i]
+        for (let i = 0; i < candidateReels.length && validPairs.length < TARGET_VALID_REELS; i++) {
+          const reel = candidateReels[i]
+          sendEvent({
+            type: 'progress',
+            step: 'transcribing',
+            reelNumber: validPairs.length + 1,
+            reelsTotal: TARGET_VALID_REELS
+          })
 
           try {
             if (!reel.videoUrl) {
-              transcripts.push('[No video URL]')
+              console.log('Skipping reel with no video URL')
               continue
             }
 
-            console.log('Fetching video from:', reel.videoUrl?.substring(0, 100))
-            const videoResponse = await fetch(reel.videoUrl)
-            console.log('Video fetch status:', videoResponse.status, 'size:', videoResponse.headers.get('content-length'))
-            const videoBlob = await videoResponse.blob()
-            console.log('Video blob size:', videoBlob.size)
+            console.log(`Transcribing candidate ${i + 1}/${candidateReels.length}, have ${validPairs.length} valid so far`)
+            console.log('Submitting to AssemblyAI:', reel.videoUrl?.substring(0, 100))
 
-            const formData = new FormData()
-            formData.append('file', videoBlob, 'video.mp4')
-            formData.append('model', 'whisper-1')
-            formData.append('response_format', 'text')
-
-            const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            // Submit transcription request
+            const submitResponse = await fetch('https://api.assemblyai.com/v2/transcript', {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${c.env.OPENAI_API_KEY}`,
+                'Authorization': c.env.ASSEMBLYAI_API_KEY,
+                'Content-Type': 'application/json',
               },
-              body: formData,
+              body: JSON.stringify({ audio_url: reel.videoUrl }),
             })
 
-            if (!whisperResponse.ok) {
-              const errorText = await whisperResponse.text()
-              console.error('Whisper error status:', whisperResponse.status, 'body:', errorText)
-              transcripts.push('[Transcription failed]')
+            if (!submitResponse.ok) {
+              const errorText = await submitResponse.text()
+              console.error('AssemblyAI submit error:', submitResponse.status, errorText)
+              continue // Try next reel
+            }
+
+            const submitData = await submitResponse.json() as { id: string }
+            console.log('AssemblyAI job submitted:', submitData.id)
+
+            // Poll for completion (max 60 seconds)
+            const maxAttempts = 30
+            let transcript = ''
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 2 seconds between polls
+
+              const pollResponse = await fetch(`https://api.assemblyai.com/v2/transcript/${submitData.id}`, {
+                headers: { 'Authorization': c.env.ASSEMBLYAI_API_KEY },
+              })
+
+              const pollData = await pollResponse.json() as { status: string; text?: string; error?: string }
+              console.log('AssemblyAI poll attempt', attempt + 1, 'status:', pollData.status)
+
+              if (pollData.status === 'completed') {
+                transcript = pollData.text || ''
+                break
+              } else if (pollData.status === 'error') {
+                console.error('AssemblyAI error:', pollData.error)
+                break
+              }
+              // Continue polling if 'queued' or 'processing'
+            }
+
+            // Validate transcript immediately
+            const trimmed = transcript.trim()
+
+            // Skip bracketed error messages
+            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+              console.log('Invalid transcript (error):', trimmed)
+              continue
+            }
+            // Skip empty
+            if (trimmed === '') {
+              console.log('Invalid transcript (empty)')
+              continue
+            }
+            // Skip too short - likely music/noise, not real dialogue
+            if (trimmed.length < MIN_TRANSCRIPT_LENGTH) {
+              console.log('Invalid transcript (too short):', trimmed.length, 'chars:', trimmed.substring(0, 30))
               continue
             }
 
-            const transcript = await whisperResponse.text()
-            console.log('Transcript received, length:', transcript.length, 'preview:', transcript.substring(0, 100))
-            transcripts.push(transcript)
+            // Valid! Add to our collection
+            console.log('Valid transcript, length:', trimmed.length, 'preview:', trimmed.substring(0, 100))
+            validPairs.push({ reel, transcript: trimmed })
+            console.log(`Now have ${validPairs.length}/${TARGET_VALID_REELS} valid reels`)
+
           } catch (error) {
             console.error('Transcription error for reel:', error)
-            transcripts.push('[Transcription failed]')
+            continue // Try next reel
           }
         }
 
-        // Debug: Log all transcripts
-        console.log('All transcripts:', JSON.stringify(transcripts))
+        const validReels = validPairs.map(p => p.reel)
+        const validTranscripts = validPairs.map(p => p.transcript)
 
-        // Only check for complete transcription failures
-        // Users already confirmed they have spoken content in the stepper
-        const validTranscripts = transcripts.filter(t => {
-          const trimmed = t.trim()
-          // Only filter out our error messages (bracketed)
-          if (trimmed.startsWith('[') && trimmed.endsWith(']')) return false
-          // Filter out empty
-          if (trimmed === '') return false
-          return true
-        })
+        console.log('Final valid reels count:', validReels.length)
 
-        console.log('Valid transcripts count:', validTranscripts.length)
-
-        if (validTranscripts.length === 0) {
+        if (validReels.length === 0) {
           sendEvent({
             type: 'error',
             message: 'We couldn\'t transcribe any of your reels. Please make sure your videos have audible speech and try again.'
@@ -430,8 +536,8 @@ app.post('/assess-stream', async (c) => {
 
         const result = await analyzeWithClaude({
           profile,
-          reels: reelsToAnalyze,
-          transcripts,
+          reels: validReels,
+          transcripts: validTranscripts,
           userInput: data,
         }, c.env.ANTHROPIC_API_KEY)
 
@@ -444,7 +550,7 @@ app.post('/assess-stream', async (c) => {
           createdAt: new Date().toISOString(),
           analysis: result,
           profile: profile,
-          reels: reelsToAnalyze,
+          reels: validReels,
         }
 
         await c.env.RESULTS_KV.put(resultId, JSON.stringify(storedResult), {
@@ -461,6 +567,14 @@ app.post('/assess-stream', async (c) => {
             handle: data.handle,
             resultsUrl: resultsUrl,
             result,
+            userResponses: {
+              problemTheySolve: data.problemTheySolve,
+              postingFrequency: data.postingFrequency,
+              avgReelLength: data.avgReelLength,
+              avgViews: data.avgViews,
+              outliersLast90Days: data.outliersLast90Days,
+              selfDiagnosis: data.selfDiagnosis,
+            },
           }, c.env.N8N_EMAIL_WEBHOOK)
         } catch (e) {
           console.error('N8N webhook failed:', e)
@@ -471,7 +585,7 @@ app.post('/assess-stream', async (c) => {
           resultId: resultId,
           analysis: result,
           profile: profile,
-          reels: reelsToAnalyze,
+          reels: validReels,
         }
 
         sendEvent({ type: 'complete', data: response })
@@ -591,7 +705,8 @@ async function scrapeReels(handle: string, apifyUrl: string): Promise<InstagramR
     throw new Error('No reels found. Make sure the account has public reels.')
   }
 
-  return results.slice(0, 4).map(r => {
+  // Get 6 reels to have buffer after maturity + dialogue filters
+  return results.slice(0, 6).map(r => {
     // Extract shortCode from URL if not provided directly
     let shortCode = r.shortCode || r.id || ''
     if (!shortCode && r.url) {
@@ -622,16 +737,36 @@ async function scrapeReels(handle: string, apifyUrl: string): Promise<InstagramR
 async function transcribeReels(reels: InstagramReel[], apiKey: string): Promise<string[]> {
   const transcripts: string[] = []
 
-  for (const reel of reels) {
+  for (let i = 0; i < reels.length; i++) {
+    const reel = reels[i]
+    console.log(`Transcribing reel ${i + 1}/${reels.length}`)
+
     try {
       if (!reel.videoUrl) {
+        console.log('No video URL for reel')
         transcripts.push('[No video URL]')
         continue
       }
 
+      console.log('Downloading video from:', reel.videoUrl.substring(0, 100) + '...')
+
       // Download the video
       const videoResponse = await fetch(reel.videoUrl)
+
+      if (!videoResponse.ok) {
+        console.error('Video download failed:', videoResponse.status, videoResponse.statusText)
+        transcripts.push('[Video download failed]')
+        continue
+      }
+
       const videoBlob = await videoResponse.blob()
+      console.log('Video downloaded, size:', videoBlob.size, 'bytes, type:', videoBlob.type)
+
+      if (videoBlob.size === 0) {
+        console.error('Video blob is empty')
+        transcripts.push('[Video download empty]')
+        continue
+      }
 
       // Send to Whisper API
       const formData = new FormData()
@@ -639,6 +774,7 @@ async function transcribeReels(reels: InstagramReel[], apiKey: string): Promise<
       formData.append('model', 'whisper-1')
       formData.append('response_format', 'text')
 
+      console.log('Sending to Whisper API...')
       const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
@@ -647,14 +783,17 @@ async function transcribeReels(reels: InstagramReel[], apiKey: string): Promise<
         body: formData,
       })
 
+      console.log('Whisper response status:', whisperResponse.status)
+
       if (!whisperResponse.ok) {
         const errorText = await whisperResponse.text()
-        console.error('Whisper error:', errorText)
+        console.error('Whisper error:', whisperResponse.status, errorText)
         transcripts.push('[Transcription failed]')
         continue
       }
 
       const transcript = await whisperResponse.text()
+      console.log('Transcript received, length:', transcript.length)
       transcripts.push(transcript)
 
     } catch (error) {
@@ -663,6 +802,7 @@ async function transcribeReels(reels: InstagramReel[], apiKey: string): Promise<
     }
   }
 
+  console.log('All transcripts:', transcripts.map(t => t.substring(0, 50) + '...'))
   return transcripts
 }
 
@@ -682,6 +822,7 @@ async function analyzeWithClaude(data: {
 Write like a direct coach giving honest feedback. Be specific—reference their actual bio text, hook words, and topics. Avoid corporate language ("leverage", "optimize", "synergy") and empty validation ("Great job on X!"). Just tell them what's working, what isn't, and what to do about it.
 
 IMPORTANT GUIDELINES:
+- ADDRESS THE CREATOR DIRECTLY using "you" and "your" — never "she/he/they" or "the creator". You're talking TO them, not about them.
 - Never tell them to delete content. Focus on what to do differently in FUTURE content.
 - Use intellectually honest language. Say "this likely performed better because..." not "this performed better because..." — you're forming hypotheses based on limited data, not stating facts.
 - When writing hook rewrites, MATCH THEIR VOICE. Analyze how they speak in the transcripts (casual vs formal, direct vs storytelling, first-person vs second-person) and write hooks that sound like them, not like a copywriter.
@@ -737,10 +878,10 @@ Suggested rewrite: If verdict is not "Clear", provide a rewritten bio that fixes
 ### 3. CONTENT ANALYSIS (per reel)
 For each reel, analyze:
 
-**Idea Quality**: Does this topic match what their market desires?
-- If strong: Explain why it likely resonated (reference market desires)
-- If weak/misaligned: Explain why the market likely didn't care about this topic
-- If weak: Show how to REPOSITION the same core idea to hit market desires better
+**Idea Quality**: Is this a topic their audience actively wants to learn about or relates to?
+- If strong: Explain why it likely resonated (connects to a real desire or pain point)
+- If weak: The topic itself doesn't connect to something they actively care about
+- Note: Topic variety is fine if each piece still serves the same audience. The algorithm matches content to interested viewers on a piece-by-piece basis. Only mark "misaligned" if the topic is completely outside their world (e.g., a fitness coach posting about cryptocurrency).
 
 **Hook Analysis**:
 - Extract the hook: typically the first sentence. If the first sentence doesn't stand alone or make sense without context, include the second sentence.
@@ -753,8 +894,8 @@ Compare view counts to their stated average (${data.userInput.avgViews}). If one
 ### 4. PRIMARY BOTTLENECK
 Pick ONE: HOOKS | NICHE | IDEAS | BIO
 - HOOKS = The topics are good but the first 3-5 seconds don't create curiosity
-- NICHE = Bio and content don't align, algorithm can't categorize them
-- IDEAS = Topics don't match what their market actually searches for/wants
+- NICHE = Content is COMPLETELY unrelated to their stated niche (e.g., a fitness coach posting about cryptocurrency). Note: The algorithm is interest-based and matches individual pieces well, so varied topics within the same general world (e.g., mom life + money + planning) are fine. Only flag NICHE if content is truly random.
+- IDEAS = The topics aren't things their audience actively searches for or cares about
 - BIO = Bio is unclear, fluffy, or doesn't speak to real desires
 
 Explain in 2-3 sentences why this is likely their #1 issue. Reference their specific content.
@@ -863,19 +1004,27 @@ Explain in 2-3 sentences why this is likely their #1 issue. Reference their spec
 // N8N Email Notification
 // ============================================
 
-async function sendToN8N(data: {
+async function sendToN8N(payload: {
   email: string
   handle: string
   resultsUrl: string
   result: AssessmentResult
+  userResponses: {
+    problemTheySolve: string
+    postingFrequency: string
+    avgReelLength: string
+    avgViews: string
+    outliersLast90Days: string
+    selfDiagnosis: string
+  }
 }, webhookUrl: string): Promise<void> {
   console.log('Sending to N8N webhook:', webhookUrl)
-  console.log('Payload email:', data.email, 'handle:', data.handle)
+  console.log('Payload email:', payload.email, 'handle:', payload.handle)
 
   const response = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   })
 
   console.log('N8N webhook response status:', response.status)
@@ -884,5 +1033,131 @@ async function sendToN8N(data: {
     console.error('N8N webhook error:', text)
   }
 }
+
+// ============================================
+// STRIPE CHECKOUT & WEBHOOK FOR COURSES
+// ============================================
+
+interface CheckoutRequest {
+  course_id: string
+  course_slug: string
+  user_id: string
+  user_email: string
+  price_cents: number
+  course_title: string
+  origin_url: string
+}
+
+// Create Stripe Checkout Session
+app.post('/create-checkout-session', async (c) => {
+  const data = await c.req.json<CheckoutRequest>()
+
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20',
+  })
+
+  // Use the origin URL from the request (localhost in dev, ryansterling.com in prod)
+  const baseUrl = data.origin_url || 'https://ryansterling.com'
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: data.course_title,
+            },
+            unit_amount: data.price_cents,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      allow_promotion_codes: true,
+      success_url: `${baseUrl}/dashboard?purchased=${data.course_slug}`,
+      cancel_url: `${baseUrl}/courses/${data.course_slug}`,
+      customer_email: data.user_email,
+      metadata: {
+        user_id: data.user_id,
+        course_id: data.course_id,
+        course_slug: data.course_slug,
+      },
+    })
+
+    return c.json({ url: session.url })
+  } catch (error) {
+    console.error('Stripe checkout error:', error)
+    return c.json({ error: 'Failed to create checkout session' }, 500)
+  }
+})
+
+// Stripe Webhook - handles successful payments
+app.post('/webhooks/stripe', async (c) => {
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20',
+  })
+
+  const signature = c.req.header('stripe-signature')
+  if (!signature) {
+    return c.json({ error: 'Missing signature' }, 400)
+  }
+
+  const body = await c.req.text()
+
+  let event: Stripe.Event
+  try {
+    event = await stripe.webhooks.constructEventAsync(
+      body,
+      signature,
+      c.env.STRIPE_WEBHOOK_SECRET
+    )
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err)
+    return c.json({ error: 'Invalid signature' }, 400)
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session
+
+    const userId = session.metadata?.user_id
+    const courseId = session.metadata?.course_id
+    const paymentId = session.payment_intent as string
+
+    if (!userId || !courseId) {
+      console.error('Missing metadata in checkout session')
+      return c.json({ error: 'Missing metadata' }, 400)
+    }
+
+    // Insert purchase into Supabase
+    const supabase = createClient(
+      c.env.SUPABASE_URL,
+      c.env.SUPABASE_SERVICE_KEY
+    )
+
+    const { error: insertError } = await supabase
+      .from('purchases')
+      .insert({
+        user_id: userId,
+        course_id: courseId,
+        stripe_payment_id: paymentId,
+      })
+
+    if (insertError) {
+      // Check if it's a duplicate (idempotent)
+      if (insertError.code === '23505') {
+        console.log('Purchase already exists, skipping')
+      } else {
+        console.error('Failed to insert purchase:', insertError)
+        return c.json({ error: 'Failed to record purchase' }, 500)
+      }
+    }
+
+    console.log('Purchase recorded:', { userId, courseId, paymentId })
+  }
+
+  return c.json({ received: true })
+})
 
 export default app

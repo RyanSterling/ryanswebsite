@@ -10,6 +10,16 @@ import AuditThankYou from './pages/AuditThankYou'
 import PromptPage from './pages/PromptPage'
 import PromptOptIn from './pages/PromptOptIn'
 
+// Course pages
+import Courses from './pages/Courses'
+import CourseLanding from './pages/CourseLanding'
+import Dashboard from './pages/Dashboard'
+import CourseViewer from './pages/CourseViewer'
+import Checkout from './pages/Checkout'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import ProtectedRoute from './components/ProtectedRoute'
+
 function App() {
   return (
     <Routes>
@@ -23,6 +33,40 @@ function App() {
       <Route path="/audit-thank-you" element={<AuditThankYou />} />
       <Route path="/prompts/:slug" element={<PromptPage />} />
       <Route path="/get/:slug" element={<PromptOptIn />} />
+
+      {/* Auth */}
+      <Route path="/sign-in/*" element={<SignIn />} />
+      <Route path="/sign-up/*" element={<SignUp />} />
+
+      {/* Courses - Public */}
+      <Route path="/courses" element={<Courses />} />
+      <Route path="/courses/:slug" element={<CourseLanding />} />
+
+      {/* Courses - Protected */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/:slug/learn"
+        element={
+          <ProtectedRoute>
+            <CourseViewer />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checkout/:slug"
+        element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   )
 }
