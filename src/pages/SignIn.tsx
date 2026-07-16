@@ -18,7 +18,7 @@ export default function SignIn() {
           variables: {
             colorPrimary: '#FF5125',
           },
-        }}
+        } as any}
       />
     </main>
   )

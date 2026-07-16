@@ -18,7 +18,7 @@ export default function SignUp() {
           variables: {
             colorPrimary: '#FF5125',
           },
-        }}
+        } as any}
       />
     </main>
   )
