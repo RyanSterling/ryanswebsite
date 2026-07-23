@@ -1,5 +1,4 @@
 import { CreatorProfile, isLesson1Complete } from './types'
-import Tooltip from './Tooltip'
 import HelpDrawer from './HelpDrawer'
 
 interface Props {
@@ -64,7 +63,28 @@ export default function Lesson1Form({ data, onChange }: Props) {
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">
-            What is the #1 problem you help people solve?
+            <HelpDrawer
+              explanation="Name the specific pain point your audience feels — something they'd actually say out loud or type into Google. Avoid vague terms like 'struggle' or 'issues.' The more concrete, the better your content ideas."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "Athletes get overlooked because coaches never see their film",
+                  note: "Specific and visceral — not 'recruiting is hard'"
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "They spend 2 hours every night figuring out dinner",
+                  note: "Names the daily friction they actually feel"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "Their photos look flat and amateur even after editing",
+                  note: "The gap between where they are and where they want to be"
+                }
+              ]}
+            >
+              What is the #1 problem you help people solve?
+            </HelpDrawer>
           </label>
           <textarea
             value={data.core_problem}
@@ -76,9 +96,28 @@ export default function Lesson1Form({ data, onChange }: Props) {
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">
-            <Tooltip text="The transformation or outcome you help people achieve.">
+            <HelpDrawer
+              explanation="Describe the outcome or transformation — what's different after they work with you? Focus on results, not methods. This isn't what you teach; it's what they get."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "Get their highlight reel in front of college coaches",
+                  note: "The result, not the process of making the reel"
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "Have a week of dinners ready in 2 hours on Sunday",
+                  note: "Specific outcome they can picture"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "Make their photos look professional without spending hours editing",
+                  note: "The after state, not the editing techniques"
+                }
+              ]}
+            >
               What do you help people do?
-            </Tooltip>
+            </HelpDrawer>
           </label>
           <textarea
             value={data.what_you_do}
@@ -90,9 +129,28 @@ export default function Lesson1Form({ data, onChange }: Props) {
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">
-            <Tooltip text="Your unique insight or expertise that sets you apart.">
+            <HelpDrawer
+              explanation="This is your edge — the insight, method, or perspective that makes your approach different. It's the thing you wish everyone knew, or the mistake you see people making that you know how to fix."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "Coaches decide in the first 8 seconds — most highlight reels bury the best plays",
+                  note: "An insight that changes how they'd approach it"
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "You don't need 20 recipes — you need 5 base meals with variations",
+                  note: "A reframe that simplifies everything"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "90% of the 'look' comes from 3 sliders, not presets",
+                  note: "The shortcut others don't know about"
+                }
+              ]}
+            >
               What do you know that most don't?
-            </Tooltip>
+            </HelpDrawer>
           </label>
           <textarea
             value={data.what_you_teach}
