@@ -77,13 +77,13 @@ export default function Lesson2Form({ data, onChange }: Props) {
               },
               {
                 label: "Helps busy moms meal prep",
-                value: "Have dinners planned → Stop dreading 5pm every day → Have one less thing draining me → Actually have something left for myself",
-                note: "The core isn't 'be a good mom' — it's having anything left for herself."
+                value: "Have dinners planned → Stop dreading 5pm every day → Have one less thing draining me → Have energy to actually enjoy my evening",
+                note: "The core isn't 'be a good mom' — it's not being empty by 8pm."
               },
               {
                 label: "Teaches photographers to edit in Lightroom",
-                value: "Make photos look professional → Not be embarrassed to share them → Feel like I'm actually improving → Have something to show for the time I spend on this",
-                note: "The core is validation that the hobby is worth the effort."
+                value: "Make photos look professional → Not be embarrassed to share them → Feel like I'm actually improving → Feel like a photographer, not just someone with an expensive camera",
+                note: "The core is identity — am I actually this thing, or just pretending?"
               }
             ]}
           >

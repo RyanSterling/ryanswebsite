@@ -1,6 +1,6 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** L1 content locked. L2-L5 content next, then Prompt A.
+> **Status:** L1 + L2 content locked. L3-L5 content next, then Prompt A.
 > **Last updated:** 2026-07-23
 > **Owner:** Ryan (R Sterling LLC)
 
@@ -511,9 +511,35 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 ---
 
-#### Lesson 2: What They Actually Want `[OPEN]`
+#### Lesson 2: What They Actually Want `[LOCKED]`
 
-*Content TBD*
+**Core concept:** Desire laddering. Your audience has desires, but the surface-level desire is a small room. When you keep asking "why do they want that?" you dig down to the emotional core — which is always more universal. The last rung of the ladder is where your reach lives.
+
+**The aha moment:** "I've been making content about the *thing they want* when I should be making content about *why they want it*. The topic I've been stuck on is at the surface — of course only my followers care. The emotional core is where strangers connect."
+
+**Key teaching points:**
+1. Each rung must answer WHY, not what happens next. "Get recruited → Play college ball" is wrong (goal sequence). "Get recruited → Keep playing the sport I love" is right (emotional why).
+2. The last rung is always more universal than the first. "Get recruited" = only HS athletes care. "Not have the dream die" = everyone understands that fear.
+3. The three dimensions (urgency, staying power, scope) help you pick which desires are worth building content around.
+
+**Video structure:**
+1. Who is your person? Not a demographic — a specific person with a situation.
+2. What do they want? List 3 desires. Surface level is fine for now.
+3. But why? Introduce the ladder. Keep asking "so they can what?"
+4. The punchline: the last rung is always the bigger room.
+5. Score it: urgency, staying power, scope.
+6. Walk through the form with examples.
+
+**Fields filled:** audience_description, desire_1-3 (laddered), urgency_read, staying_power_read, scope_estimate
+
+**Teaching vs. form:** The laddering concept MUST be explained in video — without it, the form feels like busywork. The dimensions (urgency/staying power/scope) can be handled by HelpDrawer with examples. The ladder UI progressively reveals rungs to guide the exercise.
+
+**HelpDrawer examples (consistent across course):**
+- Football recruiting coach: "Get recruited → Keep playing the sport I love → Know the early mornings meant something → Not have the dream die"
+- Meal prep mom: "Have dinners planned → Stop dreading 5pm every day → Have one less thing draining me → Have energy to actually enjoy my evening"
+- Lightroom photographer: "Make photos look professional → Not be embarrassed to share them → Feel like I'm actually improving → Feel like a photographer, not just someone with an expensive camera"
+
+**Why these examples work:** Each ladder shows WHY chains (not goal sequences), and the last rung hits a specific, visceral emotional core — not vague platitudes like "feel like a good mom" or "be proud."
 
 ---
 
