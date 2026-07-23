@@ -3,6 +3,7 @@
 // Lesson 1: Creator Profile
 export interface CreatorProfile {
   niche: string
+  core_problem: string
   what_you_do: string
   what_you_teach: string
 }
@@ -75,6 +76,7 @@ export function createEmptyFormData(): FlopProofFormData {
   return {
     lesson1: {
       niche: '',
+      core_problem: '',
       what_you_do: '',
       what_you_teach: '',
     },
@@ -115,7 +117,7 @@ export function createEmptyFormData(): FlopProofFormData {
 
 // Validation helpers
 export function isLesson1Complete(data: CreatorProfile): boolean {
-  return !!(data.niche.trim() && data.what_you_do.trim() && data.what_you_teach.trim())
+  return !!(data.niche.trim() && data.core_problem.trim() && data.what_you_do.trim() && data.what_you_teach.trim())
 }
 
 export function isDesireLadderComplete(ladder: DesireLadder): boolean {

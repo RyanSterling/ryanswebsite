@@ -44,6 +44,18 @@ export default function Lesson1Form({ data, onChange }: Props) {
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">
+            What is the #1 problem you help people solve?
+          </label>
+          <textarea
+            value={data.core_problem}
+            onChange={(e) => updateField('core_problem', e.target.value)}
+            rows={2}
+            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">
             <Tooltip text="The transformation or outcome you help people achieve.">
               What do you help people do?
             </Tooltip>
