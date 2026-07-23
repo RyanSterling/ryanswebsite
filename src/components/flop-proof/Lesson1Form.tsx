@@ -1,5 +1,6 @@
 import { CreatorProfile, isLesson1Complete } from './types'
 import Tooltip from './Tooltip'
+import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: CreatorProfile
@@ -30,9 +31,28 @@ export default function Lesson1Form({ data, onChange }: Props) {
       <div className="space-y-5">
         <div>
           <label className="block text-gray-300 text-sm mb-2">
-            <Tooltip text="The main topic area you create content about.">
+            <HelpDrawer
+              explanation="Pick the broadest topic area where your expertise is credible and all your content ideas would be relevant. The follow-up questions handle the specifics — this just sets the domain."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "Football",
+                  note: "Not \"high school football recruiting\" — the other fields capture that specificity"
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "Cooking",
+                  note: "Not \"healthy meal prep for moms\" — keep it to the domain"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "Photography",
+                  note: "Not \"Lightroom editing\" — that's what you teach, not the niche"
+                }
+              ]}
+            >
               Your niche
-            </Tooltip>
+            </HelpDrawer>
           </label>
           <input
             type="text"
