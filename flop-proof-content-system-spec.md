@@ -1,6 +1,6 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** UI built. Lesson content next, then Prompt A.
+> **Status:** L1 content locked. L2-L5 content next, then Prompt A.
 > **Last updated:** 2026-07-23
 > **Owner:** Ryan (R Sterling LLC)
 
@@ -482,9 +482,56 @@ Why it's promising: each targets a different psychological entry point, they're 
 
 **UI built:** `/src/components/flop-proof/` — forms for all 5 lessons + generator UI with generation counter and CSV export.
 
-**Next step:** Define what each lesson actually teaches and why. Reference `/assets/transcripts/` and `/assets/worksheets/` for source material.
+**Progressive disclosure help:** HelpDrawer component added for complex fields. Slide-in drawer with 1-3 sentence explanation + 3 consistent examples (football recruiting coach, meal prep mom, Lightroom photographer).
 
 Keep it short. The model offer is one 20-minute video at $29; anything that feels like a 6-hour curriculum breaks the "easy" promise that made the offer attractive in the first place.
+
+---
+
+### 6.1 Lesson content — what gets taught `[IN PROGRESS]`
+
+#### Lesson 1: Why Your Content Isn't Getting Views `[LOCKED]`
+
+**Core concept:** The room-size reframe. Your content isn't failing because of your hook, editing, or posting time. It's failing because the topic only appeals to a room too small to matter. The algorithm tests your video on a small audience first — if the topic only matters to your followers, it stops pushing.
+
+**The aha moment:** "Wait — my hooks weren't the problem. My editing wasn't the problem. The idea was the problem. I kept picking topics that only my followers cared about, then blaming my execution when it didn't spread."
+
+**Proof asset used:** TAM-bubbles Reel test (same hook/structure, different topics → 14K / 3K / 2K views). Concrete evidence that topic > execution.
+
+**Video structure:**
+1. Here's why your content isn't getting views (room size concept)
+2. Here's proof (TAM test results)
+3. Here's what this course does instead (skip the 100-post grind)
+4. Here's how the inputs work (fill it out, 3 tries, don't half-ass it)
+5. Walk through the 4 fields
+
+**Fields filled:** niche, core_problem, what_you_do, what_you_teach
+
+**Teaching vs. form:** The room-size concept must be explained in the video. The 4 profile fields are straightforward — HelpDrawer provides guidance, no special instruction needed in video beyond quick walkthrough with examples.
+
+---
+
+#### Lesson 2: What They Actually Want `[OPEN]`
+
+*Content TBD*
+
+---
+
+#### Lesson 3: Getting In Their Head `[OPEN]`
+
+*Content TBD*
+
+---
+
+#### Lesson 4: Reaching People Who Don't Know You `[OPEN]`
+
+*Content TBD*
+
+---
+
+#### Lesson 5: Setting Yourself Apart `[OPEN]`
+
+*Content TBD*
 
 ---
 
@@ -529,9 +576,9 @@ The structural template this offer is built against. What makes it work:
 | 8 | ~~Lesson count and length~~ | ~~Production~~ | **Answered** — 6 lessons, see §6 |
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
 | 10 | Sales page copy — **deliberately parked** until the above are real | Launch | Open |
-| 11 | What exactly gets taught in each lesson? | Video scripts, Prompt A | **Open — next step** |
+| 11 | What exactly gets taught in each lesson? | Video scripts, Prompt A | **In progress** — L1 done, see §6.1 |
 
-**Next step:** Define lesson content. What does each lesson teach, and why? Use `/assets/transcripts/` and `/assets/worksheets/` as source material.
+**Next step:** Define lesson content for L2-L5. Use `/assets/transcripts/` and `/assets/worksheets/` as source material.
 
 ---
 
