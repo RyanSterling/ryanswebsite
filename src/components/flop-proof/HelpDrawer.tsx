@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface Example {
   label: string
@@ -14,6 +15,12 @@ interface Props {
 
 export default function HelpDrawer({ children, explanation, examples }: Props) {
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Ensure we only render portal on client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -38,20 +45,8 @@ export default function HelpDrawer({ children, explanation, examples }: Props) {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen])
 
-  return (
+  const drawer = (
     <>
-      <span className="relative inline-flex items-center">
-        {children}
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className="ml-1.5 w-4 h-4 rounded-full bg-gray-700 text-gray-400 text-xs flex items-center justify-center hover:bg-gray-600 hover:text-white transition-colors"
-          aria-label="More info"
-        >
-          ?
-        </button>
-      </span>
-
       {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
@@ -85,7 +80,7 @@ export default function HelpDrawer({ children, explanation, examples }: Props) {
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
             {/* Explanation */}
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed font-normal text-base">
               {explanation}
             </p>
 
@@ -95,14 +90,14 @@ export default function HelpDrawer({ children, explanation, examples }: Props) {
               <div className="space-y-3">
                 {examples.map((example, i) => (
                   <div key={i} className="bg-brand-dark rounded-xl p-4">
-                    <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                    <div className="text-gray-500 text-xs uppercase tracking-wide mb-1 font-normal">
                       {example.label}
                     </div>
-                    <div className="text-white">
+                    <div className="text-white font-normal text-base">
                       {example.value}
                     </div>
                     {example.note && (
-                      <div className="text-gray-500 text-sm mt-2 italic">
+                      <div className="text-gray-500 text-sm mt-2 italic font-normal">
                         {example.note}
                       </div>
                     )}
@@ -113,6 +108,24 @@ export default function HelpDrawer({ children, explanation, examples }: Props) {
           </div>
         </div>
       </div>
+    </>
+  )
+
+  return (
+    <>
+      <span className="relative inline-flex items-center">
+        {children}
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="ml-1.5 w-4 h-4 rounded-full bg-gray-700 text-gray-400 text-xs flex items-center justify-center hover:bg-gray-600 hover:text-white transition-colors"
+          aria-label="More info"
+        >
+          ?
+        </button>
+      </span>
+
+      {mounted && createPortal(drawer, document.body)}
     </>
   )
 }
