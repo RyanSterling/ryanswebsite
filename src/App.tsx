@@ -21,6 +21,9 @@ import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import ProtectedRoute from './components/ProtectedRoute'
 
+// Custom course viewers
+import { FlopProofViewer } from './components/flop-proof'
+
 function App() {
   return (
     <Routes>
@@ -50,6 +53,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/flop-proof-content-system/learn"
+        element={
+          <ProtectedRoute>
+            <FlopProofViewer />
           </ProtectedRoute>
         }
       />
