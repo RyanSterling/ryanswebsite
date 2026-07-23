@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useUser } from '@clerk/react'
 import { supabase, Course, Lesson } from '../../lib/supabase'
@@ -38,6 +38,7 @@ export default function FlopProofViewer() {
   // Form state
   const [formData, setFormData] = useState<FlopProofFormData>(createEmptyFormData())
   const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
+  const hasInitializedLesson = useRef(false)
 
   // Load saved form data
   useEffect(() => {
@@ -116,8 +117,10 @@ export default function FlopProofViewer() {
       const lessonsArray = lessonData || []
       setLessons(lessonsArray)
 
-      if (lessonsArray.length > 0) {
+      // Only set initial lesson once — prevents Clerk token refresh from resetting
+      if (lessonsArray.length > 0 && !hasInitializedLesson.current) {
         setCurrentLesson(lessonsArray[0])
+        hasInitializedLesson.current = true
       }
 
       setLoading(false)
