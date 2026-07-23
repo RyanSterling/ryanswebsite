@@ -1,6 +1,6 @@
 import { AudienceData, isLesson2Complete, SCOPE_OPTIONS } from './types'
 import DesireLadder from './DesireLadder'
-import Tooltip from './Tooltip'
+import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: AudienceData
@@ -32,9 +32,28 @@ export default function Lesson2Form({ data, onChange }: Props) {
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">
-            <Tooltip text="Who specifically are you making content for? What's their situation?">
+            <HelpDrawer
+              explanation="Describe a specific person — not a demographic. Include their situation, where they're stuck, and what they're trying to do. The more real they feel, the better your content ideas will be."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "High school junior or senior athlete who's good enough to play college ball but isn't getting any looks. Parents are stressed, the kid is discouraged, and nobody knows how to get coaches' attention.",
+                  note: "A person with a situation, not 'athletes ages 16-18'"
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "Working mom with 2-3 kids who gets home at 6pm exhausted. Wants to feed her family healthy food but ends up ordering takeout 3x a week because she has no plan.",
+                  note: "Captures the daily friction they actually feel"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "Hobbyist photographer who's watched YouTube tutorials but their edited photos still look 'off.' Frustrated that presets don't look the same on their photos.",
+                  note: "Where they're stuck, not just who they are"
+                }
+              ]}
+            >
               Describe your target person
-            </Tooltip>
+            </HelpDrawer>
           </label>
           <textarea
             value={data.audience_description}
@@ -48,9 +67,28 @@ export default function Lesson2Form({ data, onChange }: Props) {
       {/* Desire Ladders */}
       <div className="bg-brand-card rounded-2xl p-6 md:p-8">
         <h3 className="font-soehne text-xl text-white mb-4">
-          <Tooltip text="List desires, then keep asking 'so they can what?' to find the deeper motivation.">
+          <HelpDrawer
+            explanation="List three things your audience wants. For each one, keep asking 'so they can what?' until you reach the emotional core. The top of the ladder is always the bigger room — that's where your reach lives."
+            examples={[
+              {
+                label: "High school football recruiting coach",
+                value: "Get recruited → Play college ball → Get a scholarship → Make their family proud",
+                note: "'Get recruited' is niche. 'Make their family proud' is universal."
+              },
+              {
+                label: "Helps busy moms meal prep",
+                value: "Have dinners planned → Stop stressing about food → Feel like a good mom → Have energy for what matters",
+                note: "The top rung connects to identity, not logistics"
+              },
+              {
+                label: "Teaches photographers to edit in Lightroom",
+                value: "Make photos look professional → Be proud of what they share → Get recognition → Feel like a real photographer",
+                note: "Surface desire is technical. Core desire is emotional."
+              }
+            ]}
+          >
             Desire Ladders
-          </Tooltip>
+          </HelpDrawer>
         </h3>
 
         <div className="space-y-4">
@@ -80,7 +118,28 @@ export default function Lesson2Form({ data, onChange }: Props) {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-gray-300 text-sm">
-                <Tooltip text="How badly does this bug them right now?">Urgency</Tooltip>
+                <HelpDrawer
+                  explanation="How pressing is this for them right now? A mild annoyance they'll get to someday (1) vs. something that keeps them up at night (5). High-urgency desires make people stop scrolling."
+                  examples={[
+                    {
+                      label: "High school football recruiting coach",
+                      value: "5 — Recruiting deadlines are real. Miss the window and you miss the scholarship.",
+                      note: "Time pressure creates urgency"
+                    },
+                    {
+                      label: "Helps busy moms meal prep",
+                      value: "4 — The stress is daily, but it's not life-or-death. Still, it compounds.",
+                      note: "Recurring friction builds urgency over time"
+                    },
+                    {
+                      label: "Teaches photographers to edit in Lightroom",
+                      value: "2-3 — It bugs them, but they're not losing sleep over it. It's a 'someday' problem.",
+                      note: "Hobby problems feel less urgent than professional ones"
+                    }
+                  ]}
+                >
+                  Urgency
+                </HelpDrawer>
               </label>
               <span className="text-brand-orange text-sm">{data.urgency_read}/5</span>
             </div>
@@ -97,7 +156,28 @@ export default function Lesson2Form({ data, onChange }: Props) {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-gray-300 text-sm">
-                <Tooltip text="Is this solved once, or does it keep coming back?">Staying Power</Tooltip>
+                <HelpDrawer
+                  explanation="Is this desire solved once and forgotten, or does it keep coming back? A one-time fix (1) vs. a recurring need (5). High staying power means your content stays relevant — evergreen, not dated."
+                  examples={[
+                    {
+                      label: "High school football recruiting coach",
+                      value: "2 — Once they're recruited, they're done. But new seniors every year keeps the market fresh.",
+                      note: "One-time per person, but recurring in the market"
+                    },
+                    {
+                      label: "Helps busy moms meal prep",
+                      value: "5 — Dinner happens every single night. The problem never goes away.",
+                      note: "Daily repetition = maximum staying power"
+                    },
+                    {
+                      label: "Teaches photographers to edit in Lightroom",
+                      value: "4 — Every new photo needs editing. The skill compounds but the need repeats.",
+                      note: "Recurring activity, even after learning"
+                    }
+                  ]}
+                >
+                  Staying Power
+                </HelpDrawer>
               </label>
               <span className="text-brand-orange text-sm">{data.staying_power_read}/5</span>
             </div>
@@ -113,7 +193,28 @@ export default function Lesson2Form({ data, onChange }: Props) {
 
           <div>
             <label className="block text-gray-300 text-sm mb-2">
-              <Tooltip text="How many people share this desire?">Scope</Tooltip>
+              <HelpDrawer
+                explanation="How many people share this desire? This is your room size — the core concept from Lesson 1. The answer changes which topics will reach past your followers."
+                examples={[
+                  {
+                    label: "High school football recruiting coach",
+                    value: "Niche specialists only — Few people care about high school recruiting. But 'making your family proud'? That's universal.",
+                    note: "The surface topic is small. The ladder-top emotion is big."
+                  },
+                  {
+                    label: "Helps busy moms meal prep",
+                    value: "Most people who scroll past — Everyone eats. Everyone knows dinner stress. Even non-parents get it.",
+                    note: "Daily universal experience = massive scope"
+                  },
+                  {
+                    label: "Teaches photographers to edit in Lightroom",
+                    value: "Followers + some strangers — Lots of hobbyist photographers, but not everyone. Broader than recruiting, narrower than food.",
+                    note: "Middle scope — reach depends on angle"
+                  }
+                ]}
+              >
+                Scope
+              </HelpDrawer>
             </label>
             <div className="space-y-2">
               {SCOPE_OPTIONS.map((option) => (
