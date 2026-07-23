@@ -68,22 +68,22 @@ export default function Lesson2Form({ data, onChange }: Props) {
       <div className="bg-brand-card rounded-2xl p-6 md:p-8">
         <h3 className="font-soehne text-xl text-white mb-4">
           <HelpDrawer
-            explanation="List three things your audience wants. For each one, keep asking 'so they can what?' until you reach the emotional core. The top of the ladder is always the bigger room — that's where your reach lives."
+            explanation="List three things your audience wants. For each one, keep asking 'why do they want that?' until you reach the emotional core. The last rung is always the bigger room — that's where your reach lives."
             examples={[
               {
                 label: "High school football recruiting coach",
-                value: "Get recruited → Play college ball → Get a scholarship → Make their family proud",
-                note: "'Get recruited' is niche. 'Make their family proud' is universal."
+                value: "Get recruited → Succeed at what they've worked years for → Prove they belong → Make their family proud",
+                note: "'Get recruited' = only HS athletes care. 'Make their family proud' = everyone gets it."
               },
               {
                 label: "Helps busy moms meal prep",
-                value: "Have dinners planned → Stop stressing about food → Feel like a good mom → Have energy for what matters",
-                note: "The top rung connects to identity, not logistics"
+                value: "Have dinners planned → Stop the 5pm panic every night → Feel in control → Feel like a good mom",
+                note: "Each rung answers WHY, not what happens next."
               },
               {
                 label: "Teaches photographers to edit in Lightroom",
-                value: "Make photos look professional → Be proud of what they share → Get recognition → Feel like a real photographer",
-                note: "Surface desire is technical. Core desire is emotional."
+                value: "Make photos look professional → Be proud of what they post → Have people notice their work → Feel like a real artist",
+                note: "Surface = technical skill. Core = identity and recognition."
               }
             ]}
           >
