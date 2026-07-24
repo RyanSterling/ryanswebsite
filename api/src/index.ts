@@ -1481,137 +1481,154 @@ related to one above, skip it and generate something else.
   return ideas
 }
 
-// POST /generate-ideas-start - Generate first batch, spawn background work for rest
+// POST /generate-ideas-start - Return immediately, generate ALL batches in background
 app.post('/generate-ideas-start', async (c) => {
   const formData = await c.req.json<FlopProofFormData>()
   const jobId = crypto.randomUUID()
 
-  console.log(`Starting job ${jobId} - generating batch 1 of ${TOTAL_BATCHES}`)
+  console.log(`Starting job ${jobId} - spawning ${TOTAL_BATCHES} batches in background`)
 
-  try {
-    // Generate first batch synchronously
-    const batch1Ideas = await generateBatch(formData, 1, [], c.env.ANTHROPIC_API_KEY)
+  // Create initial job state (no ideas yet)
+  const jobState: FlopProofJobState = {
+    jobId,
+    status: 'in_progress',
+    totalBatches: TOTAL_BATCHES,
+    completedBatches: 0,
+    batches: [],
+    formData,
+    startedAt: new Date().toISOString(),
+    completedAt: null,
+    error: null,
+  }
 
-    // Create initial job state
-    const jobState: FlopProofJobState = {
-      jobId,
-      status: 'in_progress',
-      totalBatches: TOTAL_BATCHES,
-      completedBatches: 1,
-      batches: [
-        {
-          batch: 1,
-          ideas: batch1Ideas,
-          completedAt: new Date().toISOString(),
-        },
-      ],
-      formData,
-      startedAt: new Date().toISOString(),
-      completedAt: null,
-      error: null,
-    }
+  // Save initial state to KV
+  await c.env.RESULTS_KV.put(
+    `flop-proof-job:${jobId}`,
+    JSON.stringify(jobState),
+    { expirationTtl: 24 * 60 * 60 } // 24 hours
+  )
 
-    // Save to KV
-    await c.env.RESULTS_KV.put(
-      `flop-proof-job:${jobId}`,
-      JSON.stringify(jobState),
-      { expirationTtl: 24 * 60 * 60 } // 24 hours
-    )
+  // Spawn ALL background work (batches 1-4)
+  const ctx = c.executionCtx
+  console.log(`Job ${jobId}: About to spawn ctx.waitUntil`)
+  ctx.waitUntil(
+    (async () => {
+      console.log(`Job ${jobId}: Background work starting - timestamp ${Date.now()}`)
 
-    // Spawn background work for batches 2-4
-    const ctx = c.executionCtx
-    ctx.waitUntil(
-      (async () => {
-        let allIdeas = [...batch1Ideas]
+      // Check if API key is available
+      if (!c.env.ANTHROPIC_API_KEY) {
+        console.error(`Job ${jobId}: ANTHROPIC_API_KEY is not set!`)
+        const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+        if (currentState) {
+          currentState.status = 'partial_complete'
+          currentState.completedAt = new Date().toISOString()
+          currentState.error = { batch: 0, message: 'API key not configured' }
+          await c.env.RESULTS_KV.put(`flop-proof-job:${jobId}`, JSON.stringify(currentState), { expirationTtl: 24 * 60 * 60 })
+        }
+        return
+      }
+      console.log(`Job ${jobId}: API key present, length: ${c.env.ANTHROPIC_API_KEY.length}`)
 
-        for (let batchNum = 2; batchNum <= TOTAL_BATCHES; batchNum++) {
+      try {
+        let allIdeas: GeneratedIdea[] = []
+
+        for (let batchNum = 1; batchNum <= TOTAL_BATCHES; batchNum++) {
           try {
-            console.log(`Job ${jobId}: Starting batch ${batchNum}`)
+            console.log(`Job ${jobId}: Starting batch ${batchNum} at ${new Date().toISOString()}`)
+            console.log(`Job ${jobId}: About to call generateBatch for batch ${batchNum}`)
 
-            const batchIdeas = await generateBatch(
-              formData,
-              batchNum,
-              allIdeas,
-              c.env.ANTHROPIC_API_KEY
-            )
+          const batchIdeas = await generateBatch(
+            formData,
+            batchNum,
+            allIdeas,
+            c.env.ANTHROPIC_API_KEY
+          )
 
-            allIdeas = [...allIdeas, ...batchIdeas]
+          allIdeas = [...allIdeas, ...batchIdeas]
 
-            // Read current state, update, and save
-            const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
-            if (!currentState) {
-              console.error(`Job ${jobId}: State not found in KV`)
-              return
-            }
+          // Read current state, update, and save
+          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          if (!currentState) {
+            console.error(`Job ${jobId}: State not found in KV`)
+            return
+          }
 
-            currentState.batches.push({
+          currentState.batches.push({
+            batch: batchNum,
+            ideas: batchIdeas,
+            completedAt: new Date().toISOString(),
+          })
+          currentState.completedBatches = batchNum
+
+          if (batchNum === TOTAL_BATCHES) {
+            currentState.status = 'complete'
+            currentState.completedAt = new Date().toISOString()
+          }
+
+          await c.env.RESULTS_KV.put(
+            `flop-proof-job:${jobId}`,
+            JSON.stringify(currentState),
+            { expirationTtl: 24 * 60 * 60 }
+          )
+
+          console.log(`Job ${jobId}: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
+
+        } catch (error) {
+          console.error(`Job ${jobId}: Batch ${batchNum} failed:`, error)
+
+          // Mark as partial_complete (or failed if batch 1)
+          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          if (currentState) {
+            currentState.status = batchNum === 1 ? 'partial_complete' : 'partial_complete'
+            currentState.completedAt = new Date().toISOString()
+            currentState.error = {
               batch: batchNum,
-              ideas: batchIdeas,
-              completedAt: new Date().toISOString(),
-            })
-            currentState.completedBatches = batchNum
-
-            if (batchNum === TOTAL_BATCHES) {
-              currentState.status = 'complete'
-              currentState.completedAt = new Date().toISOString()
+              message: error instanceof Error ? error.message : 'Unknown error',
             }
-
             await c.env.RESULTS_KV.put(
               `flop-proof-job:${jobId}`,
               JSON.stringify(currentState),
               { expirationTtl: 24 * 60 * 60 }
             )
-
-            console.log(`Job ${jobId}: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
-
-          } catch (error) {
-            console.error(`Job ${jobId}: Batch ${batchNum} failed:`, error)
-
-            // Mark as partial_complete
-            const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
-            if (currentState) {
-              currentState.status = 'partial_complete'
-              currentState.completedAt = new Date().toISOString()
-              currentState.error = {
-                batch: batchNum,
-                message: error instanceof Error ? error.message : 'Unknown error',
-              }
-              await c.env.RESULTS_KV.put(
-                `flop-proof-job:${jobId}`,
-                JSON.stringify(currentState),
-                { expirationTtl: 24 * 60 * 60 }
-              )
-            }
-            return // Stop processing further batches
           }
+          return // Stop processing further batches
         }
+      }
 
         console.log(`Job ${jobId}: All ${TOTAL_BATCHES} batches complete`)
-      })()
-    )
+      } catch (outerError) {
+        console.error(`Job ${jobId}: Fatal error in background work:`, outerError)
+        // Try to mark job as failed
+        try {
+          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          if (currentState && currentState.status === 'in_progress') {
+            currentState.status = 'partial_complete'
+            currentState.completedAt = new Date().toISOString()
+            currentState.error = {
+              batch: 0,
+              message: outerError instanceof Error ? outerError.message : 'Background task failed',
+            }
+            await c.env.RESULTS_KV.put(
+              `flop-proof-job:${jobId}`,
+              JSON.stringify(currentState),
+              { expirationTtl: 24 * 60 * 60 }
+            )
+          }
+        } catch (kvError) {
+          console.error(`Job ${jobId}: Failed to update KV with error state:`, kvError)
+        }
+      }
+    })()
+  )
 
-    // Return first batch immediately
-    return c.json({
-      jobId,
-      status: 'in_progress',
-      totalBatches: TOTAL_BATCHES,
-      completedBatches: 1,
-      batches: [
-        {
-          batch: 1,
-          ideas: batch1Ideas,
-          completedAt: jobState.batches[0].completedAt,
-        },
-      ],
-    })
-
-  } catch (error) {
-    console.error(`Job ${jobId}: Batch 1 failed:`, error)
-    return c.json({
-      error: 'Generation failed',
-      details: error instanceof Error ? error.message : 'Unknown error',
-    }, 500)
-  }
+  // Return immediately with jobId (no ideas yet - frontend polls for them)
+  return c.json({
+    jobId,
+    status: 'in_progress',
+    totalBatches: TOTAL_BATCHES,
+    completedBatches: 0,
+    batches: [],
+  })
 })
 
 // GET /generation-status/:jobId - Poll for job status
@@ -1633,6 +1650,106 @@ app.get('/generation-status/:jobId', async (c) => {
     startedAt: jobState.startedAt,
     completedAt: jobState.completedAt,
     error: jobState.error,
+  })
+})
+
+// ============================================
+// SSE STREAMING IDEA GENERATION (100 ideas)
+// ============================================
+// This keeps the connection open and streams batches as they complete
+// Works on free tier since it's a single long-running request, not background work
+
+app.post('/generate-ideas-stream', async (c) => {
+  const formData = await c.req.json<FlopProofFormData>()
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const sendEvent = (event: {
+        type: string
+        batch?: number
+        totalBatches?: number
+        ideas?: GeneratedIdea[]
+        allIdeas?: GeneratedIdea[]
+        error?: string
+      }) => {
+        controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(event)}\n\n`))
+      }
+
+      try {
+        console.log('Starting SSE idea generation')
+        let allIdeas: GeneratedIdea[] = []
+
+        for (let batchNum = 1; batchNum <= TOTAL_BATCHES; batchNum++) {
+          sendEvent({
+            type: 'progress',
+            batch: batchNum,
+            totalBatches: TOTAL_BATCHES,
+          })
+
+          console.log(`SSE: Starting batch ${batchNum}/${TOTAL_BATCHES}`)
+
+          try {
+            const batchIdeas = await generateBatch(
+              formData,
+              batchNum,
+              allIdeas,
+              c.env.ANTHROPIC_API_KEY
+            )
+
+            allIdeas = [...allIdeas, ...batchIdeas]
+
+            // Send batch complete event with all ideas so far
+            sendEvent({
+              type: 'batch_complete',
+              batch: batchNum,
+              totalBatches: TOTAL_BATCHES,
+              ideas: batchIdeas,
+              allIdeas: allIdeas,
+            })
+
+            console.log(`SSE: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
+
+          } catch (error) {
+            console.error(`SSE: Batch ${batchNum} failed:`, error)
+            sendEvent({
+              type: 'error',
+              batch: batchNum,
+              error: error instanceof Error ? error.message : 'Generation failed',
+              allIdeas: allIdeas, // Return what we have so far
+            })
+            controller.close()
+            return
+          }
+        }
+
+        // All batches complete
+        sendEvent({
+          type: 'complete',
+          totalBatches: TOTAL_BATCHES,
+          allIdeas: allIdeas,
+        })
+
+        console.log(`SSE: All ${TOTAL_BATCHES} batches complete, ${allIdeas.length} total ideas`)
+        controller.close()
+
+      } catch (error) {
+        console.error('SSE generation error:', error)
+        sendEvent({
+          type: 'error',
+          error: error instanceof Error ? error.message : 'Generation failed',
+        })
+        controller.close()
+      }
+    }
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+    },
   })
 })
 

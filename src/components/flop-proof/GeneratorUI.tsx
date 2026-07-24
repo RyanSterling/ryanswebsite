@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import {
   FlopProofFormData,
   isLesson1Complete,
@@ -33,23 +33,6 @@ interface GeneratedIdea {
   hook_contrarian: string
 }
 
-// Job status from API
-interface JobStatus {
-  jobId: string
-  status: 'in_progress' | 'partial_complete' | 'complete'
-  totalBatches: number
-  completedBatches: number
-  batches: Array<{
-    batch: number
-    ideas: GeneratedIdea[]
-    completedAt: string
-  }>
-  error?: { batch: number; message: string } | null
-}
-
-const POLL_INTERVAL = 5000 // 5 seconds
-const LOCALSTORAGE_KEY = 'flop-proof-job-id'
-const MAX_GENERATION_TIME = 10 * 60 * 1000 // 10 minutes timeout
 
 export default function GeneratorUI({
   formData,
@@ -66,120 +49,9 @@ export default function GeneratorUI({
   const [totalBatches, setTotalBatches] = useState(4)
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
-  const [hasCountedGeneration, setHasCountedGeneration] = useState(false)
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
   const apiUrl = import.meta.env.DEV
     ? 'http://localhost:8787'
     : 'https://ryan-website-api.rsterling20.workers.dev'
-
-  // Poll for job status
-  const pollJobStatus = useCallback(async (id: string, countGeneration: boolean, startTime: number) => {
-    console.log(`[FlopProof] Polling job ${id}...`)
-
-    // Check for timeout
-    const elapsed = Date.now() - startTime
-    if (elapsed > MAX_GENERATION_TIME) {
-      console.error(`[FlopProof] Generation timeout after ${Math.round(elapsed / 1000)}s`)
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current)
-        pollIntervalRef.current = null
-      }
-      setIsGenerating(false)
-      localStorage.removeItem(LOCALSTORAGE_KEY)
-      setJobError('Generation timed out. The server may be overloaded. Please try again.')
-      return
-    }
-
-    try {
-      const response = await fetch(`${apiUrl}/generation-status/${id}`)
-      console.log(`[FlopProof] Poll response status: ${response.status}`)
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          // Job expired or not found
-          localStorage.removeItem(LOCALSTORAGE_KEY)
-          setIsGenerating(false)
-          setJobError('Generation expired or not found. Please try again.')
-          return
-        }
-        throw new Error('Failed to fetch job status')
-      }
-
-      const data: JobStatus = await response.json()
-      console.log(`[FlopProof] Job status: ${data.status}, batches: ${data.completedBatches}/${data.totalBatches}`)
-
-      // Update state with all ideas from completed batches
-      const allIdeas = data.batches
-        .sort((a, b) => a.batch - b.batch)
-        .flatMap(b => b.ideas)
-      setGeneratedIdeas(allIdeas)
-      setCompletedBatches(data.completedBatches)
-      setTotalBatches(data.totalBatches)
-      setJobStatus(data.status)
-
-      // Count generation when we first receive ideas (batch 1 completes)
-      if (countGeneration && data.completedBatches >= 1 && !hasCountedGeneration) {
-        setHasCountedGeneration(true)
-        onUseGeneration()
-      }
-
-      // Check if done
-      if (data.status === 'complete' || data.status === 'partial_complete') {
-        console.log(`[FlopProof] Generation complete! Status: ${data.status}, ideas: ${allIdeas.length}`)
-        if (pollIntervalRef.current) {
-          clearInterval(pollIntervalRef.current)
-          pollIntervalRef.current = null
-        }
-        setIsGenerating(false)
-        localStorage.removeItem(LOCALSTORAGE_KEY)
-
-        if (data.status === 'partial_complete' && data.error) {
-          setJobError(`We generated ${allIdeas.length} ideas. Batch ${data.error.batch} failed: ${data.error.message}`)
-        }
-      }
-    } catch (error) {
-      console.error('[FlopProof] Polling error:', error)
-      // Don't stop polling on transient errors, just log
-    }
-  }, [apiUrl, hasCountedGeneration, onUseGeneration])
-
-  // Start polling
-  const startPolling = useCallback((id: string, countGeneration: boolean = false, startTime: number = Date.now()) => {
-    console.log(`[FlopProof] Starting polling for job ${id}`)
-
-    // Clear any existing interval
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current)
-    }
-
-    // Poll immediately
-    pollJobStatus(id, countGeneration, startTime)
-
-    // Then poll every POLL_INTERVAL
-    pollIntervalRef.current = setInterval(() => {
-      pollJobStatus(id, countGeneration, startTime)
-    }, POLL_INTERVAL)
-  }, [pollJobStatus])
-
-  // Check for existing job on mount (recover from page close)
-  useEffect(() => {
-    const savedJobId = localStorage.getItem(LOCALSTORAGE_KEY)
-    if (savedJobId) {
-      console.log(`[FlopProof] Recovering job: ${savedJobId}`)
-      setIsGenerating(true)
-      // Don't count generation on recovery - it was already counted
-      // Use current time as start for timeout (give it fresh 10 min window)
-      startPolling(savedJobId, false, Date.now())
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current)
-      }
-    }
-  }, [startPolling])
 
   const completionStatus = [
     { name: 'Lesson 1: Creator Profile', complete: isLesson1Complete(formData.lesson1) },
@@ -198,42 +70,105 @@ export default function GeneratorUI({
     setGeneratedIdeas([])
     setCompletedBatches(0)
     setJobStatus('in_progress')
-    setHasCountedGeneration(false)
-    const startTime = Date.now()
 
-    console.log('[FlopProof] Starting generation...')
+    console.log('[FlopProof] Starting SSE generation...')
 
     try {
-      const response = await fetch(`${apiUrl}/generate-ideas-start`, {
+      // Use fetch with SSE streaming
+      const response = await fetch(`${apiUrl}/generate-ideas-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
 
       if (!response.ok) {
-        const error = await response.json()
+        const error = await response.text()
         console.error('Generation failed:', error)
         setJobError('Generation failed. Please try again.')
         setIsGenerating(false)
         return
       }
 
-      const result: JobStatus = await response.json()
+      const reader = response.body?.getReader()
+      if (!reader) {
+        setJobError('Streaming not supported. Please try again.')
+        setIsGenerating(false)
+        return
+      }
 
-      // Store jobId in localStorage for recovery
-      localStorage.setItem(LOCALSTORAGE_KEY, result.jobId)
-      console.log(`[FlopProof] Job started: ${result.jobId}`)
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let generationCounted = false
 
-      // Update state (may have 0 batches initially)
-      setCompletedBatches(result.completedBatches)
-      setTotalBatches(result.totalBatches)
+      console.log('[FlopProof] SSE stream connected, reading events...')
 
-      // Start polling - this will count the generation when batch 1 completes
-      startPolling(result.jobId, true, startTime)
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          console.log('[FlopProof] SSE stream ended')
+          break
+        }
+
+        buffer += decoder.decode(value, { stream: true })
+
+        // Process complete SSE events (data: {...}\n\n)
+        const events = buffer.split('\n\n')
+        buffer = events.pop() || '' // Keep incomplete event in buffer
+
+        for (const eventStr of events) {
+          if (!eventStr.startsWith('data: ')) continue
+          const jsonStr = eventStr.slice(6) // Remove 'data: ' prefix
+
+          try {
+            const event = JSON.parse(jsonStr)
+            console.log(`[FlopProof] SSE event:`, event.type, event.batch || '')
+
+            if (event.type === 'progress') {
+              setCompletedBatches(event.batch - 1) // Currently working on this batch
+              setTotalBatches(event.totalBatches)
+            } else if (event.type === 'batch_complete') {
+              setGeneratedIdeas(event.allIdeas)
+              setCompletedBatches(event.batch)
+              setTotalBatches(event.totalBatches)
+
+              // Count generation when batch 1 completes
+              if (event.batch === 1 && !generationCounted) {
+                generationCounted = true
+                onUseGeneration()
+                console.log('[FlopProof] Generation counted after batch 1')
+              }
+            } else if (event.type === 'complete') {
+              console.log(`[FlopProof] All batches complete! ${event.allIdeas.length} ideas`)
+              setGeneratedIdeas(event.allIdeas)
+              setCompletedBatches(event.totalBatches)
+              setJobStatus('complete')
+              setIsGenerating(false)
+            } else if (event.type === 'error') {
+              console.error('[FlopProof] Generation error:', event.error)
+              if (event.allIdeas && event.allIdeas.length > 0) {
+                // Partial success
+                setGeneratedIdeas(event.allIdeas)
+                setJobStatus('partial_complete')
+                setJobError(`Generated ${event.allIdeas.length} ideas. Batch ${event.batch} failed: ${event.error}`)
+              } else {
+                setJobError(event.error || 'Generation failed')
+              }
+              setIsGenerating(false)
+            }
+          } catch {
+            console.error('[FlopProof] Failed to parse SSE event:', jsonStr)
+          }
+        }
+      }
+
+      // Stream ended without explicit complete event
+      if (isGenerating) {
+        setIsGenerating(false)
+      }
 
     } catch (error) {
-      console.error('Generation error:', error)
-      setJobError('Generation failed. Please check your connection and try again.')
+      console.error('[FlopProof] SSE connection error:', error)
+      setJobError('Connection lost. Please check your internet and try again.')
       setIsGenerating(false)
     }
   }
