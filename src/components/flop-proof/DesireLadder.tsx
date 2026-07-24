@@ -173,7 +173,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
           </div>
         </div>
 
-        {/* Who cares */}
+        {/* How common is this desire */}
         <div>
           <span className="text-gray-400 text-sm block mb-2">
             <HelpDrawer
@@ -181,22 +181,22 @@ export default function DesireLadder({ label, data, onChange }: Props) {
               examples={[
                 {
                   label: "High school football recruiting coach",
-                  value: "Just my audience — 'Get recruited' only matters to HS athletes. But the emotional core 'not wanting the dream to die'? Almost everyone.",
+                  value: "Very specific — 'Get recruited' only matters to HS athletes. But the emotional core 'not wanting the dream to die'? Nearly universal.",
                   note: "Surface desire is narrow. Emotional core is wide."
                 },
                 {
                   label: "Helps busy moms meal prep",
-                  value: "Almost everyone — Everyone eats dinner. Everyone knows the 5pm dread.",
+                  value: "Nearly universal — Everyone eats dinner. Everyone knows the 5pm dread.",
                   note: "Daily universal friction = wide reach"
                 },
                 {
                   label: "Teaches photographers to edit in Lightroom",
-                  value: "My audience + some strangers — Hobbyist photography is popular but not universal.",
+                  value: "Somewhat common — Hobbyist photography is popular but not universal.",
                   note: "Middle ground"
                 }
               ]}
             >
-              Who feels this way?
+              This desire is...
             </HelpDrawer>
           </span>
           <div className="flex flex-wrap gap-2">

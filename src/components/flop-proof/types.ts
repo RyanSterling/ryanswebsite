@@ -189,9 +189,9 @@ export const SOPHISTICATION_PRESCRIPTIONS: Record<1 | 2 | 3 | 4 | 5, string> = {
   5: 'Stop arguing the point. Use identity — "this is who we are."',
 }
 
-// Who cares options (plain language)
+// How common is this desire (plain language)
 export const WHO_CARES_OPTIONS = [
-  { value: 'just_my_audience', label: 'Just my audience' },
-  { value: 'some_strangers_too', label: 'My audience + some strangers' },
-  { value: 'almost_everyone', label: 'Almost everyone' },
+  { value: 'just_my_audience', label: 'Very specific' },
+  { value: 'some_strangers_too', label: 'Somewhat common' },
+  { value: 'almost_everyone', label: 'Nearly universal' },
 ] as const
