@@ -154,7 +154,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
                   }
                 ]}
               >
-                Does this come up once or keep repeating?
+                How often does this come up?
               </HelpDrawer>
             </span>
             <span className="text-brand-orange text-sm">{data.repeats}/5</span>
