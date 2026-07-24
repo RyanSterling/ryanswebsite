@@ -22,6 +22,7 @@ import GeneratorUI from './GeneratorUI'
 const COURSE_SLUG = 'flop-proof-content-system'
 const STORAGE_KEY = 'flop-proof-form-data'
 const GENERATIONS_KEY = 'flop-proof-generations'
+const CURRENT_LESSON_KEY = 'flop-proof-current-lesson'
 const MAX_GENERATIONS = 3
 
 export default function FlopProofViewer() {
@@ -72,6 +73,13 @@ export default function FlopProofViewer() {
     }
   }, [generationsRemaining, user])
 
+  // Save current lesson on change
+  useEffect(() => {
+    if (user && currentLesson) {
+      localStorage.setItem(`${CURRENT_LESSON_KEY}-${user.id}`, currentLesson.id)
+    }
+  }, [currentLesson, user])
+
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {
       if (!isLoaded) return
@@ -117,9 +125,13 @@ export default function FlopProofViewer() {
       const lessonsArray = lessonData || []
       setLessons(lessonsArray)
 
-      // Only set initial lesson once — prevents Clerk token refresh from resetting
+      // Restore saved lesson or default to first
       if (lessonsArray.length > 0 && !hasInitializedLesson.current) {
-        setCurrentLesson(lessonsArray[0])
+        const savedLessonId = localStorage.getItem(`${CURRENT_LESSON_KEY}-${user.id}`)
+        const savedLesson = savedLessonId
+          ? lessonsArray.find(l => l.id === savedLessonId)
+          : null
+        setCurrentLesson(savedLesson || lessonsArray[0])
         hasInitializedLesson.current = true
       }
 
