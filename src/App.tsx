@@ -10,6 +10,7 @@ import AuditThankYou from './pages/AuditThankYou'
 import PromptPage from './pages/PromptPage'
 import PromptOptIn from './pages/PromptOptIn'
 import LinkInBio from './pages/LinkInBio'
+import RoastMyProfile from './pages/RoastMyProfile'
 
 // Course pages
 import Courses from './pages/Courses'
@@ -38,6 +39,7 @@ function App() {
       <Route path="/audit-thank-you" element={<AuditThankYou />} />
       <Route path="/prompts/:slug" element={<PromptPage />} />
       <Route path="/get/:slug" element={<PromptOptIn />} />
+      <Route path="/roast" element={<RoastMyProfile />} />
 
       {/* Auth */}
       <Route path="/sign-in/*" element={<SignIn />} />

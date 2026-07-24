@@ -1092,7 +1092,7 @@ Your job is to generate content ideas that reach STRANGERS, not just followers. 
 
 Return valid JSON only. No markdown, no explanation, just the JSON object.`
 
-  const userPrompt = `Generate 100 content ideas for this creator.
+  const userPrompt = `Generate 25 content ideas for this creator.
 
 ## CREATOR PROFILE
 - Niche: ${lesson1.niche}
@@ -1172,12 +1172,12 @@ Return JSON with this structure:
     }
   ],
   "meta": {
-    "total_generated": 100,
-    "awareness_distribution": { "unaware": 30, "problem_aware": 35, "solution_aware": 25, "product_aware": 10 }
+    "total_generated": 25,
+    "awareness_distribution": { "unaware": 8, "problem_aware": 9, "solution_aware": 6, "product_aware": 2 }
   }
 }
 
-Generate 100 ideas now. Return ONLY valid JSON.`
+Generate 25 ideas now. Return ONLY valid JSON.`
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1188,7 +1188,7 @@ Generate 100 ideas now. Return ONLY valid JSON.`
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 16000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
@@ -1198,7 +1198,7 @@ Generate 100 ideas now. Return ONLY valid JSON.`
     if (!response.ok) {
       const error = await response.text()
       console.error('Claude API error:', error)
-      return c.json({ error: 'Generation failed' }, 500)
+      return c.json({ error: 'Generation failed', details: error }, 500)
     }
 
     const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
@@ -1374,6 +1374,47 @@ app.post('/webhooks/stripe', async (c) => {
   }
 
   return c.json({ received: true })
+})
+
+// ============================================
+// ROAST MY PROFILE SUBMISSION
+// ============================================
+
+const ROAST_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/42a4d4f8-664e-4200-9a43-dab4fc043768'
+
+interface RoastSubmission {
+  email: string
+  handle: string
+  timestamp: string
+}
+
+app.post('/roast-submission', async (c) => {
+  const data = await c.req.json<RoastSubmission>()
+
+  try {
+    // Send to N8N - handles ConvertKit + email notification
+    const response = await fetch(ROAST_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: data.email,
+        handle: data.handle,
+        timestamp: data.timestamp,
+      }),
+    })
+
+    if (!response.ok) {
+      console.error('N8N webhook error:', response.status)
+      return c.json({ error: 'Failed to process submission' }, 500)
+    }
+
+    console.log('Roast submission sent to N8N:', data.handle)
+    return c.json({ success: true })
+
+  } catch (error) {
+    console.error('Roast submission error:', error)
+    return c.json({ error: 'Failed to process submission' }, 500)
+  }
 })
 
 export default app
