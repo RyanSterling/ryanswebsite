@@ -1073,6 +1073,39 @@ interface FlopProofFormData {
   }
 }
 
+// Generated idea structure
+interface GeneratedIdea {
+  id: number
+  idea: string
+  room_rationale: string
+  awareness_level: string
+  urgency: number
+  staying_power: number
+  scope: number
+  hook_fortune_teller: string
+  hook_experimenter: string
+  hook_teacher: string
+  hook_investigator: string
+  hook_contrarian: string
+}
+
+// Job state for background generation (stored in KV)
+interface FlopProofJobState {
+  jobId: string
+  status: 'in_progress' | 'partial_complete' | 'complete'
+  totalBatches: number
+  completedBatches: number
+  batches: Array<{
+    batch: number
+    ideas: GeneratedIdea[]
+    completedAt: string
+  }>
+  formData: FlopProofFormData
+  startedAt: string
+  completedAt: string | null
+  error: { batch: number; message: string } | null
+}
+
 app.post('/generate-ideas', async (c) => {
   const formData = await c.req.json<FlopProofFormData>()
 
@@ -1239,6 +1272,368 @@ Generate 25 ideas now. Return ONLY valid JSON.`
     console.error('Generate error:', error)
     return c.json({ error: 'Generation failed' }, 500)
   }
+})
+
+// ============================================
+// FLOP-PROOF BACKGROUND GENERATION (100 ideas)
+// ============================================
+
+const TOTAL_BATCHES = 4
+const IDEAS_PER_BATCH = 25
+
+// Helper to build the base prompt (without deduplication section)
+function buildBasePrompt(formData: FlopProofFormData): { systemPrompt: string; userPromptBase: string } {
+  const stagePrescriptions: Record<number, string> = {
+    1: "You're first. Just say it clearly.",
+    2: "Others have said it. Go bolder — say what they were afraid to.",
+    3: "Everyone's made the claim. Show HOW it works, not just what.",
+    4: "Everyone's explained it. Go where they didn't — the part they oversimplified.",
+    5: "They've tuned out tips. Show what life looks like on the other side.",
+  }
+
+  const { lesson1, lesson2, lesson3, lesson4, lesson5 } = formData
+
+  const systemPrompt = `You are a content strategist who generates viral-worthy content ideas for creators. You understand that content fails not because of bad hooks or editing, but because creators pick topics that only appeal to their existing followers.
+
+Your job is to generate content ideas that reach STRANGERS, not just followers. Every idea must pass "the room size test" — would someone who has never heard of this creator still stop scrolling?
+
+Return valid JSON only. No markdown, no explanation, just the JSON object.`
+
+  const userPromptBase = `Generate 25 content ideas for this creator.
+
+## CREATOR PROFILE
+- Niche: ${lesson1.niche}
+- Core problem: ${lesson1.core_problem}
+- What they do: ${lesson1.what_you_do}
+- What they teach: ${lesson1.what_you_teach}
+
+## AUDIENCE
+${lesson2.audience_description}
+
+## DESIRE LADDERS
+
+**Desire 1:** ${lesson2.desire_1.desire_text}
+→ ${lesson2.desire_1.so_i_can_1}
+→ ${lesson2.desire_1.so_i_can_2}
+→ Emotional core: ${lesson2.desire_1.so_i_can_3}
+
+**Desire 2:** ${lesson2.desire_2.desire_text}
+→ ${lesson2.desire_2.so_i_can_1}
+→ ${lesson2.desire_2.so_i_can_2}
+→ Emotional core: ${lesson2.desire_2.so_i_can_3}
+
+**Desire 3:** ${lesson2.desire_3.desire_text}
+→ ${lesson2.desire_3.so_i_can_1}
+→ ${lesson2.desire_3.so_i_can_2}
+→ Emotional core: ${lesson2.desire_3.so_i_can_3}
+
+## TELL LAYERS
+
+**What they say openly:**
+- ${lesson3.will_tell_1}
+- ${lesson3.will_tell_2}
+- ${lesson3.will_tell_3}
+
+**What they think but won't admit:**
+- ${lesson3.wont_tell_1}
+- ${lesson3.wont_tell_2}
+- ${lesson3.wont_tell_3}
+
+**What they don't know:**
+- ${lesson3.cant_tell_1}
+- ${lesson3.cant_tell_2}
+- ${lesson3.cant_tell_3}
+
+## AWARENESS LEVELS
+
+**Unaware:** ${lesson4.unaware_questions}
+**Problem Aware:** ${lesson4.problem_aware_questions}
+**Solution Aware:** ${lesson4.solution_aware_questions}
+**Product Aware:** ${lesson4.product_aware_questions}
+
+## WHAT TO AVOID
+
+**Dead topics:** ${lesson5.saturated_topics}
+**Dead formats:** ${lesson5.saturated_formats}
+**Competitor angles:** ${lesson5.competitor_angles}
+
+**Market Stage:** ${lesson5.sophistication_stage}/5
+Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
+
+## HOOK FORMATS
+
+For each idea, write 5 different hooks using these formats. Each format creates contrast differently:
+
+1. **Fortune Teller** (Present vs Future): Frame the idea as something that will change the future. "This is going to change how you X forever" or "In 6 months, everyone will be doing this"
+
+2. **Experimenter** (Before vs After): Frame it as an experiment or test you ran. "I tried X for 30 days - here's what happened" or "I tested every method and this one wins"
+
+3. **Teacher** (Unknown vs Known): Frame it as a lesson or how-to. "3 things you need to know about X" or "Here's how the pros actually do X"
+
+4. **Investigator** (Hidden vs Revealed): Frame it as a secret or discovery. "Nobody talks about this..." or "I found the real reason why X happens"
+
+5. **Contrarian** (Belief A vs Belief B): Challenge conventional wisdom directly. "You're doing X completely wrong" or "Everyone says Y but actually..."
+
+## OUTPUT
+
+Return JSON with this structure:
+{
+  "ideas": [
+    {
+      "id": 1,
+      "idea": "The content idea",
+      "room_rationale": "Why strangers would care",
+      "awareness_level": "unaware|problem_aware|solution_aware|product_aware",
+      "urgency": 1-5,
+      "staying_power": 1-5,
+      "scope": 1-5,
+      "hook_fortune_teller": "Present vs future hook",
+      "hook_experimenter": "Before vs after / experiment hook",
+      "hook_teacher": "Lesson / how-to hook",
+      "hook_investigator": "Secret / discovery hook",
+      "hook_contrarian": "Challenge conventional wisdom hook"
+    }
+  ],
+  "meta": {
+    "total_generated": 25,
+    "awareness_distribution": { "unaware": 8, "problem_aware": 9, "solution_aware": 6, "product_aware": 2 }
+  }
+}`
+
+  return { systemPrompt, userPromptBase }
+}
+
+// Helper to generate a single batch
+async function generateBatch(
+  formData: FlopProofFormData,
+  batchNumber: number,
+  previousIdeas: GeneratedIdea[],
+  apiKey: string
+): Promise<GeneratedIdea[]> {
+  const { systemPrompt, userPromptBase } = buildBasePrompt(formData)
+
+  // Build deduplication section if we have previous ideas
+  let deduplicationSection = ''
+  if (previousIdeas.length > 0) {
+    const previousTitles = previousIdeas.map((idea, i) => `${i + 1}. "${idea.idea}"`).join('\n')
+    deduplicationSection = `
+
+## ALREADY GENERATED — DO NOT DUPLICATE
+
+You have already generated these ideas. Do NOT create variations, rewordings,
+or similar angles on any of these topics:
+
+${previousTitles}
+
+Generate 25 COMPLETELY DIFFERENT ideas. If an idea is even tangentially
+related to one above, skip it and generate something else.
+
+`
+  }
+
+  const userPrompt = deduplicationSection + userPromptBase + '\n\nGenerate 25 ideas now. Return ONLY valid JSON.'
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 16000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error(`Batch ${batchNumber} Claude API error:`, error)
+    throw new Error(`Claude API failed for batch ${batchNumber}`)
+  }
+
+  const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
+  const text = result.content[0].text
+
+  // Parse JSON
+  let parsed
+  try {
+    let jsonStr = text
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+    if (match) jsonStr = match[1]
+    parsed = JSON.parse(jsonStr)
+  } catch {
+    console.error(`Batch ${batchNumber} failed to parse JSON:`, text.substring(0, 500))
+    throw new Error(`Failed to parse response for batch ${batchNumber}`)
+  }
+
+  console.log(`Batch ${batchNumber}: Generated ${parsed.ideas?.length} ideas, tokens: ${result.usage?.input_tokens} in, ${result.usage?.output_tokens} out`)
+
+  // Renumber ideas based on batch
+  const startId = (batchNumber - 1) * IDEAS_PER_BATCH + 1
+  const ideas = (parsed.ideas as GeneratedIdea[]).map((idea, index) => ({
+    ...idea,
+    id: startId + index,
+  }))
+
+  return ideas
+}
+
+// POST /generate-ideas-start - Generate first batch, spawn background work for rest
+app.post('/generate-ideas-start', async (c) => {
+  const formData = await c.req.json<FlopProofFormData>()
+  const jobId = crypto.randomUUID()
+
+  console.log(`Starting job ${jobId} - generating batch 1 of ${TOTAL_BATCHES}`)
+
+  try {
+    // Generate first batch synchronously
+    const batch1Ideas = await generateBatch(formData, 1, [], c.env.ANTHROPIC_API_KEY)
+
+    // Create initial job state
+    const jobState: FlopProofJobState = {
+      jobId,
+      status: 'in_progress',
+      totalBatches: TOTAL_BATCHES,
+      completedBatches: 1,
+      batches: [
+        {
+          batch: 1,
+          ideas: batch1Ideas,
+          completedAt: new Date().toISOString(),
+        },
+      ],
+      formData,
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+      error: null,
+    }
+
+    // Save to KV
+    await c.env.RESULTS_KV.put(
+      `flop-proof-job:${jobId}`,
+      JSON.stringify(jobState),
+      { expirationTtl: 24 * 60 * 60 } // 24 hours
+    )
+
+    // Spawn background work for batches 2-4
+    const ctx = c.executionCtx
+    ctx.waitUntil(
+      (async () => {
+        let allIdeas = [...batch1Ideas]
+
+        for (let batchNum = 2; batchNum <= TOTAL_BATCHES; batchNum++) {
+          try {
+            console.log(`Job ${jobId}: Starting batch ${batchNum}`)
+
+            const batchIdeas = await generateBatch(
+              formData,
+              batchNum,
+              allIdeas,
+              c.env.ANTHROPIC_API_KEY
+            )
+
+            allIdeas = [...allIdeas, ...batchIdeas]
+
+            // Read current state, update, and save
+            const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+            if (!currentState) {
+              console.error(`Job ${jobId}: State not found in KV`)
+              return
+            }
+
+            currentState.batches.push({
+              batch: batchNum,
+              ideas: batchIdeas,
+              completedAt: new Date().toISOString(),
+            })
+            currentState.completedBatches = batchNum
+
+            if (batchNum === TOTAL_BATCHES) {
+              currentState.status = 'complete'
+              currentState.completedAt = new Date().toISOString()
+            }
+
+            await c.env.RESULTS_KV.put(
+              `flop-proof-job:${jobId}`,
+              JSON.stringify(currentState),
+              { expirationTtl: 24 * 60 * 60 }
+            )
+
+            console.log(`Job ${jobId}: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
+
+          } catch (error) {
+            console.error(`Job ${jobId}: Batch ${batchNum} failed:`, error)
+
+            // Mark as partial_complete
+            const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+            if (currentState) {
+              currentState.status = 'partial_complete'
+              currentState.completedAt = new Date().toISOString()
+              currentState.error = {
+                batch: batchNum,
+                message: error instanceof Error ? error.message : 'Unknown error',
+              }
+              await c.env.RESULTS_KV.put(
+                `flop-proof-job:${jobId}`,
+                JSON.stringify(currentState),
+                { expirationTtl: 24 * 60 * 60 }
+              )
+            }
+            return // Stop processing further batches
+          }
+        }
+
+        console.log(`Job ${jobId}: All ${TOTAL_BATCHES} batches complete`)
+      })()
+    )
+
+    // Return first batch immediately
+    return c.json({
+      jobId,
+      status: 'in_progress',
+      totalBatches: TOTAL_BATCHES,
+      completedBatches: 1,
+      batches: [
+        {
+          batch: 1,
+          ideas: batch1Ideas,
+          completedAt: jobState.batches[0].completedAt,
+        },
+      ],
+    })
+
+  } catch (error) {
+    console.error(`Job ${jobId}: Batch 1 failed:`, error)
+    return c.json({
+      error: 'Generation failed',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    }, 500)
+  }
+})
+
+// GET /generation-status/:jobId - Poll for job status
+app.get('/generation-status/:jobId', async (c) => {
+  const jobId = c.req.param('jobId')
+
+  const jobState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState | null
+
+  if (!jobState) {
+    return c.json({ error: 'Job not found or expired' }, 404)
+  }
+
+  return c.json({
+    jobId: jobState.jobId,
+    status: jobState.status,
+    totalBatches: jobState.totalBatches,
+    completedBatches: jobState.completedBatches,
+    batches: jobState.batches,
+    startedAt: jobState.startedAt,
+    completedAt: jobState.completedAt,
+    error: jobState.error,
+  })
 })
 
 // ============================================

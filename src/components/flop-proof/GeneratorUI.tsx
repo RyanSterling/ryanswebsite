@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   FlopProofFormData,
   isLesson1Complete,
@@ -33,6 +33,23 @@ interface GeneratedIdea {
   hook_contrarian: string
 }
 
+// Job status from API
+interface JobStatus {
+  jobId: string
+  status: 'in_progress' | 'partial_complete' | 'complete'
+  totalBatches: number
+  completedBatches: number
+  batches: Array<{
+    batch: number
+    ideas: GeneratedIdea[]
+    completedAt: string
+  }>
+  error?: { batch: number; message: string } | null
+}
+
+const POLL_INTERVAL = 10000 // 10 seconds
+const LOCALSTORAGE_KEY = 'flop-proof-job-id'
+
 export default function GeneratorUI({
   formData,
   generationsRemaining,
@@ -44,6 +61,92 @@ export default function GeneratorUI({
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([])
   const [expandedIdea, setExpandedIdea] = useState<number | null>(null)
+  const [completedBatches, setCompletedBatches] = useState(0)
+  const [totalBatches, setTotalBatches] = useState(4)
+  const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
+  const [jobError, setJobError] = useState<string | null>(null)
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const apiUrl = import.meta.env.DEV
+    ? 'http://localhost:8787'
+    : 'https://ryan-website-api.rsterling20.workers.dev'
+
+  // Poll for job status
+  const pollJobStatus = useCallback(async (id: string) => {
+    try {
+      const response = await fetch(`${apiUrl}/generation-status/${id}`)
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Job expired or not found
+          localStorage.removeItem(LOCALSTORAGE_KEY)
+          setIsGenerating(false)
+          setJobError('Generation expired or not found. Please try again.')
+          return
+        }
+        throw new Error('Failed to fetch job status')
+      }
+
+      const data: JobStatus = await response.json()
+
+      // Update state with all ideas from completed batches
+      const allIdeas = data.batches
+        .sort((a, b) => a.batch - b.batch)
+        .flatMap(b => b.ideas)
+      setGeneratedIdeas(allIdeas)
+      setCompletedBatches(data.completedBatches)
+      setTotalBatches(data.totalBatches)
+      setJobStatus(data.status)
+
+      // Check if done
+      if (data.status === 'complete' || data.status === 'partial_complete') {
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current)
+          pollIntervalRef.current = null
+        }
+        setIsGenerating(false)
+        localStorage.removeItem(LOCALSTORAGE_KEY)
+
+        if (data.status === 'partial_complete' && data.error) {
+          setJobError(`We generated ${allIdeas.length} ideas. Batch ${data.error.batch} failed: ${data.error.message}`)
+        }
+      }
+    } catch (error) {
+      console.error('Polling error:', error)
+      // Don't stop polling on transient errors, just log
+    }
+  }, [apiUrl])
+
+  // Start polling
+  const startPolling = useCallback((id: string) => {
+    // Clear any existing interval
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
+    }
+
+    // Poll immediately
+    pollJobStatus(id)
+
+    // Then poll every POLL_INTERVAL
+    pollIntervalRef.current = setInterval(() => {
+      pollJobStatus(id)
+    }, POLL_INTERVAL)
+  }, [pollJobStatus])
+
+  // Check for existing job on mount (recover from page close)
+  useEffect(() => {
+    const savedJobId = localStorage.getItem(LOCALSTORAGE_KEY)
+    if (savedJobId) {
+      setIsGenerating(true)
+      startPolling(savedJobId)
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+    }
+  }, [startPolling])
 
   const completionStatus = [
     { name: 'Lesson 1: Creator Profile', complete: isLesson1Complete(formData.lesson1) },
@@ -58,14 +161,13 @@ export default function GeneratorUI({
 
     setShowConfirmation(false)
     setIsGenerating(true)
+    setJobError(null)
+    setGeneratedIdeas([])
+    setCompletedBatches(0)
+    setJobStatus('in_progress')
 
     try {
-      // Call the API endpoint
-      const apiUrl = import.meta.env.DEV
-        ? 'http://localhost:8787/generate-ideas'
-        : 'https://ryan-website-api.rsterling20.workers.dev/generate-ideas'
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${apiUrl}/generate-ideas-start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -74,26 +176,33 @@ export default function GeneratorUI({
       if (!response.ok) {
         const error = await response.json()
         console.error('Generation failed:', error)
-        alert('Generation failed. Please try again.')
+        setJobError('Generation failed. Please try again.')
         setIsGenerating(false)
         return
       }
 
-      const result = await response.json()
+      const result: JobStatus = await response.json()
 
-      if (result.ideas && result.ideas.length > 0) {
-        setGeneratedIdeas(result.ideas)
-        onUseGeneration()
-      } else {
-        console.error('No ideas in response:', result)
-        alert('No ideas generated. Please try again.')
-      }
+      // Store jobId in localStorage for recovery
+      localStorage.setItem(LOCALSTORAGE_KEY, result.jobId)
+
+      // Display first batch immediately
+      const firstBatchIdeas = result.batches[0]?.ideas || []
+      setGeneratedIdeas(firstBatchIdeas)
+      setCompletedBatches(result.completedBatches)
+      setTotalBatches(result.totalBatches)
+
+      // Batch 1 succeeded - count as a used generation
+      onUseGeneration()
+
+      // Start polling for remaining batches
+      startPolling(result.jobId)
+
     } catch (error) {
       console.error('Generation error:', error)
-      alert('Generation failed. Please check your connection and try again.')
+      setJobError('Generation failed. Please check your connection and try again.')
+      setIsGenerating(false)
     }
-
-    setIsGenerating(false)
   }
 
   const downloadCSV = () => {
@@ -257,6 +366,13 @@ Hook (${hookLabels[hookType]}): ${hook}
           </div>
         </div>
 
+        {/* Error Message */}
+        {jobError && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4">
+            <p className="text-red-400 text-sm">{jobError}</p>
+          </div>
+        )}
+
         {/* Generate Button */}
         {!showConfirmation ? (
           <button
@@ -274,7 +390,7 @@ Hook (${hookLabels[hookType]}): ${hook}
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Generating 100 Ideas...
+                {completedBatches * 25} of {totalBatches * 25} ideas...
               </span>
             ) : generationsRemaining <= 0 ? (
               'No Generations Remaining'
@@ -311,12 +427,36 @@ Hook (${hookLabels[hookType]}): ${hook}
       {generatedIdeas.length > 0 && (
         <div className="bg-brand-card rounded-2xl p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-soehne text-xl text-white">
-              Your Ideas ({generatedIdeas.length})
-            </h3>
+            <div>
+              <h3 className="font-soehne text-xl text-white">
+                Your Ideas ({generatedIdeas.length})
+              </h3>
+              {isGenerating && jobStatus === 'in_progress' && (
+                <p className="text-brand-orange text-sm mt-1 flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  {completedBatches * 25} of {totalBatches * 25} • Generating more...
+                </p>
+              )}
+              {jobStatus === 'complete' && (
+                <p className="text-green-400 text-sm mt-1">All {totalBatches * 25} ideas ready!</p>
+              )}
+              {jobStatus === 'partial_complete' && (
+                <p className="text-amber-400 text-sm mt-1">
+                  Generation partially complete ({generatedIdeas.length} ideas)
+                </p>
+              )}
+            </div>
             <button
               onClick={downloadCSV}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-dark text-gray-300 hover:text-white transition-colors text-sm"
+              disabled={isGenerating}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${
+                isGenerating
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-brand-dark text-gray-300 hover:text-white transition-colors'
+              }`}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

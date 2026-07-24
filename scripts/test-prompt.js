@@ -146,6 +146,20 @@ ${lesson2.audience_description}
 **Market Stage:** ${lesson5.sophistication_stage}/5
 Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
 
+## HOOK FORMATS
+
+For each idea, write 5 different hooks using these formats. Each format creates contrast differently:
+
+1. **Fortune Teller** (Present vs Future): Frame the idea as something that will change the future. "This is going to change how you X forever" or "In 6 months, everyone will be doing this"
+
+2. **Experimenter** (Before vs After): Frame it as an experiment or test you ran. "I tried X for 30 days - here's what happened" or "I tested every method and this one wins"
+
+3. **Teacher** (Unknown vs Known): Frame it as a lesson or how-to. "3 things you need to know about X" or "Here's how the pros actually do X"
+
+4. **Investigator** (Hidden vs Revealed): Frame it as a secret or discovery. "Nobody talks about this..." or "I found the real reason why X happens"
+
+5. **Contrarian** (Belief A vs Belief B): Challenge conventional wisdom directly. "You're doing X completely wrong" or "Everyone says Y but actually..."
+
 ## OUTPUT
 
 Return JSON with this structure:
@@ -159,29 +173,34 @@ Return JSON with this structure:
       "urgency": 1-5,
       "staying_power": 1-5,
       "scope": 1-5,
-      "hook_will_tell": "Hook based on what they say",
-      "hook_wont_tell": "Hook based on their secret thought",
-      "hook_cant_tell": "Hook based on what they don't know"
+      "hook_fortune_teller": "Present vs future hook",
+      "hook_experimenter": "Before vs after / experiment hook",
+      "hook_teacher": "Lesson / how-to hook",
+      "hook_investigator": "Secret / discovery hook",
+      "hook_contrarian": "Challenge conventional wisdom hook"
     }
   ],
   "meta": {
-    "total_generated": 100,
-    "awareness_distribution": { "unaware": 30, "problem_aware": 35, "solution_aware": 25, "product_aware": 10 }
+    "total_generated": 25,
+    "awareness_distribution": { "unaware": 8, "problem_aware": 9, "solution_aware": 6, "product_aware": 2 }
   }
 }
 
-Generate 100 ideas now. Return ONLY valid JSON.`
+Generate 25 ideas now. Return ONLY valid JSON.`
 
 async function run() {
   console.log('')
-  console.log('🎯 Testing Prompt A')
-  console.log('   Model: claude-sonnet-4-20250514')
+  console.log('🎯 Testing Prompt A (25 ideas)')
+  console.log('   Model: claude-sonnet-4-5')
   console.log('   Niche:', testData.lesson1.niche)
   console.log('')
-  console.log('⏳ Calling API... (this takes 30-60 seconds)')
+  console.log('⏳ Calling API... (25 ideas may take 30-60 seconds)')
   console.log('')
 
   const start = Date.now()
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 300000) // 5 minute timeout
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -191,12 +210,15 @@ async function run() {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 16000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }],
     }),
+    signal: controller.signal,
   })
+
+  clearTimeout(timeout)
 
   const elapsed = ((Date.now() - start) / 1000).toFixed(1)
 
@@ -248,13 +270,14 @@ async function run() {
     const idea = parsed.ideas[i]
     console.log(`${i + 1}. ${idea.idea}`)
     console.log(`   [${idea.awareness_level}] ${idea.room_rationale}`)
-    console.log(`   Hook: "${idea.hook_wont_tell}"`)
+    console.log(`   Contrarian: "${idea.hook_contrarian}"`)
     console.log('')
   }
 
   // Save full output
   const filename = `test-output-${Date.now()}.json`
-  require('fs').writeFileSync(filename, JSON.stringify(parsed, null, 2))
+  const fs = await import('fs')
+  fs.writeFileSync(filename, JSON.stringify(parsed, null, 2))
   console.log(`💾 Full output: ${filename}`)
 
   // Cost estimate

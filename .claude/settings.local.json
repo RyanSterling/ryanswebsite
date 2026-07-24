@@ -44,7 +44,8 @@
       "Bash(lsof:*)",
       "Bash(node -e \"\nconst path = require\\(''path''\\);\nconst fs = require\\(''fs''\\);\nconst importPath = ''./src/components/flop-proof/index.ts'';\nif \\(fs.existsSync\\(importPath\\)\\) {\n  console.log\\(''Index file exists at:'', path.resolve\\(importPath\\)\\);\n  console.log\\(''Contents:'', fs.readFileSync\\(importPath, ''utf8''\\)\\);\n} else {\n  console.log\\(''Index file NOT found''\\);\n}\n\")",
       "Bash(pkill:*)",
-      "Bash(npx wrangler:*)"
+      "Bash(npx wrangler:*)",
+      "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website && npx tsc:*)"
     ]
   }
 }

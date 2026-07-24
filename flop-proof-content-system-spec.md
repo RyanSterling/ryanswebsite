@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** Testing Prompt A with Sonnet 4.
-> **Last updated:** 2026-07-23 (Prompt A created, ready for testing)
+> **Status:** Prompt A tested successfully. Planning 100 ideas per generation via background polling.
+> **Last updated:** 2026-07-24 (Next: implement background generation + polling system)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -74,9 +74,9 @@ Lesson 5 ─┘
 Final lesson: THE GENERATOR
     input form (pre-filled from lessons)
     ↓
-    Prompt A → 100 content ideas
+    Prompt A → 100 content ideas (4 batches of 25)
     ↓
-    each idea: 3 hook variations + copy button
+    each idea: 5 hook variations + copy button
     ↓
     copy button → idea + hook + Prompt B (hidden) → user's own LLM
 ```
@@ -261,7 +261,13 @@ who_cares: select
 
 ### 3.1.3 Generation limits `[LOCKED]`
 
-**Decision:** 3 generations per purchase.
+**Decision:** 3 generations per purchase, 100 ideas per generation.
+
+**Why 4 batches of 25:** Testing showed 25 ideas takes ~2 minutes via Claude API. 100 ideas in a single call would take too long and risk timeout. 4 batches of 25 = ~8 minutes total, delivered incrementally as each batch completes.
+
+**Total per customer:** 3 generations × 100 ideas = 300 ideas maximum.
+
+**Cost estimate:** 12 Claude calls per customer × ~$0.08 = ~$1/customer (3.4% of $29 revenue).
 
 **Rationale:** Protects API costs on a $29 product. Also creates productive pressure — students must review their inputs before running.
 
@@ -277,12 +283,12 @@ who_cares: select
 
 ### 3.1.4 Output export `[LOCKED]`
 
-**Decision:** Allow CSV download of all 100 ideas.
+**Decision:** Allow CSV download of all generated ideas.
 
 **Format:**
 ```csv
-id,idea,room_rationale,urgency,staying_power,scope,hook_will_tell,hook_wont_tell,hook_cant_tell
-1,"Idea text here","Why this reaches strangers",4,5,4,"Hook 1","Hook 2","Hook 3"
+id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_teller,hook_experimenter,hook_teacher,hook_investigator,hook_contrarian
+1,"Idea text here","Why this reaches strangers","problem_aware",4,5,4,"Future hook","Experiment hook","Teaching hook","Discovery hook","Contrarian hook"
 ...
 ```
 
@@ -290,7 +296,126 @@ id,idea,room_rationale,urgency,staying_power,scope,hook_will_tell,hook_wont_tell
 
 ---
 
-### 3.1.5 How fields feed Prompt A
+### 3.1.5 Background generation architecture `[PLANNING]`
+
+**The problem:** Claude API takes ~2 minutes per 25 ideas. 100 ideas = ~8 minutes total. User can't wait with page open that long.
+
+**Solution:** Background generation + polling. First 25 ideas return immediately, remaining 3 batches generate in background sequentially.
+
+#### User flow
+
+```
+1. User clicks "Generate"
+   ↓
+2. API generates FIRST 25 ideas, returns immediately
+   ↓
+3. API spawns background work via ctx.waitUntil()
+   - Generates batches 2, 3, 4 sequentially (25 ideas each)
+   - Saves each batch to KV as it completes
+   - Passes all previous ideas to Claude to avoid duplicates
+   ↓
+4. Frontend displays first 25 immediately
+   Shows: "25 of 100 ideas generated. Generating more..."
+   ↓
+5. Frontend polls /generation-status/:jobId every 10 seconds
+   - Gets new batches as they complete
+   - Appends to display: "50 of 100...", "75 of 100..."
+   ↓
+6. When all 4 batches done, show "All 100 ideas ready!"
+   User can leave and come back anytime
+```
+
+#### Avoiding duplicate ideas (CRITICAL)
+
+Each subsequent Claude call receives the TITLES of all previously generated ideas. The prompt includes:
+
+```
+## ALREADY GENERATED — DO NOT DUPLICATE
+
+You have already generated these ideas. Do NOT create variations, rewordings,
+or similar angles on any of these topics:
+
+1. "The recruiting timeline most parents get wrong"
+2. "Why coaches ghost talented players"
+3. "What your highlight tape is actually missing"
+... [all previous idea titles]
+
+Generate 25 COMPLETELY DIFFERENT ideas. If an idea is even tangentially
+related to one above, skip it and generate something else.
+```
+
+**Why this works:**
+- Passing only titles keeps context window small (~500 tokens for 75 previous ideas)
+- Explicit "do NOT duplicate" instruction with examples
+- "Tangentially related" catches near-duplicates like "5 recruiting timeline mistakes" vs "The recruiting timeline most parents get wrong"
+
+**Fallback:** If duplicates still appear, post-process: compare new ideas against previous via fuzzy string matching, reject matches >70% similarity, regenerate those slots
+
+#### API endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /generate-ideas-start` | Generates first 25, returns with jobId, spawns background batch 2 |
+| `GET /generation-status/:jobId` | Returns job status + any completed batches |
+
+#### KV schema (RESULTS_KV)
+
+```json
+{
+  "jobId": "uuid",
+  "status": "in_progress" | "partial_complete" | "complete",
+  "totalBatches": 4,
+  "completedBatches": 2,
+  "batches": [
+    { "batch": 1, "ideas": [...], "completedAt": "..." },
+    { "batch": 2, "ideas": [...], "completedAt": "..." },
+    { "batch": 3, "ideas": [...], "completedAt": "..." },
+    { "batch": 4, "ideas": [...], "completedAt": "..." }
+  ],
+  "formData": { ... },
+  "startedAt": "...",
+  "completedAt": "...",
+  "error": null | { "batch": 3, "message": "..." }
+}
+```
+
+#### Frontend behavior
+
+- Call `/generate-ideas-start`, get first 25 ideas + jobId
+- Store jobId in localStorage (survives page close)
+- Display first 25 immediately
+- Poll `/generation-status/:jobId` every 10 seconds
+- Append batches 2, 3, 4 as they arrive
+- Show progress: "25 of 100", "50 of 100", "75 of 100", "100 of 100"
+- Stop polling when status is "complete" or "partial_complete"
+
+#### Error handling
+
+| Scenario | Behavior |
+|----------|----------|
+| Claude fails on batch 1 | Return error, don't charge a generation |
+| Claude fails on batch 2/3/4 | Mark "partial_complete", show ideas so far + message "We generated X ideas. Contact support for remaining." |
+| User closes page mid-generation | JobId in localStorage, poll on return, get all completed batches |
+| Polling fails (network) | Retry with exponential backoff (1s, 2s, 4s, 8s, max 30s) |
+| Job not found in KV | Show "Generation expired or not found" |
+| Stuck jobs (>15 min) | Mark partial_complete via Cloudflare Cron |
+
+#### Generation counting
+
+- Only decrement `generationsRemaining` when batch 1 successfully returns
+- If batch 1 fails, don't decrement — user can retry
+- If any later batch fails, user already got ideas — count it as used
+
+#### Files to modify
+
+| File | Changes |
+|------|---------|
+| `api/src/index.ts` | New endpoints, ctx.waitUntil() for background work |
+| `src/components/flop-proof/GeneratorUI.tsx` | Polling logic, localStorage persistence, incremental display |
+
+---
+
+### 3.1.6 How fields feed Prompt A
 
 The prompt receives structured data, not a wall of text. Payload shape:
 
@@ -343,7 +468,7 @@ The prompt receives structured data, not a wall of text. Payload shape:
 
 ---
 
-### 3.1.6 Legacy summary (for reference)
+### 3.1.7 Legacy summary (for reference)
 
 | Field group | Captures | Fed by lesson |
 |---|---|---|
@@ -358,15 +483,18 @@ The prompt receives structured data, not a wall of text. Payload shape:
 
 ```json
 {
-  "id": "string",
+  "id": 1,
   "idea": "string",
   "room_rationale": "string — why this reaches past existing followers",
-  "scores": { "urgency": 1-5, "staying_power": 1-5, "scope": 1-5 },
-  "hooks": [
-    { "type": "TBD", "text": "string" },
-    { "type": "TBD", "text": "string" },
-    { "type": "TBD", "text": "string" }
-  ],
+  "awareness_level": "unaware|problem_aware|solution_aware|product_aware",
+  "urgency": 1-5,
+  "staying_power": 1-5,
+  "scope": 1-5,
+  "hook_fortune_teller": "Present vs future framing",
+  "hook_experimenter": "I tried this, here's what happened",
+  "hook_teacher": "Here's how to do X",
+  "hook_investigator": "Secret/discovery framing",
+  "hook_contrarian": "Opposite of conventional wisdom",
   "copy_payload": "idea + selected hook + Prompt B"
 }
 ```
@@ -375,16 +503,16 @@ The prompt receives structured data, not a wall of text. Payload shape:
 
 ### 3.3 The two prompts — this is the IP
 
-**Prompt A** — turns the input form into 100 ideas.
+**Prompt A** — turns the input form into 100 ideas (4 batches of 25).
 **Prompt B** — the hidden per-idea prompt shipped in the copy button; expands one idea into a script/post.
 
-> **The moat is Prompt A and the input form, not the AI.** If the 100 ideas come back generic, the whole offer reads as a ChatGPT wrapper and dies on refund requests. Prompt A must encode the thesis — room size, desire dimensions, awareness match, saturation avoidance — as hard constraints, not vibes.
+> **The moat is Prompt A and the input form, not the AI.** If the ideas come back generic, the whole offer reads as a ChatGPT wrapper and dies on refund requests. Prompt A must encode the thesis — room size, desire dimensions, awareness match, saturation avoidance — as hard constraints, not vibes.
 
 **Model decision:** Claude Sonnet 4 (`claude-sonnet-4-20250514`). Cost ~$0.25/generation × 3 generations = ~$0.75/customer on a $29 product (2.6% of revenue). Acceptable margin.
 
 Requirements for Prompt A:
-- Rejects small-room ideas rather than padding to hit 100. Quality floor beats the round number. If it can only produce 60 good ones, that needs a designed behavior (generate fewer, or widen inputs and retry).
-- No duplicates-in-disguise. 100 rewordings of 8 ideas is the obvious failure mode.
+- Rejects small-room ideas rather than padding count. Quality floor beats round numbers.
+- No duplicates-in-disguise. 25 rewordings of 8 ideas is the obvious failure mode.
 - Must cover a spread of awareness levels, weighted toward stranger-facing.
 - Must avoid saturated angles unless it supplies a new mechanism.
 
@@ -400,7 +528,7 @@ See file for full prompt. Key design decisions:
 2. **Awareness distribution** — explicitly weights toward unaware/problem-aware (60%+)
 3. **Market stage enforcement** — stage affects execution style, not just topic selection
 4. **Exclusion enforcement** — dead topics/formats/angles are hard blockers
-5. **Hook taxonomy** — will-tell / won't-tell / can't-tell per idea
+5. **Hook taxonomy** — 5 structural formats per idea: Fortune Teller, Experimenter, Teacher, Investigator, Contrarian (see §5)
 6. **Quality over quantity** — instruction to return fewer ideas rather than pad
 
 ---
@@ -475,21 +603,28 @@ Write our own pattern set. Don't reuse theirs.
 
 ---
 
-## 5. Hook taxonomy `[OPEN — next decision]`
+## 5. Hook taxonomy `[LOCKED]`
 
-The 3 variations must be **3 distinct mechanisms**, not 3 rewordings. Rewordings feel like padding and undercut the whole "tangible" promise.
+Each idea gets **5 hook variations** using different structural formats. Each format creates contrast differently — this gives the creator options for how to open the content.
 
-**Leading candidate** — map to §4.2:
+| Format | Key | Contrast Mechanism | Example Pattern |
+|--------|-----|-------------------|-----------------|
+| **Fortune Teller** | `hook_fortune_teller` | Present vs Future | "This is going to change X forever" / "In 6 months, everyone will be doing this" |
+| **Experimenter** | `hook_experimenter` | Before vs After | "I tried X for 30 days — here's what happened" / "I tested every method and this one wins" |
+| **Teacher** | `hook_teacher` | Unknown vs Known | "3 things you need to know about X" / "Here's how the pros actually do X" |
+| **Investigator** | `hook_investigator` | Hidden vs Revealed | "Nobody talks about this..." / "I found the real reason why X happens" |
+| **Contrarian** | `hook_contrarian` | Belief A vs Belief B | "You're doing X completely wrong" / "Everyone says Y but actually..." |
 
-| Hook | Mechanism | Feels like |
-|---|---|---|
-| 1 | **Will tell** | "You've said this out loud" — instant recognition |
-| 2 | **Won't tell** | "You've thought this and never admitted it" — the callout |
-| 3 | **Can't tell** | "Here's what's actually happening" — the reveal |
+**Why 5 formats instead of 3 psychological layers:**
 
-Why it's promising: each targets a different psychological entry point, they're mutually exclusive by construction, and they're derived from the same input data the form already collects — so no extra fields needed.
+The original candidate (will-tell / won't-tell / can't-tell) targeted *which psychological nerve to hit*. The chosen taxonomy targets *how to structure the opening*. Both are valid dimensions, but structural formats are:
+1. More actionable — creators know exactly how to start
+2. More distinct — no confusion about what makes each different
+3. More varied — 5 options gives real choice
 
-**To validate:** does hook 1 (will tell) actually perform, or is it the weakest of the three because it tells people what they already know? Possible replacement: an awareness-level split instead (unaware / problem-aware / solution-aware openers). Test before locking.
+**Skipped: Magician format** — "visual/audio stun" that stops the scroll through pattern interruption. Not included because it's a visual execution technique, not a verbal hook structure. Combines with the other formats rather than standing alone.
+
+**UI display:** Generator shows all 5 hooks per idea with single-letter labels (F, E, T, I, C) and distinct colors.
 
 ---
 
@@ -502,7 +637,7 @@ Why it's promising: each targets a different psychological entry point, they're 
 | 3 | Getting In Their Head | Will / won't / can't tell layers | Tell layers (9 fields) |
 | 4 | Reaching People Who Don't Know You | Awareness levels — why insider content dies | Awareness questions |
 | 5 | Setting Yourself Apart | Saturation — why "proven" topics still flop | Saturation read |
-| 6 | Generate 100 Ideas | Run the generator | — |
+| 6 | Generate Your Ideas | Run the generator | — |
 
 **UI built:** `/src/components/flop-proof/` — forms for all 5 lessons + generator UI with generation counter and CSV export.
 
@@ -764,12 +899,12 @@ The structural template this offer is built against. What makes it work:
 
 | # | Question | Blocks | Status |
 |---|---|---|---|
-| 1 | Hook taxonomy — lock the 3 mechanisms | Prompt A, output schema | Open |
+| 1 | ~~Hook taxonomy — lock the 3 mechanisms~~ | ~~Prompt A, output schema~~ | **Answered** — 5 structural formats (Fortune Teller, Experimenter, Teacher, Investigator, Contrarian), see §5 |
 | 2 | ~~Input form schema — exact fields, wording, order~~ | ~~Lessons, Prompt A~~ | **Answered** — see §3.1 |
 | 3 | ~~Prompt A — the 100-idea generator~~ | ~~Everything~~ | **Testing** — see §3.3.1, file at `/src/prompts/prompt-a.ts` |
 | 4 | Prompt B — hidden per-idea expansion prompt | Copy button | Open |
 | 5 | Are the 1–5 scores shown to the student? | UI | Open |
-| 6 | What happens if the model can't produce 100 good ideas? | Prompt A, UX | Open |
+| 6 | ~~What happens if the model can't produce 100 good ideas?~~ | ~~Prompt A, UX~~ | **Answered** — 100 ideas per generation via 4 batches of 25. Deduplication via title passing. See §3.1.3 and §3.1.5 |
 | 7 | Worked example — use Maggie's market or build a neutral one? | Lessons | Open |
 | 8 | ~~Lesson count and length~~ | ~~Production~~ | **Answered** — 6 lessons, see §6 |
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
@@ -777,7 +912,7 @@ The structural template this offer is built against. What makes it work:
 | 11 | ~~What exactly gets taught in each lesson?~~ | ~~Video scripts, Prompt A~~ | **Answered** — L1-L5 complete, see §6.1 |
 | 12 | How should market stage affect the 100 ideas? | Prompt A | Open — shapes execution vs. just educational? |
 
-**Next step:** Test Prompt A with dummy data. Evaluate output quality before connecting to UI.
+**Next step:** Implement background generation + polling system (§3.1.5). Prompt A tested successfully with 25 ideas in ~2 min.
 
 ---
 
@@ -788,7 +923,7 @@ The structural template this offer is built against. What makes it work:
 | 2026-07 | Name: **The Flop-Proof Content System** | "System" > "framework" (framework sounds like homework). "Content" > "videos" (broader). "Flop" is the word that resonates and it's honest to the barely-seen reality in a way "viral" isn't |
 | 2026-07 | Target the **views** desire, not followers or sales | Biggest room — most of the market is on that rung. The thesis picks the offer |
 | 2026-07 | Sell **generation**, not repair | Sometimes an idea should just be trashed; "fix your idea" was the wrong mechanic |
-| 2026-07 | Deliverable is **100 ideas**, not a skill | Tangibility comes from walking out holding something |
+| 2026-07 | Deliverable is **100 ideas** per generation, not a skill | Tangibility comes from walking out holding something. 3 generations = 300 total ideas |
 | 2026-07 | Expansion offloaded to the **user's LLM** | Protects margin on a $29 product |
 | 2026-07 | **All fields required** — no skipping | Garbage in = garbage out. Lazy inputs cause bad ideas, bad reviews, refunds. Expectation set in intro video |
 | 2026-07 | **3 generations per purchase** | Protects API costs. Creates pressure to review inputs before running. Edge cases handled via support |
@@ -806,6 +941,12 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-23 | **L5 content locked** | Market saturation — "stage vs execution" reframe explains why proven topics flop. Prescription display teaches what to do at each stage |
 | 2026-07-23 | **Sonnet 4 for Prompt A** | ~$0.25/generation, 3 generations/customer = ~$0.75 total (2.6% of $29). Acceptable margin, good quality. Can downgrade to Haiku if testing shows quality holds |
 | 2026-07-23 | **Prompt A created** | `/src/prompts/prompt-a.ts` — first version ready for testing |
+| 2026-07-24 | **Hook taxonomy locked** | 5 structural formats: Fortune Teller (present vs future), Experimenter (before vs after), Teacher (unknown vs known), Investigator (hidden vs revealed), Contrarian (belief A vs B). Replaced psychological depth approach (will/won't/can't tell) with structural delivery approach. Skipped "Magician" format (visual stun technique, not verbal hook) |
+| 2026-07-24 | **25 ideas per batch** | Testing showed 25 ideas takes ~2 min. Proven reliable batch size |
+| 2026-07-24 | **100 ideas per generation (4 batches)** | 25 ideas × 4 batches = 100 ideas. First batch returns immediately, batches 2-4 generate in background sequentially. ~8 min total but user sees results incrementally |
+| 2026-07-24 | **Background generation + polling** | User doesn't need to keep page open. First 25 appear fast, remaining 75 generate in background via ctx.waitUntil(). Frontend polls for completion every 10 seconds. JobId stored in localStorage for page close recovery |
+| 2026-07-24 | **300 total ideas per customer** | 100 ideas × 3 generations = 300 ideas. ~$1 API cost per customer (3.4% of $29) |
+| 2026-07-24 | **Deduplication via title passing** | Each batch after the first receives all previous idea titles in prompt with explicit "do NOT duplicate" instruction. Keeps context small (~500 tokens for 75 titles), prevents thematic overlap |
 
 ### Rejected — don't revisit
 
