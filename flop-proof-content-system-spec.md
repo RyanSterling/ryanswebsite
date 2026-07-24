@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** Prompt A tested successfully. Planning 100 ideas per generation via background polling.
-> **Last updated:** 2026-07-24 (Next: implement background generation + polling system)
+> **Status:** SSE streaming implemented. Batch 1 works, batch 2+ failing (Claude API error). Debug needed.
+> **Last updated:** 2026-07-24 (Next: debug batch 2+ failures in SSE endpoint)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -296,38 +296,51 @@ id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_
 
 ---
 
-### 3.1.5 Background generation architecture `[PLANNING]`
+### 3.1.5 SSE streaming architecture `[IMPLEMENTED - DEBUGGING]`
 
-**The problem:** Claude API takes ~2 minutes per 25 ideas. 100 ideas = ~8 minutes total. User can't wait with page open that long.
+**The problem:** Claude API takes ~2 minutes per 25 ideas. 100 ideas = ~8 minutes total.
 
-**Solution:** Background generation + polling. First 25 ideas return immediately, remaining 3 batches generate in background sequentially.
+**Solution:** Server-Sent Events (SSE) streaming. Keep HTTP connection open while generating all 4 batches sequentially. Frontend receives real-time updates as each batch completes.
+
+**Why SSE over background polling:**
+- Real-time updates (no polling delay)
+- Simpler code (no KV storage for job state, no localStorage recovery)
+- Works on Cloudflare Workers free tier (single long-running request, not background work)
+
+**Tradeoff:** User must keep page open during ~8 min generation. If they close, generation stops.
+
+#### Current status
+
+**Working:** Batch 1 completes successfully, ideas display, generation counted.
+**Broken:** Batch 2+ fails with "Claude API failed for batch 2". Need to debug.
+
+**Likely causes:**
+1. Anthropic rate limiting (requests per minute)
+2. Cloudflare Workers request timeout (even on paid tier)
+3. Context window issue with deduplication section
 
 #### User flow
 
 ```
 1. User clicks "Generate"
    ↓
-2. API generates FIRST 25 ideas, returns immediately
+2. Frontend opens SSE connection to /generate-ideas-stream
    ↓
-3. API spawns background work via ctx.waitUntil()
-   - Generates batches 2, 3, 4 sequentially (25 ideas each)
-   - Saves each batch to KV as it completes
-   - Passes all previous ideas to Claude to avoid duplicates
+3. API generates batch 1, streams: { type: "batch_complete", batch: 1, allIdeas: [...] }
+   Frontend displays 25 ideas immediately
    ↓
-4. Frontend displays first 25 immediately
-   Shows: "25 of 100 ideas generated. Generating more..."
+4. API generates batch 2, streams: { type: "batch_complete", batch: 2, allIdeas: [...] }
+   Frontend displays 50 ideas
    ↓
-5. Frontend polls /generation-status/:jobId every 10 seconds
-   - Gets new batches as they complete
-   - Appends to display: "50 of 100...", "75 of 100..."
+5. ... batches 3, 4 ...
    ↓
-6. When all 4 batches done, show "All 100 ideas ready!"
-   User can leave and come back anytime
+6. API streams: { type: "complete", allIdeas: [...] }
+   Frontend shows "All 100 ideas ready!"
 ```
 
 #### Avoiding duplicate ideas (CRITICAL)
 
-Each subsequent Claude call receives the TITLES of all previously generated ideas. The prompt includes:
+Each subsequent Claude call receives the TITLES of all previously generated ideas:
 
 ```
 ## ALREADY GENERATED — DO NOT DUPLICATE
@@ -337,81 +350,61 @@ or similar angles on any of these topics:
 
 1. "The recruiting timeline most parents get wrong"
 2. "Why coaches ghost talented players"
-3. "What your highlight tape is actually missing"
 ... [all previous idea titles]
 
-Generate 25 COMPLETELY DIFFERENT ideas. If an idea is even tangentially
-related to one above, skip it and generate something else.
+Generate 25 COMPLETELY DIFFERENT ideas.
 ```
 
-**Why this works:**
-- Passing only titles keeps context window small (~500 tokens for 75 previous ideas)
-- Explicit "do NOT duplicate" instruction with examples
-- "Tangentially related" catches near-duplicates like "5 recruiting timeline mistakes" vs "The recruiting timeline most parents get wrong"
-
-**Fallback:** If duplicates still appear, post-process: compare new ideas against previous via fuzzy string matching, reject matches >70% similarity, regenerate those slots
-
-#### API endpoints
+#### API endpoint
 
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /generate-ideas-start` | Generates first 25, returns with jobId, spawns background batch 2 |
-| `GET /generation-status/:jobId` | Returns job status + any completed batches |
+| `POST /generate-ideas-stream` | SSE endpoint that streams batches as they complete |
 
-#### KV schema (RESULTS_KV)
+#### SSE event types
 
-```json
-{
-  "jobId": "uuid",
-  "status": "in_progress" | "partial_complete" | "complete",
-  "totalBatches": 4,
-  "completedBatches": 2,
-  "batches": [
-    { "batch": 1, "ideas": [...], "completedAt": "..." },
-    { "batch": 2, "ideas": [...], "completedAt": "..." },
-    { "batch": 3, "ideas": [...], "completedAt": "..." },
-    { "batch": 4, "ideas": [...], "completedAt": "..." }
-  ],
-  "formData": { ... },
-  "startedAt": "...",
-  "completedAt": "...",
-  "error": null | { "batch": 3, "message": "..." }
-}
+```typescript
+// Progress update (batch starting)
+{ type: "progress", batch: 1, totalBatches: 4 }
+
+// Batch complete (includes all ideas so far)
+{ type: "batch_complete", batch: 1, totalBatches: 4, ideas: [...], allIdeas: [...] }
+
+// All done
+{ type: "complete", totalBatches: 4, allIdeas: [...] }
+
+// Error (includes partial results if any)
+{ type: "error", batch: 2, error: "message", allIdeas: [...] }
 ```
-
-#### Frontend behavior
-
-- Call `/generate-ideas-start`, get first 25 ideas + jobId
-- Store jobId in localStorage (survives page close)
-- Display first 25 immediately
-- Poll `/generation-status/:jobId` every 10 seconds
-- Append batches 2, 3, 4 as they arrive
-- Show progress: "25 of 100", "50 of 100", "75 of 100", "100 of 100"
-- Stop polling when status is "complete" or "partial_complete"
 
 #### Error handling
 
 | Scenario | Behavior |
 |----------|----------|
-| Claude fails on batch 1 | Return error, don't charge a generation |
-| Claude fails on batch 2/3/4 | Mark "partial_complete", show ideas so far + message "We generated X ideas. Contact support for remaining." |
-| User closes page mid-generation | JobId in localStorage, poll on return, get all completed batches |
-| Polling fails (network) | Retry with exponential backoff (1s, 2s, 4s, 8s, max 30s) |
-| Job not found in KV | Show "Generation expired or not found" |
-| Stuck jobs (>15 min) | Mark partial_complete via Cloudflare Cron |
+| Claude fails on batch 1 | Stream error event, don't charge a generation |
+| Claude fails on batch 2/3/4 | Stream error with partial ideas, count generation as used |
+| User closes page | Generation stops (SSE connection closed) |
+| Network error | Frontend shows "Connection lost" message |
 
 #### Generation counting
 
-- Only decrement `generationsRemaining` when batch 1 successfully returns
+- Only decrement `generationsRemaining` when batch 1 completes
 - If batch 1 fails, don't decrement — user can retry
 - If any later batch fails, user already got ideas — count it as used
 
-#### Files to modify
+#### Files
 
-| File | Changes |
+| File | Purpose |
 |------|---------|
-| `api/src/index.ts` | New endpoints, ctx.waitUntil() for background work |
-| `src/components/flop-proof/GeneratorUI.tsx` | Polling logic, localStorage persistence, incremental display |
+| `api/src/index.ts` | `POST /generate-ideas-stream` endpoint, `generateBatch()` helper |
+| `src/components/flop-proof/GeneratorUI.tsx` | Fetch streaming, SSE event parsing, progress display |
+
+#### Debug next steps
+
+1. Check Cloudflare Worker logs (`wrangler tail`) to see actual error from Claude API
+2. If rate limiting: add delay between batches
+3. If timeout: check if Cloudflare paid tier is correctly configured
+4. If context window: reduce deduplication section size
 
 ---
 
@@ -944,7 +937,8 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-24 | **Hook taxonomy locked** | 5 structural formats: Fortune Teller (present vs future), Experimenter (before vs after), Teacher (unknown vs known), Investigator (hidden vs revealed), Contrarian (belief A vs B). Replaced psychological depth approach (will/won't/can't tell) with structural delivery approach. Skipped "Magician" format (visual stun technique, not verbal hook) |
 | 2026-07-24 | **25 ideas per batch** | Testing showed 25 ideas takes ~2 min. Proven reliable batch size |
 | 2026-07-24 | **100 ideas per generation (4 batches)** | 25 ideas × 4 batches = 100 ideas. First batch returns immediately, batches 2-4 generate in background sequentially. ~8 min total but user sees results incrementally |
-| 2026-07-24 | **Background generation + polling** | User doesn't need to keep page open. First 25 appear fast, remaining 75 generate in background via ctx.waitUntil(). Frontend polls for completion every 10 seconds. JobId stored in localStorage for page close recovery |
+| 2026-07-24 | ~~**Background generation + polling**~~ | ~~User doesn't need to keep page open. First 25 appear fast, remaining 75 generate in background via ctx.waitUntil().~~ **REPLACED by SSE** |
+| 2026-07-24 | **SSE streaming architecture** | Replaced polling with Server-Sent Events. Simpler code, real-time updates, no KV state. User must keep page open (~8 min). Batch 1 works; batches 2-4 failing with Claude API error — needs debug |
 | 2026-07-24 | **300 total ideas per customer** | 100 ideas × 3 generations = 300 ideas. ~$1 API cost per customer (3.4% of $29) |
 | 2026-07-24 | **Deduplication via title passing** | Each batch after the first receives all previous idea titles in prompt with explicit "do NOT duplicate" instruction. Keeps context small (~500 tokens for 75 titles), prevents thematic overlap |
 
