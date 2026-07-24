@@ -65,6 +65,7 @@ export default function GeneratorUI({
   const [totalBatches, setTotalBatches] = useState(4)
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
+  const [hasCountedGeneration, setHasCountedGeneration] = useState(false)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const apiUrl = import.meta.env.DEV
@@ -72,7 +73,7 @@ export default function GeneratorUI({
     : 'https://ryan-website-api.rsterling20.workers.dev'
 
   // Poll for job status
-  const pollJobStatus = useCallback(async (id: string) => {
+  const pollJobStatus = useCallback(async (id: string, countGeneration: boolean) => {
     try {
       const response = await fetch(`${apiUrl}/generation-status/${id}`)
       if (!response.ok) {
@@ -97,6 +98,12 @@ export default function GeneratorUI({
       setTotalBatches(data.totalBatches)
       setJobStatus(data.status)
 
+      // Count generation when we first receive ideas (batch 1 completes)
+      if (countGeneration && data.completedBatches >= 1 && !hasCountedGeneration) {
+        setHasCountedGeneration(true)
+        onUseGeneration()
+      }
+
       // Check if done
       if (data.status === 'complete' || data.status === 'partial_complete') {
         if (pollIntervalRef.current) {
@@ -114,21 +121,21 @@ export default function GeneratorUI({
       console.error('Polling error:', error)
       // Don't stop polling on transient errors, just log
     }
-  }, [apiUrl])
+  }, [apiUrl, hasCountedGeneration, onUseGeneration])
 
   // Start polling
-  const startPolling = useCallback((id: string) => {
+  const startPolling = useCallback((id: string, countGeneration: boolean = false) => {
     // Clear any existing interval
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current)
     }
 
     // Poll immediately
-    pollJobStatus(id)
+    pollJobStatus(id, countGeneration)
 
     // Then poll every POLL_INTERVAL
     pollIntervalRef.current = setInterval(() => {
-      pollJobStatus(id)
+      pollJobStatus(id, countGeneration)
     }, POLL_INTERVAL)
   }, [pollJobStatus])
 
@@ -137,7 +144,8 @@ export default function GeneratorUI({
     const savedJobId = localStorage.getItem(LOCALSTORAGE_KEY)
     if (savedJobId) {
       setIsGenerating(true)
-      startPolling(savedJobId)
+      // Don't count generation on recovery - it was already counted
+      startPolling(savedJobId, false)
     }
 
     // Cleanup on unmount
@@ -165,6 +173,7 @@ export default function GeneratorUI({
     setGeneratedIdeas([])
     setCompletedBatches(0)
     setJobStatus('in_progress')
+    setHasCountedGeneration(false)
 
     try {
       const response = await fetch(`${apiUrl}/generate-ideas-start`, {
@@ -186,17 +195,12 @@ export default function GeneratorUI({
       // Store jobId in localStorage for recovery
       localStorage.setItem(LOCALSTORAGE_KEY, result.jobId)
 
-      // Display first batch immediately
-      const firstBatchIdeas = result.batches[0]?.ideas || []
-      setGeneratedIdeas(firstBatchIdeas)
+      // Update state (may have 0 batches initially)
       setCompletedBatches(result.completedBatches)
       setTotalBatches(result.totalBatches)
 
-      // Batch 1 succeeded - count as a used generation
-      onUseGeneration()
-
-      // Start polling for remaining batches
-      startPolling(result.jobId)
+      // Start polling - this will count the generation when batch 1 completes
+      startPolling(result.jobId, true)
 
     } catch (error) {
       console.error('Generation error:', error)
@@ -390,7 +394,7 @@ Hook (${hookLabels[hookType]}): ${hook}
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                {completedBatches * 25} of {totalBatches * 25} ideas...
+                {completedBatches === 0 ? 'Starting generation...' : `${completedBatches * 25} of ${totalBatches * 25} ideas...`}
               </span>
             ) : generationsRemaining <= 0 ? (
               'No Generations Remaining'
@@ -431,7 +435,7 @@ Hook (${hookLabels[hookType]}): ${hook}
               <h3 className="font-soehne text-xl text-white">
                 Your Ideas ({generatedIdeas.length})
               </h3>
-              {isGenerating && jobStatus === 'in_progress' && (
+              {isGenerating && jobStatus === 'in_progress' && completedBatches > 0 && (
                 <p className="text-brand-orange text-sm mt-1 flex items-center gap-2">
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
