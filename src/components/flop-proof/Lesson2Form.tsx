@@ -1,4 +1,4 @@
-import { AudienceData, isLesson2Complete, SCOPE_OPTIONS } from './types'
+import { AudienceData, isLesson2Complete } from './types'
 import DesireLadder from './DesireLadder'
 import HelpDrawer from './HelpDrawer'
 
@@ -99,6 +99,7 @@ export default function Lesson2Form({ data, onChange }: Props) {
             Desire Ladders
           </HelpDrawer>
         </h3>
+        <p className="text-gray-500 text-sm mb-4">Fill out the ladder first, then answer the questions about each desire.</p>
 
         <div className="space-y-4">
           <DesireLadder
@@ -116,138 +117,6 @@ export default function Lesson2Form({ data, onChange }: Props) {
             data={data.desire_3}
             onChange={(value) => updateField('desire_3', value)}
           />
-        </div>
-      </div>
-
-      {/* Dimensions */}
-      <div className="bg-brand-card rounded-2xl p-6 md:p-8">
-        <h3 className="font-soehne text-xl text-white mb-6">Desire Dimensions</h3>
-
-        <div className="space-y-6">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-gray-300 text-sm">
-                <HelpDrawer
-                  explanation="How pressing is this for them right now? A mild annoyance they'll get to someday (1) vs. something that keeps them up at night (5). High-urgency desires make people stop scrolling."
-                  examples={[
-                    {
-                      label: "High school football recruiting coach",
-                      value: "5 — Recruiting deadlines are real. Miss the window and you miss the scholarship.",
-                      note: "Time pressure creates urgency"
-                    },
-                    {
-                      label: "Helps busy moms meal prep",
-                      value: "4 — The stress is daily, but it's not life-or-death. Still, it compounds.",
-                      note: "Recurring friction builds urgency over time"
-                    },
-                    {
-                      label: "Teaches photographers to edit in Lightroom",
-                      value: "2-3 — It bugs them, but they're not losing sleep over it. It's a 'someday' problem.",
-                      note: "Hobby problems feel less urgent than professional ones"
-                    }
-                  ]}
-                >
-                  Urgency
-                </HelpDrawer>
-              </label>
-              <span className="text-brand-orange text-sm">{data.urgency_read}/5</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={data.urgency_read}
-              onChange={(e) => updateField('urgency_read', parseInt(e.target.value))}
-              className="w-full h-2 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-orange"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-gray-300 text-sm">
-                <HelpDrawer
-                  explanation="Is this desire solved once and forgotten, or does it keep coming back? A one-time fix (1) vs. a recurring need (5). High staying power means your content stays relevant — evergreen, not dated."
-                  examples={[
-                    {
-                      label: "High school football recruiting coach",
-                      value: "2 — Once they're recruited, they're done. But new seniors every year keeps the market fresh.",
-                      note: "One-time per person, but recurring in the market"
-                    },
-                    {
-                      label: "Helps busy moms meal prep",
-                      value: "5 — Dinner happens every single night. The problem never goes away.",
-                      note: "Daily repetition = maximum staying power"
-                    },
-                    {
-                      label: "Teaches photographers to edit in Lightroom",
-                      value: "4 — Every new photo needs editing. The skill compounds but the need repeats.",
-                      note: "Recurring activity, even after learning"
-                    }
-                  ]}
-                >
-                  Staying Power
-                </HelpDrawer>
-              </label>
-              <span className="text-brand-orange text-sm">{data.staying_power_read}/5</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={data.staying_power_read}
-              onChange={(e) => updateField('staying_power_read', parseInt(e.target.value))}
-              className="w-full h-2 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-orange"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-300 text-sm mb-2">
-              <HelpDrawer
-                explanation="How many people would stop scrolling for this desire? The algorithm tests your content on a small group first. If only your niche cares, it stops there. If strangers also care, it keeps pushing. This is why the emotional core (bottom of your ladder) usually has wider scope than the surface desire (top)."
-                examples={[
-                  {
-                    label: "High school football recruiting coach",
-                    value: "Niche specialists only — 'Get recruited' only matters to HS athletes. But 'not wanting the dream to die'? Everyone's felt that.",
-                    note: "Surface desire is narrow. Emotional core is wide."
-                  },
-                  {
-                    label: "Helps busy moms meal prep",
-                    value: "Most people who scroll past — Everyone eats dinner. Everyone knows the 5pm dread. This desire is massive.",
-                    note: "Daily universal friction = wide scope"
-                  },
-                  {
-                    label: "Teaches photographers to edit in Lightroom",
-                    value: "Followers + some strangers — Hobbyist photography is popular but not universal. More people than recruiting, fewer than food.",
-                    note: "Middle scope"
-                  }
-                ]}
-              >
-                Scope
-              </HelpDrawer>
-            </label>
-            <div className="space-y-2">
-              {SCOPE_OPTIONS.map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-                    data.scope_estimate === option.value
-                      ? 'bg-brand-orange/20 border border-brand-orange'
-                      : 'bg-brand-dark border border-transparent hover:border-gray-700'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="scope_estimate"
-                    value={option.value}
-                    checked={data.scope_estimate === option.value}
-                    onChange={(e) => updateField('scope_estimate', e.target.value as AudienceData['scope_estimate'])}
-                    className="sr-only"
-                  />
-                  <span className="text-white text-sm">{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

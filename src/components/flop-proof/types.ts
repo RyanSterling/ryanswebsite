@@ -8,12 +8,16 @@ export interface CreatorProfile {
   what_you_teach: string
 }
 
-// Lesson 2: Desire Ladder Structure
+// Lesson 2: Desire Ladder Structure (with dimensions per desire)
 export interface DesireLadder {
   desire_text: string
   so_i_can_1: string
   so_i_can_2: string
   so_i_can_3: string
+  // Dimensions for this specific desire
+  urgency: number // 1-5: How urgent is this for them?
+  repeats: number // 1-5: Does this come up once or keep repeating?
+  who_cares: 'just_my_audience' | 'some_strangers_too' | 'almost_everyone'
 }
 
 export interface AudienceData {
@@ -21,9 +25,6 @@ export interface AudienceData {
   desire_1: DesireLadder
   desire_2: DesireLadder
   desire_3: DesireLadder
-  urgency_read: number // 1-5
-  staying_power_read: number // 1-5
-  scope_estimate: 'niche_specialists' | 'followers_plus_strangers' | 'most_people'
 }
 
 // Lesson 3: Tell Layers
@@ -71,6 +72,9 @@ export function createEmptyFormData(): FlopProofFormData {
     so_i_can_1: '',
     so_i_can_2: '',
     so_i_can_3: '',
+    urgency: 3,
+    repeats: 3,
+    who_cares: 'some_strangers_too',
   }
 
   return {
@@ -85,9 +89,6 @@ export function createEmptyFormData(): FlopProofFormData {
       desire_1: { ...emptyLadder },
       desire_2: { ...emptyLadder },
       desire_3: { ...emptyLadder },
-      urgency_read: 3,
-      staying_power_read: 3,
-      scope_estimate: 'followers_plus_strangers',
     },
     lesson3: {
       will_tell_1: '',
@@ -188,9 +189,9 @@ export const SOPHISTICATION_PRESCRIPTIONS: Record<1 | 2 | 3 | 4 | 5, string> = {
   5: 'Stop arguing the point. Use identity — "this is who we are."',
 }
 
-// Scope options for select
-export const SCOPE_OPTIONS = [
-  { value: 'niche_specialists', label: 'Niche specialists only' },
-  { value: 'followers_plus_strangers', label: 'My followers + some strangers' },
-  { value: 'most_people', label: 'Most people who scroll past' },
+// Who cares options (plain language)
+export const WHO_CARES_OPTIONS = [
+  { value: 'just_my_audience', label: 'Just my audience' },
+  { value: 'some_strangers_too', label: 'My audience + some strangers' },
+  { value: 'almost_everyone', label: 'Almost everyone' },
 ] as const

@@ -1,4 +1,4 @@
-import { DesireLadder as DesireLadderType, isDesireLadderComplete } from './types'
+import { DesireLadder as DesireLadderType, isDesireLadderComplete, WHO_CARES_OPTIONS } from './types'
 
 interface Props {
   label: string
@@ -16,7 +16,7 @@ function IndentArrow({ className = '' }: { className?: string }) {
 }
 
 export default function DesireLadder({ label, data, onChange }: Props) {
-  const updateField = (field: keyof DesireLadderType, value: string) => {
+  const updateField = <K extends keyof DesireLadderType>(field: K, value: DesireLadderType[K]) => {
     onChange({ ...data, [field]: value })
   }
 
@@ -24,6 +24,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
   const showRung1 = data.desire_text.trim().length > 0
   const showRung2 = showRung1 && data.so_i_can_1.trim().length > 0
   const showRung3 = showRung2 && data.so_i_can_2.trim().length > 0
+  const showDimensions = showRung3 && data.so_i_can_3.trim().length > 0
 
   return (
     <div className="bg-brand-dark/50 rounded-xl p-4 border border-gray-800">
@@ -80,6 +81,70 @@ export default function DesireLadder({ label, data, onChange }: Props) {
             placeholder="So they can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500/30"
           />
+        </div>
+      </div>
+
+      {/* Dimensions - appear after ladder is complete */}
+      <div className={`mt-4 pt-4 border-t border-gray-700 space-y-4 transition-all duration-200 ${showDimensions ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+        {/* Urgency */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-gray-400 text-xs">How urgent is this for them?</label>
+            <span className="text-brand-orange text-xs">{data.urgency}/5</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value={data.urgency}
+            onChange={(e) => updateField('urgency', parseInt(e.target.value))}
+            className="w-full h-1.5 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-orange"
+          />
+          <div className="flex justify-between text-[10px] text-gray-600 mt-1">
+            <span>Mild annoyance</span>
+            <span>Keeps them up at night</span>
+          </div>
+        </div>
+
+        {/* Repeats */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-gray-400 text-xs">Does this come up once or keep repeating?</label>
+            <span className="text-brand-orange text-xs">{data.repeats}/5</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value={data.repeats}
+            onChange={(e) => updateField('repeats', parseInt(e.target.value))}
+            className="w-full h-1.5 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-orange"
+          />
+          <div className="flex justify-between text-[10px] text-gray-600 mt-1">
+            <span>One-time thing</span>
+            <span>Comes up constantly</span>
+          </div>
+        </div>
+
+        {/* Who cares */}
+        <div>
+          <label className="text-gray-400 text-xs block mb-2">Who feels this way?</label>
+          <div className="flex flex-wrap gap-2">
+            {WHO_CARES_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => updateField('who_cares', option.value)}
+                className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  data.who_cares === option.value
+                    ? 'bg-brand-orange text-white'
+                    : 'bg-brand-dark text-gray-400 hover:text-white'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
