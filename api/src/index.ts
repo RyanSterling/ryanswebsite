@@ -1940,6 +1940,67 @@ app.post('/webhooks/stripe', async (c) => {
 })
 
 // ============================================
+// FLOP-PROOF GENERATIONS PERSISTENCE
+// ============================================
+
+// Save a completed generation to Supabase
+app.post('/save-generation', async (c) => {
+  const { userId, courseId, ideas } = await c.req.json<{
+    userId: string
+    courseId: string
+    ideas: GeneratedIdea[]
+  }>()
+
+  if (!userId || !courseId || !ideas) {
+    return c.json({ error: 'Missing required fields' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  const { error } = await supabase
+    .from('generations')
+    .insert({
+      user_id: userId,
+      course_id: courseId,
+      ideas: ideas,
+    })
+
+  if (error) {
+    console.error('Failed to save generation:', error)
+    return c.json({ error: 'Failed to save generation' }, 500)
+  }
+
+  console.log(`Saved generation for user ${userId}, course ${courseId}, ${ideas.length} ideas`)
+  return c.json({ success: true })
+})
+
+// Get generations for a user/course
+app.get('/generations/:courseId', async (c) => {
+  const courseId = c.req.param('courseId')
+  const userId = c.req.query('userId')
+
+  if (!userId) {
+    return c.json({ error: 'Missing userId' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  const { data, error } = await supabase
+    .from('generations')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Failed to fetch generations:', error)
+    return c.json({ error: 'Failed to fetch generations' }, 500)
+  }
+
+  return c.json({ generations: data })
+})
+
+// ============================================
 // ROAST MY PROFILE SUBMISSION
 // ============================================
 

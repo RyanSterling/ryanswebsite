@@ -44,3 +44,26 @@ export interface Purchase {
   stripe_payment_id: string | null
   created_at: string
 }
+
+export interface GeneratedIdea {
+  id: number
+  idea: string
+  room_rationale: string
+  awareness_level: string
+  urgency: number
+  staying_power: number
+  scope: number
+  hook_fortune_teller: string
+  hook_experimenter: string
+  hook_teacher: string
+  hook_investigator: string
+  hook_contrarian: string
+}
+
+export interface Generation {
+  id: string
+  user_id: string
+  course_id: string
+  ideas: GeneratedIdea[]
+  created_at: string
+}

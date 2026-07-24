@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   FlopProofFormData,
   isLesson1Complete,
@@ -8,6 +8,7 @@ import {
   isLesson5Complete,
   SOPHISTICATION_PRESCRIPTIONS,
 } from './types'
+import { GeneratedIdea } from '../../lib/supabase'
 
 interface Props {
   formData: FlopProofFormData
@@ -15,22 +16,9 @@ interface Props {
   onUseGeneration: () => void
   allComplete: boolean
   onLoadTestData?: () => void
-}
-
-// Generated idea structure from API
-interface GeneratedIdea {
-  id: number
-  idea: string
-  room_rationale: string
-  awareness_level: string
-  urgency: number
-  staying_power: number
-  scope: number
-  hook_fortune_teller: string
-  hook_experimenter: string
-  hook_teacher: string
-  hook_investigator: string
-  hook_contrarian: string
+  userId?: string
+  courseId?: string
+  savedIdeas?: GeneratedIdea[]
 }
 
 
@@ -40,10 +28,13 @@ export default function GeneratorUI({
   onUseGeneration,
   allComplete,
   onLoadTestData,
+  userId,
+  courseId,
+  savedIdeas,
 }: Props) {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([])
+  const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>(savedIdeas || [])
   const [expandedIdea, setExpandedIdea] = useState<number | null>(null)
   const [completedBatches, setCompletedBatches] = useState(0)
   const [totalBatches, setTotalBatches] = useState(4)
@@ -52,6 +43,14 @@ export default function GeneratorUI({
   const apiUrl = import.meta.env.DEV
     ? 'http://localhost:8787'
     : 'https://ryan-website-api.rsterling20.workers.dev'
+
+  // Load saved ideas when prop changes
+  useEffect(() => {
+    if (savedIdeas && savedIdeas.length > 0 && generatedIdeas.length === 0) {
+      setGeneratedIdeas(savedIdeas)
+      setJobStatus('complete')
+    }
+  }, [savedIdeas])
 
   const completionStatus = [
     { name: 'Lesson 1: Creator Profile', complete: isLesson1Complete(formData.lesson1) },
@@ -143,13 +142,47 @@ export default function GeneratorUI({
               setCompletedBatches(event.totalBatches)
               setJobStatus('complete')
               setIsGenerating(false)
+
+              // Save to Supabase
+              if (userId && courseId) {
+                fetch(`${apiUrl}/save-generation`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userId,
+                    courseId,
+                    ideas: event.allIdeas,
+                  }),
+                }).then(res => {
+                  if (res.ok) {
+                    console.log('[FlopProof] Ideas saved to Supabase')
+                  } else {
+                    console.error('[FlopProof] Failed to save ideas to Supabase')
+                  }
+                }).catch(err => {
+                  console.error('[FlopProof] Error saving ideas:', err)
+                })
+              }
             } else if (event.type === 'error') {
               console.error('[FlopProof] Generation error:', event.error)
               if (event.allIdeas && event.allIdeas.length > 0) {
-                // Partial success
+                // Partial success - save what we have
                 setGeneratedIdeas(event.allIdeas)
                 setJobStatus('partial_complete')
                 setJobError(`Generated ${event.allIdeas.length} ideas. Batch ${event.batch} failed: ${event.error}`)
+
+                // Save partial results to Supabase
+                if (userId && courseId) {
+                  fetch(`${apiUrl}/save-generation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      userId,
+                      courseId,
+                      ideas: event.allIdeas,
+                    }),
+                  }).catch(err => console.error('[FlopProof] Error saving partial ideas:', err))
+                }
               } else {
                 setJobError(event.error || 'Generation failed')
               }

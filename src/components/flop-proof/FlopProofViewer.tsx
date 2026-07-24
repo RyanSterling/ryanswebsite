@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useUser } from '@clerk/react'
-import { supabase, Course, Lesson } from '../../lib/supabase'
+import { supabase, Course, Lesson, GeneratedIdea } from '../../lib/supabase'
 import {
   FlopProofFormData,
   createEmptyFormData,
@@ -95,6 +95,11 @@ export default function FlopProofViewer() {
   // Form state
   const [formData, setFormData] = useState<FlopProofFormData>(createEmptyFormData())
   const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
+  const [savedIdeas, setSavedIdeas] = useState<GeneratedIdea[]>([])
+
+  const apiUrl = import.meta.env.DEV
+    ? 'http://localhost:8787'
+    : 'https://ryan-website-api.rsterling20.workers.dev'
 
   // Load saved form data
   useEffect(() => {
@@ -163,6 +168,23 @@ export default function FlopProofViewer() {
       }
 
       setHasAccess(true)
+
+      // Load saved generation ideas
+      try {
+        const genResponse = await fetch(
+          `${apiUrl}/generations/${courseData.id}?userId=${user.id}`
+        )
+        if (genResponse.ok) {
+          const { generations } = await genResponse.json()
+          if (generations && generations.length > 0) {
+            // Load most recent generation
+            setSavedIdeas(generations[0].ideas)
+            console.log(`Loaded ${generations[0].ideas.length} saved ideas`)
+          }
+        }
+      } catch (err) {
+        console.error('Error loading saved ideas:', err)
+      }
 
       const { data: lessonData } = await supabase
         .from('lessons')
@@ -248,6 +270,9 @@ export default function FlopProofViewer() {
           onUseGeneration={handleUseGeneration}
           allComplete={allComplete}
           onLoadTestData={handleLoadTestData}
+          userId={user?.id}
+          courseId={course?.id}
+          savedIdeas={savedIdeas}
         />
       )
     }
