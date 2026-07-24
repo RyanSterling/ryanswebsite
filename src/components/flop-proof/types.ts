@@ -182,11 +182,11 @@ export function isAllComplete(data: FlopProofFormData): boolean {
 
 // Sophistication stage prescriptions
 export const SOPHISTICATION_PRESCRIPTIONS: Record<1 | 2 | 3 | 4 | 5, string> = {
-  1: 'Just say it plainly. You\'re first — clarity wins.',
-  2: 'Say it bigger. Go further than they did.',
-  3: 'Need a new mechanism. Shift from what to how it actually works.',
-  4: 'Extend the mechanism. Make it explain more than theirs does.',
-  5: 'Stop arguing the point. Use identity — "this is who we are."',
+  1: 'You\'re first. Just say it clearly.',
+  2: 'Others have said it. Go bolder — say what they were afraid to.',
+  3: 'Everyone\'s made the claim. Show HOW it works, not just what.',
+  4: 'Everyone\'s explained it. Go where they didn\'t — the part they oversimplified.',
+  5: 'They\'ve tuned out tips. Show what life looks like on the other side.',
 }
 
 // How common is this desire (plain language)

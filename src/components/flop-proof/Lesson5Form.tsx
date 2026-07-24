@@ -174,18 +174,18 @@ export default function Lesson5Form({ data, onChange }: Props) {
                 examples={[
                   {
                     label: "Stage 1-2: Fresh or Early",
-                    value: "You can say it plainly or just say it bigger. Clarity wins.",
+                    value: "You're first, or close to it. Say it clearly, or go bolder than the few who came before.",
                     note: "Rare. Most niches are past this point."
                   },
                   {
                     label: "Stage 3: Crowded",
-                    value: "Everyone's made the same claim. You need a new mechanism — explain HOW it works, not just WHAT.",
+                    value: "Everyone's made the claim. Show HOW it works, not just what.",
                     note: "Most niches live here. This is where 'proven' topics flop."
                   },
                   {
                     label: "Stage 4-5: Very crowded or Burned out",
-                    value: "Even the new angles are copied. Use identity, not arguments. 'This is who we are.'",
-                    note: "Stop trying to convince. Start building a tribe."
+                    value: "They've heard the explanations too. Go where others didn't, or show what life looks like on the other side.",
+                    note: "Stop explaining. Go deeper or show the result."
                   }
                 ]}
               >

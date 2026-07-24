@@ -219,11 +219,11 @@ who_cares: select
 **Teaching point to embed in UI:** "This is why 'proven' topics still flop for you — you arrived at stage 3 with stage 1 execution. The generator won't make that mistake."
 
 **Prescription display (read-only, based on stage selection):**
-- Stage 1: Just say it plainly.
-- Stage 2: Say it bigger / go further than they did.
-- Stage 3: Need a new mechanism. Shift from *what* to *how it actually works.*
-- Stage 4: Extend the mechanism — make it explain more than theirs does.
-- Stage 5: Stop arguing the point. Use identity — "this is who we are."
+- Stage 1: You're first. Just say it clearly.
+- Stage 2: Others have said it. Go bolder — say what they were afraid to.
+- Stage 3: Everyone's made the claim. Show HOW it works, not just what.
+- Stage 4: Everyone's explained it. Go where they didn't — the part they oversimplified.
+- Stage 5: They've tuned out tips. Show what life looks like on the other side.
 
 **Field count:** 4 fields
 **UX note:** The "saturated topics" field is cathartic — they get to vent about what they're sick of seeing.
@@ -673,11 +673,11 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
    - **Competitor angles:** What messages has your audience heard 100 times? The positioning everyone uses.
 
 3. **The 5 market stages** (what to do at each):
-   - **Stage 1 (Fresh):** Nobody's said this yet. Just say it plainly — clarity wins.
-   - **Stage 2 (Early):** A few have said it. Say it bigger, go further than they did.
-   - **Stage 3 (Crowded):** Everyone's said it, nobody believes it. Need a new mechanism — shift from *what* to *how it actually works*.
-   - **Stage 4 (Very crowded):** Even the new angles are copied. Extend the mechanism — make it explain more than theirs does.
-   - **Stage 5 (Burned out):** Total fatigue. Stop arguing the point. Use identity — "this is who we are."
+   - **Stage 1 (Fresh):** Nobody's said this yet. Just say it clearly.
+   - **Stage 2 (Early):** A few have said it. Go bolder — say what they were afraid to.
+   - **Stage 3 (Crowded):** Everyone's made the claim. Show HOW it works, not just what.
+   - **Stage 4 (Very crowded):** Everyone's explained it. Go where they didn't — the part they oversimplified.
+   - **Stage 5 (Burned out):** They've tuned out tips. Show what life looks like on the other side.
 
 4. **Why the prescription matters:** Selecting your market stage forces you to be honest about competition. The prescription tells you what kind of execution you need. The generator uses this to avoid producing stage 1 ideas for a stage 3 audience.
 
