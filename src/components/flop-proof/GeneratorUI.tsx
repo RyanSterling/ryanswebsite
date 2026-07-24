@@ -67,7 +67,6 @@ export default function GeneratorUI({
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
   const [hasCountedGeneration, setHasCountedGeneration] = useState(false)
-  const [generationStartTime, setGenerationStartTime] = useState<number | null>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const apiUrl = import.meta.env.DEV
@@ -201,7 +200,6 @@ export default function GeneratorUI({
     setJobStatus('in_progress')
     setHasCountedGeneration(false)
     const startTime = Date.now()
-    setGenerationStartTime(startTime)
 
     console.log('[FlopProof] Starting generation...')
 
