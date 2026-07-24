@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useUser } from '@clerk/react'
 import { supabase, Course, Lesson } from '../../lib/supabase'
 import {
@@ -22,16 +22,15 @@ import GeneratorUI from './GeneratorUI'
 const COURSE_SLUG = 'flop-proof-content-system'
 const STORAGE_KEY = 'flop-proof-form-data'
 const GENERATIONS_KEY = 'flop-proof-generations'
-const CURRENT_LESSON_KEY = 'flop-proof-current-lesson'
 const MAX_GENERATIONS = 3
 
 export default function FlopProofViewer() {
   const navigate = useNavigate()
+  const { lessonId } = useParams<{ lessonId?: string }>()
   const { user, isLoaded } = useUser()
 
   const [course, setCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
-  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
   const [loading, setLoading] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -39,7 +38,6 @@ export default function FlopProofViewer() {
   // Form state
   const [formData, setFormData] = useState<FlopProofFormData>(createEmptyFormData())
   const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
-  const hasInitializedLesson = useRef(false)
 
   // Load saved form data
   useEffect(() => {
@@ -72,13 +70,6 @@ export default function FlopProofViewer() {
       localStorage.setItem(`${GENERATIONS_KEY}-${user.id}`, generationsRemaining.toString())
     }
   }, [generationsRemaining, user])
-
-  // Save current lesson on change
-  useEffect(() => {
-    if (user && currentLesson) {
-      localStorage.setItem(`${CURRENT_LESSON_KEY}-${user.id}`, currentLesson.id)
-    }
-  }, [currentLesson, user])
 
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {
@@ -125,14 +116,9 @@ export default function FlopProofViewer() {
       const lessonsArray = lessonData || []
       setLessons(lessonsArray)
 
-      // Restore saved lesson or default to first
-      if (lessonsArray.length > 0 && !hasInitializedLesson.current) {
-        const savedLessonId = localStorage.getItem(`${CURRENT_LESSON_KEY}-${user.id}`)
-        const savedLesson = savedLessonId
-          ? lessonsArray.find(l => l.id === savedLessonId)
-          : null
-        setCurrentLesson(savedLesson || lessonsArray[0])
-        hasInitializedLesson.current = true
+      // Redirect to first lesson if no lessonId in URL
+      if (lessonsArray.length > 0 && !lessonId) {
+        navigate(`/courses/${COURSE_SLUG}/learn/${lessonsArray[0].id}`, { replace: true })
       }
 
       setLoading(false)
@@ -164,9 +150,15 @@ export default function FlopProofViewer() {
     }
   }
 
-  const currentLessonIndex = lessons.findIndex((l) => l.id === currentLesson?.id)
+  // Derive current lesson from URL
+  const currentLesson = lessonId ? lessons.find(l => l.id === lessonId) : null
+  const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
   const isGeneratorLesson = currentLessonIndex === 5 // 6th lesson (0-indexed)
   const allComplete = isAllComplete(formData)
+
+  const goToLesson = (lesson: Lesson) => {
+    navigate(`/courses/${COURSE_SLUG}/learn/${lesson.id}`)
+  }
 
   const handleUseGeneration = () => {
     if (generationsRemaining > 0) {
@@ -357,7 +349,7 @@ export default function FlopProofViewer() {
                 <button
                   key={lesson.id}
                   onClick={() => {
-                    setCurrentLesson(lesson)
+                    goToLesson(lesson)
                     setSidebarOpen(false)
                   }}
                   className={`w-full text-left px-6 py-4 flex items-start gap-4 hover:bg-gray-800/50 transition-colors ${
@@ -453,9 +445,7 @@ export default function FlopProofViewer() {
               {currentLessonIndex < lessons.length - 1 && (
                 <div className="flex justify-end">
                   <button
-                    onClick={() => {
-                      setCurrentLesson(lessons[currentLessonIndex + 1])
-                    }}
+                    onClick={() => goToLesson(lessons[currentLessonIndex + 1])}
                     className="bg-brand-orange text-white font-medium px-8 py-3 rounded-[19px] hover:opacity-90 transition-opacity"
                   >
                     Next Lesson

@@ -57,7 +57,7 @@ function App() {
         }
       />
       <Route
-        path="/courses/flop-proof-content-system/learn"
+        path="/courses/flop-proof-content-system/learn/:lessonId?"
         element={
           <ProtectedRoute>
             <FlopProofViewer />
