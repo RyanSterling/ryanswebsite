@@ -60,7 +60,7 @@ export default function GeneratorUI({
       // Call the API endpoint
       const apiUrl = import.meta.env.DEV
         ? 'http://localhost:8787/generate-ideas'
-        : 'https://api.ryansterling.com/generate-ideas'
+        : 'https://ryan-website-api.rsterling20.workers.dev/generate-ideas'
 
       const response = await fetch(apiUrl, {
         method: 'POST',
