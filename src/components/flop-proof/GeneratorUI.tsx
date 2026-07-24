@@ -47,8 +47,9 @@ interface JobStatus {
   error?: { batch: number; message: string } | null
 }
 
-const POLL_INTERVAL = 10000 // 10 seconds
+const POLL_INTERVAL = 5000 // 5 seconds
 const LOCALSTORAGE_KEY = 'flop-proof-job-id'
+const MAX_GENERATION_TIME = 10 * 60 * 1000 // 10 minutes timeout
 
 export default function GeneratorUI({
   formData,
@@ -66,6 +67,7 @@ export default function GeneratorUI({
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
   const [hasCountedGeneration, setHasCountedGeneration] = useState(false)
+  const [generationStartTime, setGenerationStartTime] = useState<number | null>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const apiUrl = import.meta.env.DEV
@@ -73,9 +75,27 @@ export default function GeneratorUI({
     : 'https://ryan-website-api.rsterling20.workers.dev'
 
   // Poll for job status
-  const pollJobStatus = useCallback(async (id: string, countGeneration: boolean) => {
+  const pollJobStatus = useCallback(async (id: string, countGeneration: boolean, startTime: number) => {
+    console.log(`[FlopProof] Polling job ${id}...`)
+
+    // Check for timeout
+    const elapsed = Date.now() - startTime
+    if (elapsed > MAX_GENERATION_TIME) {
+      console.error(`[FlopProof] Generation timeout after ${Math.round(elapsed / 1000)}s`)
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+      }
+      setIsGenerating(false)
+      localStorage.removeItem(LOCALSTORAGE_KEY)
+      setJobError('Generation timed out. The server may be overloaded. Please try again.')
+      return
+    }
+
     try {
       const response = await fetch(`${apiUrl}/generation-status/${id}`)
+      console.log(`[FlopProof] Poll response status: ${response.status}`)
+
       if (!response.ok) {
         if (response.status === 404) {
           // Job expired or not found
@@ -88,6 +108,7 @@ export default function GeneratorUI({
       }
 
       const data: JobStatus = await response.json()
+      console.log(`[FlopProof] Job status: ${data.status}, batches: ${data.completedBatches}/${data.totalBatches}`)
 
       // Update state with all ideas from completed batches
       const allIdeas = data.batches
@@ -106,6 +127,7 @@ export default function GeneratorUI({
 
       // Check if done
       if (data.status === 'complete' || data.status === 'partial_complete') {
+        console.log(`[FlopProof] Generation complete! Status: ${data.status}, ideas: ${allIdeas.length}`)
         if (pollIntervalRef.current) {
           clearInterval(pollIntervalRef.current)
           pollIntervalRef.current = null
@@ -118,24 +140,26 @@ export default function GeneratorUI({
         }
       }
     } catch (error) {
-      console.error('Polling error:', error)
+      console.error('[FlopProof] Polling error:', error)
       // Don't stop polling on transient errors, just log
     }
   }, [apiUrl, hasCountedGeneration, onUseGeneration])
 
   // Start polling
-  const startPolling = useCallback((id: string, countGeneration: boolean = false) => {
+  const startPolling = useCallback((id: string, countGeneration: boolean = false, startTime: number = Date.now()) => {
+    console.log(`[FlopProof] Starting polling for job ${id}`)
+
     // Clear any existing interval
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current)
     }
 
     // Poll immediately
-    pollJobStatus(id, countGeneration)
+    pollJobStatus(id, countGeneration, startTime)
 
     // Then poll every POLL_INTERVAL
     pollIntervalRef.current = setInterval(() => {
-      pollJobStatus(id, countGeneration)
+      pollJobStatus(id, countGeneration, startTime)
     }, POLL_INTERVAL)
   }, [pollJobStatus])
 
@@ -143,9 +167,11 @@ export default function GeneratorUI({
   useEffect(() => {
     const savedJobId = localStorage.getItem(LOCALSTORAGE_KEY)
     if (savedJobId) {
+      console.log(`[FlopProof] Recovering job: ${savedJobId}`)
       setIsGenerating(true)
       // Don't count generation on recovery - it was already counted
-      startPolling(savedJobId, false)
+      // Use current time as start for timeout (give it fresh 10 min window)
+      startPolling(savedJobId, false, Date.now())
     }
 
     // Cleanup on unmount
@@ -174,6 +200,10 @@ export default function GeneratorUI({
     setCompletedBatches(0)
     setJobStatus('in_progress')
     setHasCountedGeneration(false)
+    const startTime = Date.now()
+    setGenerationStartTime(startTime)
+
+    console.log('[FlopProof] Starting generation...')
 
     try {
       const response = await fetch(`${apiUrl}/generate-ideas-start`, {
@@ -194,13 +224,14 @@ export default function GeneratorUI({
 
       // Store jobId in localStorage for recovery
       localStorage.setItem(LOCALSTORAGE_KEY, result.jobId)
+      console.log(`[FlopProof] Job started: ${result.jobId}`)
 
       // Update state (may have 0 batches initially)
       setCompletedBatches(result.completedBatches)
       setTotalBatches(result.totalBatches)
 
       // Start polling - this will count the generation when batch 1 completes
-      startPolling(result.jobId, true)
+      startPolling(result.jobId, true, startTime)
 
     } catch (error) {
       console.error('Generation error:', error)
