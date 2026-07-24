@@ -93,7 +93,7 @@ export default function HelpDrawer({ children, explanation, examples }: Props) {
                     <div className="text-gray-500 text-xs uppercase tracking-wide mb-1 font-normal">
                       {example.label}
                     </div>
-                    <div className="text-white font-normal text-base">
+                    <div className="text-white font-normal text-base whitespace-pre-line">
                       {example.value}
                     </div>
                     {example.note && (

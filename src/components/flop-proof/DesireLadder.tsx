@@ -6,6 +6,15 @@ interface Props {
   onChange: (data: DesireLadderType) => void
 }
 
+function IndentArrow({ className = '' }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <path d="M3.75 4.75V12.25C3.75 13.9069 5.09315 15.25 6.75 15.25H19.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16.25 11.25L20.25 15.25L16.25 19.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
 export default function DesireLadder({ label, data, onChange }: Props) {
   const updateField = (field: keyof DesireLadderType, value: string) => {
     onChange({ ...data, [field]: value })
@@ -28,54 +37,47 @@ export default function DesireLadder({ label, data, onChange }: Props) {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-brand-orange text-xs">1</span>
-          </div>
-          <input
-            type="text"
-            value={data.desire_text}
-            onChange={(e) => updateField('desire_text', e.target.value)}
-            placeholder="They want to..."
-            className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
-          />
-        </div>
+        {/* Rung 1 - no indent */}
+        <input
+          type="text"
+          value={data.desire_text}
+          onChange={(e) => updateField('desire_text', e.target.value)}
+          placeholder="They want to"
+          className="w-full px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
+        />
 
-        <div className={`flex items-center gap-3 transition-all duration-200 ${showRung1 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-brand-orange text-xs">2</span>
-          </div>
+        {/* Rung 2 - first indent */}
+        <div className={`flex items-center gap-2 pl-4 transition-all duration-200 ${showRung1 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-gray-600" />
           <input
             type="text"
             value={data.so_i_can_1}
             onChange={(e) => updateField('so_i_can_1', e.target.value)}
-            placeholder="...so they can..."
+            placeholder="So they can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
 
-        <div className={`flex items-center gap-3 transition-all duration-200 ${showRung2 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-brand-orange text-xs">3</span>
-          </div>
+        {/* Rung 3 - second indent */}
+        <div className={`flex items-center gap-2 pl-12 transition-all duration-200 ${showRung2 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-gray-600" />
           <input
             type="text"
             value={data.so_i_can_2}
             onChange={(e) => updateField('so_i_can_2', e.target.value)}
-            placeholder="...so they can..."
+            placeholder="So they can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
 
-        <div className={`flex items-center gap-3 transition-all duration-200 ${showRung3 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-green-400 text-xs">4</span>
-          </div>
+        {/* Rung 4 - third indent (the emotional core) */}
+        <div className={`flex items-center gap-2 pl-20 transition-all duration-200 ${showRung3 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-green-500" />
           <input
             type="text"
             value={data.so_i_can_3}
             onChange={(e) => updateField('so_i_can_3', e.target.value)}
-            placeholder="...so they can..."
+            placeholder="So they can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500/30"
           />
         </div>

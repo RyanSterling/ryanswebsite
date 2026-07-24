@@ -72,17 +72,26 @@ export default function Lesson2Form({ data, onChange }: Props) {
             examples={[
               {
                 label: "High school football recruiting coach",
-                value: "Get recruited → Keep playing the sport I love → Know the early mornings meant something → Not have the dream die",
+                value: `Get recruited
+  ↳ Keep playing the sport I love
+    ↳ Know the early mornings meant something
+      ↳ Not have the dream die`,
                 note: "The core fear is the dream ending. That's universal."
               },
               {
                 label: "Helps busy moms meal prep",
-                value: "Have dinners planned → Stop dreading 5pm every day → Have one less thing draining me → Have energy to actually enjoy my evening",
+                value: `Have dinners planned
+  ↳ Stop dreading 5pm every day
+    ↳ Have one less thing draining me
+      ↳ Have energy to actually enjoy my evening`,
                 note: "The core isn't 'be a good mom' — it's not being empty by 8pm."
               },
               {
                 label: "Teaches photographers to edit in Lightroom",
-                value: "Make photos look professional → Not be embarrassed to share them → Feel like I'm actually improving → Feel like a photographer, not just someone with an expensive camera",
+                value: `Make photos look professional
+  ↳ Not be embarrassed to share them
+    ↳ Feel like I'm actually improving
+      ↳ Feel like a photographer, not just someone with an expensive camera`,
                 note: "The core is identity — am I actually this thing, or just pretending?"
               }
             ]}
