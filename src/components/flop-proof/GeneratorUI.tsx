@@ -17,17 +17,20 @@ interface Props {
   onLoadTestData?: () => void
 }
 
-// Placeholder for generated ideas - will be replaced with actual API response
+// Generated idea structure from API
 interface GeneratedIdea {
   id: number
   idea: string
   room_rationale: string
+  awareness_level: string
   urgency: number
   staying_power: number
   scope: number
-  hook_will_tell: string
-  hook_wont_tell: string
-  hook_cant_tell: string
+  hook_fortune_teller: string
+  hook_experimenter: string
+  hook_teacher: string
+  hook_investigator: string
+  hook_contrarian: string
 }
 
 export default function GeneratorUI({
@@ -100,12 +103,15 @@ export default function GeneratorUI({
       'id',
       'idea',
       'room_rationale',
+      'awareness_level',
       'urgency',
       'staying_power',
       'scope',
-      'hook_will_tell',
-      'hook_wont_tell',
-      'hook_cant_tell',
+      'hook_fortune_teller',
+      'hook_experimenter',
+      'hook_teacher',
+      'hook_investigator',
+      'hook_contrarian',
     ]
 
     const csvContent = [
@@ -115,12 +121,15 @@ export default function GeneratorUI({
           idea.id,
           `"${idea.idea.replace(/"/g, '""')}"`,
           `"${idea.room_rationale.replace(/"/g, '""')}"`,
+          idea.awareness_level,
           idea.urgency,
           idea.staying_power,
           idea.scope,
-          `"${idea.hook_will_tell.replace(/"/g, '""')}"`,
-          `"${idea.hook_wont_tell.replace(/"/g, '""')}"`,
-          `"${idea.hook_cant_tell.replace(/"/g, '""')}"`,
+          `"${idea.hook_fortune_teller.replace(/"/g, '""')}"`,
+          `"${idea.hook_experimenter.replace(/"/g, '""')}"`,
+          `"${idea.hook_teacher.replace(/"/g, '""')}"`,
+          `"${idea.hook_investigator.replace(/"/g, '""')}"`,
+          `"${idea.hook_contrarian.replace(/"/g, '""')}"`,
         ].join(',')
       ),
     ].join('\n')
@@ -133,17 +142,30 @@ export default function GeneratorUI({
     URL.revokeObjectURL(link.href)
   }
 
-  const copyIdeaToClipboard = (idea: GeneratedIdea, hookType: 'will_tell' | 'wont_tell' | 'cant_tell') => {
-    const hook = hookType === 'will_tell'
-      ? idea.hook_will_tell
-      : hookType === 'wont_tell'
-      ? idea.hook_wont_tell
-      : idea.hook_cant_tell
+  type HookType = 'fortune_teller' | 'experimenter' | 'teacher' | 'investigator' | 'contrarian'
+
+  const hookLabels: Record<HookType, string> = {
+    fortune_teller: 'Fortune Teller',
+    experimenter: 'Experimenter',
+    teacher: 'Teacher',
+    investigator: 'Investigator',
+    contrarian: 'Contrarian',
+  }
+
+  const copyIdeaToClipboard = (idea: GeneratedIdea, hookType: HookType) => {
+    const hookMap: Record<HookType, string> = {
+      fortune_teller: idea.hook_fortune_teller,
+      experimenter: idea.hook_experimenter,
+      teacher: idea.hook_teacher,
+      investigator: idea.hook_investigator,
+      contrarian: idea.hook_contrarian,
+    }
+    const hook = hookMap[hookType]
 
     // Prompt B would be included here
     const copyText = `Idea: ${idea.idea}
 
-Hook: ${hook}
+Hook (${hookLabels[hookType]}): ${hook}
 
 ---
 [Prompt B would be included here for expansion in your own LLM]`
@@ -347,16 +369,37 @@ Hook: ${hook}
                     </div>
 
                     <div className="space-y-3">
-                      {/* Will Tell Hook */}
+                      {/* Fortune Teller Hook */}
+                      <div className="flex items-start gap-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                        <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-amber-400 text-xs font-bold">F</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-400 text-xs mb-1">Fortune Teller</p>
+                          <p className="text-white text-sm">{idea.hook_fortune_teller}</p>
+                        </div>
+                        <button
+                          onClick={() => copyIdeaToClipboard(idea, 'fortune_teller')}
+                          className="text-gray-400 hover:text-white p-1"
+                          title="Copy to clipboard"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Experimenter Hook */}
                       <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
                         <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-400 text-xs font-bold">W</span>
+                          <span className="text-blue-400 text-xs font-bold">E</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-white text-sm">{idea.hook_will_tell}</p>
+                          <p className="text-gray-400 text-xs mb-1">Experimenter</p>
+                          <p className="text-white text-sm">{idea.hook_experimenter}</p>
                         </div>
                         <button
-                          onClick={() => copyIdeaToClipboard(idea, 'will_tell')}
+                          onClick={() => copyIdeaToClipboard(idea, 'experimenter')}
                           className="text-gray-400 hover:text-white p-1"
                           title="Copy to clipboard"
                         >
@@ -366,35 +409,57 @@ Hook: ${hook}
                         </button>
                       </div>
 
-                      {/* Won't Tell Hook */}
-                      <div className="flex items-start gap-3 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-purple-400 text-xs font-bold">S</span>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-white text-sm">{idea.hook_wont_tell}</p>
-                        </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'wont_tell')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Can't Tell Hook */}
+                      {/* Teacher Hook */}
                       <div className="flex items-start gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
                         <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-emerald-400 text-xs font-bold">C</span>
+                          <span className="text-emerald-400 text-xs font-bold">T</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-white text-sm">{idea.hook_cant_tell}</p>
+                          <p className="text-gray-400 text-xs mb-1">Teacher</p>
+                          <p className="text-white text-sm">{idea.hook_teacher}</p>
                         </div>
                         <button
-                          onClick={() => copyIdeaToClipboard(idea, 'cant_tell')}
+                          onClick={() => copyIdeaToClipboard(idea, 'teacher')}
+                          className="text-gray-400 hover:text-white p-1"
+                          title="Copy to clipboard"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Investigator Hook */}
+                      <div className="flex items-start gap-3 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-purple-400 text-xs font-bold">I</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-400 text-xs mb-1">Investigator</p>
+                          <p className="text-white text-sm">{idea.hook_investigator}</p>
+                        </div>
+                        <button
+                          onClick={() => copyIdeaToClipboard(idea, 'investigator')}
+                          className="text-gray-400 hover:text-white p-1"
+                          title="Copy to clipboard"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Contrarian Hook */}
+                      <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-red-400 text-xs font-bold">C</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-400 text-xs mb-1">Contrarian</p>
+                          <p className="text-white text-sm">{idea.hook_contrarian}</p>
+                        </div>
+                        <button
+                          onClick={() => copyIdeaToClipboard(idea, 'contrarian')}
                           className="text-gray-400 hover:text-white p-1"
                           title="Copy to clipboard"
                         >

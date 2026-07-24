@@ -1153,6 +1153,20 @@ ${lesson2.audience_description}
 **Market Stage:** ${lesson5.sophistication_stage}/5
 Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
 
+## HOOK FORMATS
+
+For each idea, write 5 different hooks using these formats. Each format creates contrast differently:
+
+1. **Fortune Teller** (Present vs Future): Frame the idea as something that will change the future. "This is going to change how you X forever" or "In 6 months, everyone will be doing this"
+
+2. **Experimenter** (Before vs After): Frame it as an experiment or test you ran. "I tried X for 30 days - here's what happened" or "I tested every method and this one wins"
+
+3. **Teacher** (Unknown vs Known): Frame it as a lesson or how-to. "3 things you need to know about X" or "Here's how the pros actually do X"
+
+4. **Investigator** (Hidden vs Revealed): Frame it as a secret or discovery. "Nobody talks about this..." or "I found the real reason why X happens"
+
+5. **Contrarian** (Belief A vs Belief B): Challenge conventional wisdom directly. "You're doing X completely wrong" or "Everyone says Y but actually..."
+
 ## OUTPUT
 
 Return JSON with this structure:
@@ -1166,9 +1180,11 @@ Return JSON with this structure:
       "urgency": 1-5,
       "staying_power": 1-5,
       "scope": 1-5,
-      "hook_will_tell": "Hook based on what they say",
-      "hook_wont_tell": "Hook based on their secret thought",
-      "hook_cant_tell": "Hook based on what they don't know"
+      "hook_fortune_teller": "Present vs future hook",
+      "hook_experimenter": "Before vs after / experiment hook",
+      "hook_teacher": "Lesson / how-to hook",
+      "hook_investigator": "Secret / discovery hook",
+      "hook_contrarian": "Challenge conventional wisdom hook"
     }
   ],
   "meta": {
