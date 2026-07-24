@@ -2,7 +2,7 @@ import { useState, FormEvent } from 'react'
 
 const API_URL = import.meta.env.DEV
   ? 'http://localhost:8787'
-  : 'https://ryan-website-api.ryansterling3651.workers.dev'
+  : 'https://ryan-website-api.rsterling20.workers.dev'
 
 export default function RoastMyProfile() {
   const [email, setEmail] = useState('')
