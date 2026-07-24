@@ -1,4 +1,5 @@
 import { DesireLadder as DesireLadderType, isDesireLadderComplete, WHO_CARES_OPTIONS } from './types'
+import HelpDrawer from './HelpDrawer'
 
 interface Props {
   label: string
@@ -85,12 +86,35 @@ export default function DesireLadder({ label, data, onChange }: Props) {
       </div>
 
       {/* Dimensions - appear after ladder is complete */}
-      <div className={`mt-4 pt-4 border-t border-gray-700 space-y-4 transition-all duration-200 ${showDimensions ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+      <div className={`mt-4 space-y-4 transition-all duration-200 ${showDimensions ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
         {/* Urgency */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-gray-400 text-xs">How urgent is this for them?</label>
-            <span className="text-brand-orange text-xs">{data.urgency}/5</span>
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="How pressing is this for them right now? High-urgency desires make people stop scrolling."
+                examples={[
+                  {
+                    label: "High school football recruiting coach",
+                    value: "5 — Recruiting deadlines are real. Miss the window and you miss the scholarship.",
+                    note: "Time pressure creates urgency"
+                  },
+                  {
+                    label: "Helps busy moms meal prep",
+                    value: "4 — The stress is daily, but it's not life-or-death. Still, it compounds.",
+                    note: "Recurring friction builds urgency over time"
+                  },
+                  {
+                    label: "Teaches photographers to edit in Lightroom",
+                    value: "2-3 — It bugs them, but they're not losing sleep over it.",
+                    note: "Hobby problems feel less urgent"
+                  }
+                ]}
+              >
+                How urgent is this for them?
+              </HelpDrawer>
+            </span>
+            <span className="text-brand-orange text-sm">{data.urgency}/5</span>
           </div>
           <input
             type="range"
@@ -109,8 +133,31 @@ export default function DesireLadder({ label, data, onChange }: Props) {
         {/* Repeats */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-gray-400 text-xs">Does this come up once or keep repeating?</label>
-            <span className="text-brand-orange text-xs">{data.repeats}/5</span>
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="Is this desire solved once and forgotten, or does it keep coming back? High-repeat desires mean your content stays relevant longer."
+                examples={[
+                  {
+                    label: "High school football recruiting coach",
+                    value: "2 — Once they're recruited, they're done. But new seniors every year keeps the market fresh.",
+                    note: "One-time per person, but recurring in the market"
+                  },
+                  {
+                    label: "Helps busy moms meal prep",
+                    value: "5 — Dinner happens every single night. The problem never goes away.",
+                    note: "Daily repetition = maximum staying power"
+                  },
+                  {
+                    label: "Teaches photographers to edit in Lightroom",
+                    value: "4 — Every new photo needs editing. The skill compounds but the need repeats.",
+                    note: "Recurring activity, even after learning"
+                  }
+                ]}
+              >
+                Does this come up once or keep repeating?
+              </HelpDrawer>
+            </span>
+            <span className="text-brand-orange text-sm">{data.repeats}/5</span>
           </div>
           <input
             type="range"
@@ -128,7 +175,30 @@ export default function DesireLadder({ label, data, onChange }: Props) {
 
         {/* Who cares */}
         <div>
-          <label className="text-gray-400 text-xs block mb-2">Who feels this way?</label>
+          <span className="text-gray-400 text-sm block mb-2">
+            <HelpDrawer
+              explanation="How many people would stop scrolling for this desire? The algorithm tests your content on a small group first. If only your niche cares, it stops there. If strangers also care, it keeps pushing."
+              examples={[
+                {
+                  label: "High school football recruiting coach",
+                  value: "Just my audience — 'Get recruited' only matters to HS athletes. But the emotional core 'not wanting the dream to die'? Almost everyone.",
+                  note: "Surface desire is narrow. Emotional core is wide."
+                },
+                {
+                  label: "Helps busy moms meal prep",
+                  value: "Almost everyone — Everyone eats dinner. Everyone knows the 5pm dread.",
+                  note: "Daily universal friction = wide reach"
+                },
+                {
+                  label: "Teaches photographers to edit in Lightroom",
+                  value: "My audience + some strangers — Hobbyist photography is popular but not universal.",
+                  note: "Middle ground"
+                }
+              ]}
+            >
+              Who feels this way?
+            </HelpDrawer>
+          </span>
           <div className="flex flex-wrap gap-2">
             {WHO_CARES_OPTIONS.map((option) => (
               <button
