@@ -550,9 +550,51 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 ---
 
-#### Lesson 3: Getting In Their Head `[OPEN]`
+#### Lesson 3: Getting In Their Head `[LOCKED]`
 
-*Content TBD*
+**Core concept:** Your audience thinks at three depths. Most creators only speak to the surface — what they'd openly say — which feels like validation but doesn't stop the scroll.
+
+| Layer | What it is | Content it creates |
+|-------|------------|-------------------|
+| **Will tell** | What they openly say | Validation — they feel seen, but it's the weakest hook because you're telling them what they already know |
+| **Won't tell** | The embarrassing truth they'd never admit | **Callout hooks** — the "he's in my head" moment. This stops the scroll |
+| **Can't tell** | What they don't know about their own situation | Teaching content — positions you as the expert who sees what they can't |
+
+**The aha moment:** "My content keeps saying what they already know. That's why it feels flat — it's all will-tell. Won't-tell is where they stop scrolling. Can't-tell is where they start trusting me. I left the two strongest layers on the table."
+
+**Key teaching points:**
+1. Will-tell makes them feel seen, but it's the safest, weakest content. Everyone's making it.
+2. Won't-tell is where hooks live — you say the thing they've never admitted out loud. That's the "how did you know?" moment.
+3. Can't-tell positions you as the expert. You see something about their situation they can't see yet. This builds authority.
+4. Most creators default to will-tell because it feels safe. The breakthrough is going to the deeper layers.
+
+**Video structure:**
+1. Why validation content feels safe but doesn't break out
+2. The three layers (will/won't/can't) with examples
+3. Why won't-tell is where the hooks live
+4. Why can't-tell builds authority
+5. Walk through the form — 3 entries per layer
+
+**Fields filled:** will_tell_1-3, wont_tell_1-3, cant_tell_1-3
+
+**Teaching vs. form:** The three-layer concept MUST be explained in video — without it, the form feels like random prompts. HelpDrawer provides quick reminders with consistent examples.
+
+**HelpDrawer examples (consistent across course):**
+
+**Will Tell examples:**
+- Football recruiting coach: "I just need to get seen by coaches" / "The competition is crazy these days" / "My highlight tape is solid"
+- Meal prep mom: "I don't have time to cook every night" / "My kids are picky eaters" / "Takeout is so expensive"
+- Lightroom photographer: "Presets never look the same on my photos" / "I've watched so many tutorials" / "My edits look too edited"
+
+**Won't Tell examples:**
+- Football recruiting coach: "I'm terrified the whole thing was a waste of time" / "I don't actually know if I'm good enough" / "I'm scared to hear I peaked in high school"
+- Meal prep mom: "I feel like a failure feeding them chicken nuggets again" / "I'm too tired to care by 6pm" / "My mom did this without complaining and I can't"
+- Lightroom photographer: "I'm embarrassed to show my edited photos" / "I think I might just not have the eye for this" / "I feel like a fraud calling myself a photographer"
+
+**Can't Tell examples:**
+- Football recruiting coach: "Coaches aren't evaluating your tape — they're evaluating whether you're coachable" / "The recruiting process tests character, not just talent" / "Your online presence matters more than your highlight reel"
+- Meal prep mom: "The problem isn't recipes, it's decision fatigue at 5pm" / "You don't need a meal plan — you need decisions removed" / "Batch cooking once won't solve this — you need recurring decisions eliminated"
+- Lightroom photographer: "You're editing based on what looks 'right' instead of telling a story" / "Presets are starting points, not finishes — you need to read the histogram" / "You're over-editing because you don't trust the original shot"
 
 ---
 
