@@ -16,30 +16,7 @@ export default function Lesson3Form({ data, onChange }: Props) {
   return (
     <div className="bg-brand-card rounded-2xl p-6 md:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-soehne text-xl text-white">
-          <HelpDrawer
-            explanation="Your audience thinks at three depths. Most content only addresses the surface — what they'd say out loud. The deeper layers are where the strongest hooks and teaching content live. List 3 examples for each layer to give the generator material for different hook angles."
-            examples={[
-              {
-                label: "Why three layers?",
-                value: "Each layer creates a different type of content:\n• Surface = validation (they feel seen)\n• Hidden = callout hooks (they stop scrolling)\n• Blind spots = teaching (they trust you)",
-                note: "The generator uses all three to vary your hooks"
-              },
-              {
-                label: "Why three examples each?",
-                value: "More inputs = more angles for the generator. One example gives you one hook. Three gives you variety across your 100 ideas.",
-                note: "Don't overthink it — first thoughts are usually right"
-              },
-              {
-                label: "How specific should they be?",
-                value: "Write in their words, not yours. If they'd say 'I've tried everything,' write that — not 'they have attempted multiple solutions.'",
-                note: "Their language = hooks that resonate"
-              }
-            ]}
-          >
-            Getting In Their Head
-          </HelpDrawer>
-        </h3>
+        <h3 className="font-soehne text-xl text-white">Getting In Their Head</h3>
         {isComplete && (
           <span className="text-green-400 text-sm flex items-center gap-1">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
