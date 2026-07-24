@@ -1391,9 +1391,11 @@ interface RoastSubmission {
 app.post('/roast-submission', async (c) => {
   const data = await c.req.json<RoastSubmission>()
 
+  console.log('Roast submission received:', data.email, data.handle)
+
+  // Send to N8N - handles ConvertKit + email notification
   try {
-    // Send to N8N - handles ConvertKit + email notification
-    const response = await fetch(ROAST_WEBHOOK_URL, {
+    const res = await fetch(ROAST_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1402,19 +1404,12 @@ app.post('/roast-submission', async (c) => {
         timestamp: data.timestamp,
       }),
     })
-
-    if (!response.ok) {
-      console.error('N8N webhook error:', response.status)
-      return c.json({ error: 'Failed to process submission' }, 500)
-    }
-
-    console.log('Roast submission sent to N8N:', data.handle)
-    return c.json({ success: true })
-
-  } catch (error) {
-    console.error('Roast submission error:', error)
-    return c.json({ error: 'Failed to process submission' }, 500)
+    console.log('N8N response:', res.status)
+  } catch (err) {
+    console.error('N8N webhook error:', err)
   }
+
+  return c.json({ success: true })
 })
 
 export default app
