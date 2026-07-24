@@ -758,6 +758,7 @@ The structural template this offer is built against. What makes it work:
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
 | 10 | Sales page copy — **deliberately parked** until the above are real | Launch | Open |
 | 11 | ~~What exactly gets taught in each lesson?~~ | ~~Video scripts, Prompt A~~ | **Answered** — L1-L5 complete, see §6.1 |
+| 12 | How should market stage affect the 100 ideas? | Prompt A | Open — shapes execution vs. just educational? |
 
 **Next step:** Build Prompt A. All lesson content and field definitions are locked.
 
