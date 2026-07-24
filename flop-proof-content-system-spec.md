@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** L1-L4 content locked. L5 content next, then Prompt A.
-> **Last updated:** 2026-07-23 (L4 content + UI finalized)
+> **Status:** L1-L5 content locked. Prompt A next.
+> **Last updated:** 2026-07-23 (L5 content + UI finalized)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -658,9 +658,61 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 ---
 
-#### Lesson 5: Setting Yourself Apart `[OPEN]`
+#### Lesson 5: Setting Yourself Apart `[LOCKED]`
 
-*Content TBD*
+**Core concept:** Market saturation. Even a "proven" topic can flop if you execute it the way everyone else already has. Your audience has seen the same takes, the same hooks, the same formats — and they've tuned out. The generator needs to know what's already been done to death so it can avoid producing ideas your audience will scroll past.
+
+**The aha moment:** "That topic worked for someone else because they got there first. By the time I made it, everyone had already heard it. It's not that my idea was bad — I just showed up with a stage 1 take to a stage 3 audience."
+
+**Key teaching points:**
+1. **Why "proven" topics flop:** A topic that worked 6 months ago has now been copied 50 times. Your audience has heard the take, seen the format, and scrolled past it. You're not competing with the original — you're competing with everyone who copied it.
+
+2. **The three saturation inputs:**
+   - **Dead topics:** What subjects have been posted to death? The obvious takes everyone makes.
+   - **Dead formats:** What hooks or structures make people scroll? "Day in my life," "unpopular opinion:...", etc.
+   - **Competitor angles:** What messages has your audience heard 100 times? The positioning everyone uses.
+
+3. **The 5 market stages** (what to do at each):
+   - **Stage 1 (Fresh):** Nobody's said this yet. Just say it plainly — clarity wins.
+   - **Stage 2 (Early):** A few have said it. Say it bigger, go further than they did.
+   - **Stage 3 (Crowded):** Everyone's said it, nobody believes it. Need a new mechanism — shift from *what* to *how it actually works*.
+   - **Stage 4 (Very crowded):** Even the new angles are copied. Extend the mechanism — make it explain more than theirs does.
+   - **Stage 5 (Burned out):** Total fatigue. Stop arguing the point. Use identity — "this is who we are."
+
+4. **Why the prescription matters:** Selecting your market stage forces you to be honest about competition. The prescription tells you what kind of execution you need. The generator uses this to avoid producing stage 1 ideas for a stage 3 audience.
+
+**Video structure:**
+1. Why "proven" topics still flop (you arrived late with early execution)
+2. The three saturation inputs — what to list
+3. The 5 market stages explained
+4. What the prescription means for your content
+5. Walk through the form with examples
+
+**Fields filled:** saturated_topics, saturated_formats, competitor_angles, sophistication_stage
+
+**Teaching vs. form:** The 5 stages MUST be explained in video — otherwise the selector feels arbitrary. The prescription display gives immediate value: they select a stage, they see what to do about it. HelpDrawer provides examples for the three text fields.
+
+**HelpDrawer examples (consistent across course):**
+
+**Dead topics** (what's been posted to death):
+- Football recruiting coach: "You need to email coaches" / "GPA matters for recruiting" / "Start your recruiting journey early"
+- Meal prep mom: "Meal prep saves time" / "Cook once, eat all week" / "Here's what I meal prepped this Sunday"
+- Lightroom photographer: "Before and after edits" / "My editing workflow" / "How I edit my photos in Lightroom"
+- *Note: These aren't bad topics — they're just exhausted. Everyone has made this content.*
+
+**Dead formats** (hooks and structures that make people scroll):
+- Football recruiting coach: "Day in the life of a recruit" / "Things coaches won't tell you" / "Unpopular recruiting opinion"
+- Meal prep mom: "What I eat in a day" / "Grocery haul" / "Realistic meal prep for busy moms"
+- Lightroom photographer: "POV: you're editing photos" / "Presets I can't live without" / "Watch me edit this photo"
+- *Note: The format itself has been copied so many times that people scroll past before they even read.*
+
+**Competitor angles** (messages your audience has heard 100 times):
+- Football recruiting coach: "Coaches want to see hustle" / "Be proactive, reach out first" / "Your highlight tape is your resume"
+- Meal prep mom: "You just need to plan ahead" / "Healthy eating doesn't have to be hard" / "15-minute meals the whole family will love"
+- Lightroom photographer: "Editing is where the magic happens" / "Presets are just a starting point" / "Shoot in RAW for more flexibility"
+- *Note: These might be true, but your audience has heard them so many times they've stopped listening.*
+
+**Why these examples work:** Each shows content that isn't *wrong* — it's just saturated. The creator's instinct is often to make "proven" content, but proven content has a shelf life. These examples help them recognize what to avoid.
 
 ---
 
@@ -697,7 +749,7 @@ The structural template this offer is built against. What makes it work:
 |---|---|---|---|
 | 1 | Hook taxonomy — lock the 3 mechanisms | Prompt A, output schema | Open |
 | 2 | ~~Input form schema — exact fields, wording, order~~ | ~~Lessons, Prompt A~~ | **Answered** — see §3.1 |
-| 3 | Prompt A — the 100-idea generator | Everything | **Blocked** — waiting on lesson content |
+| 3 | Prompt A — the 100-idea generator | Everything | **Unblocked** — lesson content complete, see §6.1 |
 | 4 | Prompt B — hidden per-idea expansion prompt | Copy button | Open |
 | 5 | Are the 1–5 scores shown to the student? | UI | Open |
 | 6 | What happens if the model can't produce 100 good ideas? | Prompt A, UX | Open |
@@ -705,9 +757,9 @@ The structural template this offer is built against. What makes it work:
 | 8 | ~~Lesson count and length~~ | ~~Production~~ | **Answered** — 6 lessons, see §6 |
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
 | 10 | Sales page copy — **deliberately parked** until the above are real | Launch | Open |
-| 11 | What exactly gets taught in each lesson? | Video scripts, Prompt A | **In progress** — L1-L4 done, L5 next, see §6.1 |
+| 11 | ~~What exactly gets taught in each lesson?~~ | ~~Video scripts, Prompt A~~ | **Answered** — L1-L5 complete, see §6.1 |
 
-**Next step:** Define lesson content for L2-L5. Use `/assets/transcripts/` and `/assets/worksheets/` as source material.
+**Next step:** Build Prompt A. All lesson content and field definitions are locked.
 
 ---
 
@@ -733,6 +785,7 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-23 | **Visual indent arrows in ladders** | Progressive indentation with arrow SVG showing the WHY chain depth. Last rung highlighted green as the emotional core |
 | 2026-07-23 | **URL-based lesson navigation** | Each lesson gets a unique URL (`/courses/.../learn/:lessonId`). Persists on refresh |
 | 2026-07-23 | **L4 content locked** | Awareness levels — "Google test" framing makes abstract concept concrete. HelpDrawer shows progressively specific knowledge at each level |
+| 2026-07-23 | **L5 content locked** | Market saturation — "stage vs execution" reframe explains why proven topics flop. Prescription display teaches what to do at each stage |
 
 ### Rejected — don't revisit
 
