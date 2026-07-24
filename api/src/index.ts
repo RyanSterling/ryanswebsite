@@ -1413,9 +1413,18 @@ async function generateBatch(
   const { systemPrompt, userPromptBase } = buildBasePrompt(formData)
 
   // Build deduplication section if we have previous ideas
+  // Escape quotes and newlines in idea titles to prevent prompt injection
   let deduplicationSection = ''
   if (previousIdeas.length > 0) {
-    const previousTitles = previousIdeas.map((idea, i) => `${i + 1}. "${idea.idea}"`).join('\n')
+    const previousTitles = previousIdeas.map((idea, i) => {
+      // Escape special characters that could break the prompt
+      const escapedIdea = idea.idea
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, ' ')
+        .trim()
+      return `${i + 1}. "${escapedIdea}"`
+    }).join('\n')
     deduplicationSection = `
 
 ## ALREADY GENERATED — DO NOT DUPLICATE
@@ -1433,6 +1442,9 @@ related to one above, skip it and generate something else.
 
   const userPrompt = deduplicationSection + userPromptBase + '\n\nGenerate 25 ideas now. Return ONLY valid JSON.'
 
+  console.log(`Batch ${batchNumber}: Sending request to Claude API...`)
+  console.log(`Batch ${batchNumber}: Deduplication includes ${previousIdeas.length} previous ideas`)
+
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -1449,9 +1461,26 @@ related to one above, skip it and generate something else.
   })
 
   if (!response.ok) {
-    const error = await response.text()
-    console.error(`Batch ${batchNumber} Claude API error:`, error)
-    throw new Error(`Claude API failed for batch ${batchNumber}`)
+    const errorBody = await response.text()
+    const errorDetails = {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorBody,
+      headers: Object.fromEntries(response.headers.entries()),
+    }
+    console.error(`Batch ${batchNumber} Claude API error:`, JSON.stringify(errorDetails, null, 2))
+
+    // Include more details in the error message for debugging
+    let errorMessage = `Claude API failed for batch ${batchNumber} (${response.status})`
+    try {
+      const parsed = JSON.parse(errorBody)
+      if (parsed.error?.message) {
+        errorMessage = `Batch ${batchNumber}: ${parsed.error.message}`
+      }
+    } catch {
+      // Use generic message if we can't parse
+    }
+    throw new Error(errorMessage)
   }
 
   const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
@@ -1680,6 +1709,12 @@ app.post('/generate-ideas-stream', async (c) => {
         let allIdeas: GeneratedIdea[] = []
 
         for (let batchNum = 1; batchNum <= TOTAL_BATCHES; batchNum++) {
+          // Add delay between batches to avoid rate limiting (skip for batch 1)
+          if (batchNum > 1) {
+            console.log(`SSE: Waiting 3 seconds before batch ${batchNum} to avoid rate limiting...`)
+            await new Promise(resolve => setTimeout(resolve, 3000))
+          }
+
           sendEvent({
             type: 'progress',
             batch: batchNum,

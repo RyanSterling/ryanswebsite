@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** SSE streaming implemented. Batch 1 works, batch 2+ failing (Claude API error). Debug needed.
-> **Last updated:** 2026-07-24 (Next: debug batch 2+ failures in SSE endpoint)
+> **Status:** SSE streaming implemented with rate limiting fixes. Testing batch 2+ after deploying fixes.
+> **Last updated:** 2026-07-24 (Fixes deployed: rate limiting delay, improved error logging, deduplication escaping)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -312,12 +312,12 @@ id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_
 #### Current status
 
 **Working:** Batch 1 completes successfully, ideas display, generation counted.
-**Broken:** Batch 2+ fails with "Claude API failed for batch 2". Need to debug.
+**Fixed (2026-07-24):** Batch 2+ was failing. Applied these fixes:
+1. Added 3-second delay between batches to avoid Anthropic rate limiting
+2. Added proper escaping for quotes/newlines in deduplication section
+3. Improved error logging to show actual API error messages (status code, body, headers)
 
-**Likely causes:**
-1. Anthropic rate limiting (requests per minute)
-2. Cloudflare Workers request timeout (even on paid tier)
-3. Context window issue with deduplication section
+**Testing:** Need to verify all 4 batches complete successfully after fixes.
 
 #### User flow
 
@@ -399,12 +399,12 @@ Generate 25 COMPLETELY DIFFERENT ideas.
 | `api/src/index.ts` | `POST /generate-ideas-stream` endpoint, `generateBatch()` helper |
 | `src/components/flop-proof/GeneratorUI.tsx` | Fetch streaming, SSE event parsing, progress display |
 
-#### Debug next steps
+#### Debug next steps (if issues persist)
 
-1. Check Cloudflare Worker logs (`wrangler tail`) to see actual error from Claude API
-2. If rate limiting: add delay between batches
-3. If timeout: check if Cloudflare paid tier is correctly configured
-4. If context window: reduce deduplication section size
+1. Check Cloudflare Worker logs (`wrangler tail`) — now shows detailed error info (status, body, headers)
+2. If rate limiting persists: increase delay between batches (currently 3 seconds)
+3. If timeout: check Cloudflare paid tier configuration
+4. If context window: reduce deduplication section size (currently ~500 tokens for 75 titles)
 
 ---
 
