@@ -408,15 +408,15 @@ Scope is the load-bearing one. It is literally room size, already quantified in 
 
 **The laddering mechanic:** "I want X… so I can Y… so I can Z… so I can W." Chasing a narrow desire up the ladder lands on what it's *really* about — which is nearly always a bigger room. This is the core move for widening an idea, and it's a generation mechanic, not just analysis.
 
-### 4.2 Will tell / won't tell / can't tell `[DRAFT]`
+### 4.2 The three layers (source: will/won't/can't tell) `[LOCKED]`
 
 The sharpest content mechanic in the source material. Three layers of what a person in the market is thinking:
 
-| Layer | What it is | Content it produces |
-|---|---|---|
-| **Will tell** | What they say out loud, publicly | Relatable / validation content |
-| **Won't tell** | The shameful thing they'd never admit | Callout content — strongest hooks |
-| **Can't tell** | What they don't yet know about their own situation | Teaching / contrarian content |
+| Source term | UI label | What it is | Content it produces |
+|---|---|---|---|
+| Will tell | **What they say** | What they say out loud, publicly | Relatable / validation content |
+| Won't tell | **What they hide** | The shameful thing they'd never admit | Callout content — strongest hooks |
+| Can't tell | **What they don't know** | What they don't yet know about their own situation | Teaching / contrarian content |
 
 **Leading candidate for the 3 hook variations.** See §5.
 
@@ -554,25 +554,25 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 **Core concept:** Your audience thinks at three depths. Most creators only speak to the surface — what they'd openly say — which feels like validation but doesn't stop the scroll.
 
-| Layer | What it is | Content it creates |
-|-------|------------|-------------------|
-| **Will tell** | What they openly say | Validation — they feel seen, but it's the weakest hook because you're telling them what they already know |
-| **Won't tell** | The embarrassing truth they'd never admit | **Callout hooks** — the "he's in my head" moment. This stops the scroll |
-| **Can't tell** | What they don't know about their own situation | Teaching content — positions you as the expert who sees what they can't |
+| Layer | UI label | What it is | Content it creates |
+|-------|----------|------------|-------------------|
+| **What they say** | "What they say" | What they openly say | Validation — they feel seen, but it's the weakest hook because you're telling them what they already know |
+| **What they hide** | "What they hide" | The embarrassing truth they'd never admit | **Callout hooks** — the "he's in my head" moment. This stops the scroll |
+| **What they don't know** | "What they don't know" | The insight they're missing | Teaching content — positions you as the expert who sees what they can't |
 
-**The aha moment:** "My content keeps saying what they already know. That's why it feels flat — it's all will-tell. Won't-tell is where they stop scrolling. Can't-tell is where they start trusting me. I left the two strongest layers on the table."
+**The aha moment:** "My content keeps saying what they already know. That's why it feels flat — it's all surface-level. The hidden layer is where they stop scrolling. The blind spots are where they start trusting me. I left the two strongest layers on the table."
 
 **Key teaching points:**
-1. Will-tell makes them feel seen, but it's the safest, weakest content. Everyone's making it.
-2. Won't-tell is where hooks live — you say the thing they've never admitted out loud. That's the "how did you know?" moment.
-3. Can't-tell positions you as the expert. You see something about their situation they can't see yet. This builds authority.
-4. Most creators default to will-tell because it feels safe. The breakthrough is going to the deeper layers.
+1. "What they say" makes them feel seen, but it's the safest, weakest content. Everyone's making it.
+2. "What they hide" is where hooks live — you say the thing they've never admitted out loud. That's the "how did you know?" moment.
+3. "What they don't know" positions you as the expert. You see something about their situation they can't see yet. This builds authority.
+4. Most creators default to the surface because it feels safe. The breakthrough is going to the deeper layers.
 
 **Video structure:**
 1. Why validation content feels safe but doesn't break out
-2. The three layers (will/won't/can't) with examples
-3. Why won't-tell is where the hooks live
-4. Why can't-tell builds authority
+2. The three layers with examples
+3. Why "what they hide" is where the hooks live
+4. Why "what they don't know" builds authority
 5. Walk through the form — 3 entries per layer
 
 **Fields filled:** will_tell_1-3, wont_tell_1-3, cant_tell_1-3
@@ -581,17 +581,17 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 **HelpDrawer examples (consistent across course):**
 
-**Will Tell examples:**
+**"What they say" examples:**
 - Football recruiting coach: "I just need to get seen by coaches" / "The competition is crazy these days" / "My highlight tape is solid"
 - Meal prep mom: "I don't have time to cook every night" / "My kids are picky eaters" / "Takeout is so expensive"
 - Lightroom photographer: "Presets never look the same on my photos" / "I've watched so many tutorials" / "My edits look too edited"
 
-**Won't Tell examples:**
+**"What they hide" examples:**
 - Football recruiting coach: "I'm terrified the whole thing was a waste of time" / "I don't actually know if I'm good enough" / "I'm scared to hear I peaked in high school"
 - Meal prep mom: "I feel like a failure feeding them chicken nuggets again" / "I'm too tired to care by 6pm" / "My mom did this without complaining and I can't"
 - Lightroom photographer: "I'm embarrassed to show my edited photos" / "I think I might just not have the eye for this" / "I feel like a fraud calling myself a photographer"
 
-**Can't Tell examples:**
+**"What they don't know" examples:**
 - Football recruiting coach: "Coaches aren't evaluating your tape — they're evaluating whether you're coachable" / "The recruiting process tests character, not just talent" / "Your online presence matters more than your highlight reel"
 - Meal prep mom: "The problem isn't recipes, it's decision fatigue at 5pm" / "You don't need a meal plan — you need decisions removed" / "Batch cooking once won't solve this — you need recurring decisions eliminated"
 - Lightroom photographer: "You're editing based on what looks 'right' instead of telling a story" / "Presets are starting points, not finishes — you need to read the histogram" / "You're over-editing because you don't trust the original shot"
