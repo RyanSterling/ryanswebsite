@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** SSE streaming implemented with rate limiting fixes. Testing batch 2+ after deploying fixes.
-> **Last updated:** 2026-07-24 (Fixes deployed: rate limiting delay, improved error logging, deduplication escaping)
+> **Status:** SSE streaming working. All 4 batches complete. Persistence to Supabase working. Next: improve output quality.
+> **Last updated:** 2026-07-24 (All batches working, generations saved to Supabase)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -309,15 +309,15 @@ id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_
 
 **Tradeoff:** User must keep page open during ~8 min generation. If they close, generation stops.
 
-#### Current status
+#### Current status `[WORKING]`
 
-**Working:** Batch 1 completes successfully, ideas display, generation counted.
-**Fixed (2026-07-24):** Batch 2+ was failing. Applied these fixes:
-1. Added 3-second delay between batches to avoid Anthropic rate limiting
-2. Added proper escaping for quotes/newlines in deduplication section
-3. Improved error logging to show actual API error messages (status code, body, headers)
+**All 4 batches complete successfully.** Tested 2026-07-24 with nervous system regulation niche.
+- SSE streaming delivers 100 ideas across 4 batches
+- 3-second delay between batches prevents rate limiting
+- Ideas persist to Supabase `generations` table
+- Ideas reload on page refresh
 
-**Testing:** Need to verify all 4 batches complete successfully after fixes.
+**Next:** Improve output quality. User needs to evaluate generated ideas against domain expertise.
 
 #### User flow
 
