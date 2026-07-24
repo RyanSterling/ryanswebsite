@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** L1-L5 content locked. Prompt A next.
-> **Last updated:** 2026-07-23 (L5 content + UI finalized)
+> **Status:** Testing Prompt A with Sonnet 4.
+> **Last updated:** 2026-07-23 (Prompt A created, ready for testing)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -380,11 +380,28 @@ The prompt receives structured data, not a wall of text. Payload shape:
 
 > **The moat is Prompt A and the input form, not the AI.** If the 100 ideas come back generic, the whole offer reads as a ChatGPT wrapper and dies on refund requests. Prompt A must encode the thesis — room size, desire dimensions, awareness match, saturation avoidance — as hard constraints, not vibes.
 
+**Model decision:** Claude Sonnet 4 (`claude-sonnet-4-20250514`). Cost ~$0.25/generation × 3 generations = ~$0.75/customer on a $29 product (2.6% of revenue). Acceptable margin.
+
 Requirements for Prompt A:
 - Rejects small-room ideas rather than padding to hit 100. Quality floor beats the round number. If it can only produce 60 good ones, that needs a designed behavior (generate fewer, or widen inputs and retry).
 - No duplicates-in-disguise. 100 rewordings of 8 ideas is the obvious failure mode.
 - Must cover a spread of awareness levels, weighted toward stranger-facing.
 - Must avoid saturated angles unless it supplies a new mechanism.
+
+---
+
+### 3.3.1 Prompt A — The 100-Idea Generator `[TESTING]`
+
+Location: `/src/prompts/prompt-a.ts`
+
+See file for full prompt. Key design decisions:
+
+1. **Structured JSON output** — returns array of idea objects with scores and hooks
+2. **Awareness distribution** — explicitly weights toward unaware/problem-aware (60%+)
+3. **Market stage enforcement** — stage affects execution style, not just topic selection
+4. **Exclusion enforcement** — dead topics/formats/angles are hard blockers
+5. **Hook taxonomy** — will-tell / won't-tell / can't-tell per idea
+6. **Quality over quantity** — instruction to return fewer ideas rather than pad
 
 ---
 
@@ -749,7 +766,7 @@ The structural template this offer is built against. What makes it work:
 |---|---|---|---|
 | 1 | Hook taxonomy — lock the 3 mechanisms | Prompt A, output schema | Open |
 | 2 | ~~Input form schema — exact fields, wording, order~~ | ~~Lessons, Prompt A~~ | **Answered** — see §3.1 |
-| 3 | Prompt A — the 100-idea generator | Everything | **Unblocked** — lesson content complete, see §6.1 |
+| 3 | ~~Prompt A — the 100-idea generator~~ | ~~Everything~~ | **Testing** — see §3.3.1, file at `/src/prompts/prompt-a.ts` |
 | 4 | Prompt B — hidden per-idea expansion prompt | Copy button | Open |
 | 5 | Are the 1–5 scores shown to the student? | UI | Open |
 | 6 | What happens if the model can't produce 100 good ideas? | Prompt A, UX | Open |
@@ -760,7 +777,7 @@ The structural template this offer is built against. What makes it work:
 | 11 | ~~What exactly gets taught in each lesson?~~ | ~~Video scripts, Prompt A~~ | **Answered** — L1-L5 complete, see §6.1 |
 | 12 | How should market stage affect the 100 ideas? | Prompt A | Open — shapes execution vs. just educational? |
 
-**Next step:** Build Prompt A. All lesson content and field definitions are locked.
+**Next step:** Test Prompt A with dummy data. Evaluate output quality before connecting to UI.
 
 ---
 
@@ -787,6 +804,8 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-23 | **URL-based lesson navigation** | Each lesson gets a unique URL (`/courses/.../learn/:lessonId`). Persists on refresh |
 | 2026-07-23 | **L4 content locked** | Awareness levels — "Google test" framing makes abstract concept concrete. HelpDrawer shows progressively specific knowledge at each level |
 | 2026-07-23 | **L5 content locked** | Market saturation — "stage vs execution" reframe explains why proven topics flop. Prescription display teaches what to do at each stage |
+| 2026-07-23 | **Sonnet 4 for Prompt A** | ~$0.25/generation, 3 generations/customer = ~$0.75 total (2.6% of $29). Acceptable margin, good quality. Can downgrade to Haiku if testing shows quality holds |
+| 2026-07-23 | **Prompt A created** | `/src/prompts/prompt-a.ts` — first version ready for testing |
 
 ### Rejected — don't revisit
 

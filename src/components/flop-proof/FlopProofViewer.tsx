@@ -24,6 +24,63 @@ const STORAGE_KEY = 'flop-proof-form-data'
 const GENERATIONS_KEY = 'flop-proof-generations'
 const MAX_GENERATIONS = 3
 
+// Test data for development
+const TEST_DATA: FlopProofFormData = {
+  lesson1: {
+    niche: 'College football recruiting',
+    core_problem: "Parents don't know how the recruiting process works and their kids are getting overlooked",
+    what_you_do: 'Help high school athletes get recruited to play college football',
+    what_you_teach: "The recruiting timeline, how to build relationships with coaches, what coaches actually look for beyond highlight tapes",
+  },
+  lesson2: {
+    audience_description: "Parents of high school football players (mostly dads, ages 40-55) who believe their son has college potential but feel lost navigating the recruiting process. They've been to showcases, made highlight videos, but haven't heard from coaches.",
+    desire_1: {
+      desire_text: 'Get my son recruited to play college football',
+      so_i_can_1: 'See him keep playing the sport he loves past high school',
+      so_i_can_2: 'Know the years of early mornings and travel ball meant something',
+      so_i_can_3: "Not watch his dream die because we didn't know how the game works",
+      urgency: 5, repeats: 4, who_cares: 'some_strangers_too',
+    },
+    desire_2: {
+      desire_text: 'Understand what coaches actually want',
+      so_i_can_1: 'Stop guessing and wasting time on the wrong things',
+      so_i_can_2: 'Give my son the best chance instead of random shots in the dark',
+      so_i_can_3: 'Feel like a good dad who did everything he could',
+      urgency: 4, repeats: 5, who_cares: 'almost_everyone',
+    },
+    desire_3: {
+      desire_text: 'Know if my son is actually good enough',
+      so_i_can_1: 'Stop lying to myself or underselling him',
+      so_i_can_2: 'Set realistic expectations instead of chasing false hope',
+      so_i_can_3: 'Have an honest conversation about his future without crushing him',
+      urgency: 5, repeats: 3, who_cares: 'almost_everyone',
+    },
+  },
+  lesson3: {
+    will_tell_1: 'My son just needs to get seen by more coaches',
+    will_tell_2: 'The recruiting process is confusing and nobody explains it clearly',
+    will_tell_3: "We've done showcases and camps but nothing is happening",
+    wont_tell_1: "I'm terrified we've already missed the window and it's too late",
+    wont_tell_2: "I don't actually know if my son is good enough and I'm scared to find out",
+    wont_tell_3: 'I feel like a failure as a dad for not figuring this out earlier',
+    cant_tell_1: "Coaches aren't evaluating your son's tape — they're evaluating whether he's coachable",
+    cant_tell_2: 'The recruiting process is a relationship game, not a talent showcase',
+    cant_tell_3: 'Most parents are doing the exact opposite of what works',
+  },
+  lesson4: {
+    unaware_questions: 'How do I help my kid stand out in sports? Is it worth pushing my son in athletics?',
+    problem_aware_questions: "How does college recruiting actually work? Why aren't coaches reaching out to my son?",
+    solution_aware_questions: 'Are recruiting services worth it? What should be in a highlight video?',
+    product_aware_questions: 'Does this recruiting system actually work? What results have other families gotten?',
+  },
+  lesson5: {
+    saturated_topics: '"Email coaches early", "GPA matters", "Make a highlight video", "Go to camps"',
+    saturated_formats: '"Day in the life of a recruit", "Things coaches won\'t tell you"',
+    competitor_angles: '"Coaches want hustle", "Be proactive", "Your highlight tape is your resume"',
+    sophistication_stage: 3,
+  },
+}
+
 export default function FlopProofViewer() {
   const navigate = useNavigate()
   const { lessonId } = useParams<{ lessonId?: string }>()
@@ -166,6 +223,10 @@ export default function FlopProofViewer() {
     }
   }
 
+  const handleLoadTestData = () => {
+    setFormData(TEST_DATA)
+  }
+
   if (loading || !isLoaded) {
     return (
       <main className="min-h-screen bg-brand-dark flex items-center justify-center">
@@ -186,6 +247,7 @@ export default function FlopProofViewer() {
           generationsRemaining={generationsRemaining}
           onUseGeneration={handleUseGeneration}
           allComplete={allComplete}
+          onLoadTestData={handleLoadTestData}
         />
       )
     }

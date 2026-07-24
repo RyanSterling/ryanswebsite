@@ -14,6 +14,7 @@ interface Props {
   generationsRemaining: number
   onUseGeneration: () => void
   allComplete: boolean
+  onLoadTestData?: () => void
 }
 
 // Placeholder for generated ideas - will be replaced with actual API response
@@ -34,6 +35,7 @@ export default function GeneratorUI({
   generationsRemaining,
   onUseGeneration,
   allComplete,
+  onLoadTestData,
 }: Props) {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -54,49 +56,40 @@ export default function GeneratorUI({
     setShowConfirmation(false)
     setIsGenerating(true)
 
-    // TODO: Replace with actual API call to Prompt A
-    // For now, simulate a delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      // Call the API endpoint
+      const apiUrl = import.meta.env.DEV
+        ? 'http://localhost:8787/generate-ideas'
+        : 'https://api.ryansterling.com/generate-ideas'
 
-    // Placeholder generated ideas for UI demonstration
-    const placeholderIdeas: GeneratedIdea[] = [
-      {
-        id: 1,
-        idea: `Why ${formData.lesson1.niche} advice fails most people (and what actually works)`,
-        room_rationale: 'Appeals to unaware audience experiencing frustration',
-        urgency: 4,
-        staying_power: 5,
-        scope: 4,
-        hook_will_tell: "Everyone says 'just be consistent' but that's not the real problem",
-        hook_wont_tell: "You've tried everything and secretly wonder if you're the problem",
-        hook_cant_tell: "The advice isn't wrong — it's just missing this critical piece",
-      },
-      {
-        id: 2,
-        idea: `The hidden reason your ${formData.lesson1.niche} content isn't working`,
-        room_rationale: 'Problem-aware content that names the real obstacle',
-        urgency: 5,
-        staying_power: 4,
-        scope: 5,
-        hook_will_tell: "I've been posting for months with nothing to show for it",
-        hook_wont_tell: "I'm starting to think my content is just... bad",
-        hook_cant_tell: "It's not your content — it's who you're making it for",
-      },
-      {
-        id: 3,
-        idea: `What I wish I knew about ${formData.lesson1.niche} before I started`,
-        room_rationale: 'Broad appeal to anyone considering this path',
-        urgency: 3,
-        staying_power: 5,
-        scope: 5,
-        hook_will_tell: "I'm just getting started and want to do this right",
-        hook_wont_tell: "I've been doing this wrong and I'm embarrassed to admit it",
-        hook_cant_tell: "The game changed and nobody told you",
-      },
-    ]
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
 
-    setGeneratedIdeas(placeholderIdeas)
-    onUseGeneration()
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('Generation failed:', error)
+        alert('Generation failed. Please try again.')
+        setIsGenerating(false)
+        return
+      }
+
+      const result = await response.json()
+
+      if (result.ideas && result.ideas.length > 0) {
+        setGeneratedIdeas(result.ideas)
+        onUseGeneration()
+      } else {
+        console.error('No ideas in response:', result)
+        alert('No ideas generated. Please try again.')
+      }
+    } catch (error) {
+      console.error('Generation error:', error)
+      alert('Generation failed. Please check your connection and try again.')
+    }
+
     setIsGenerating(false)
   }
 
@@ -189,6 +182,16 @@ Hook: ${hook}
             </div>
           ))}
         </div>
+
+        {/* Load Test Data Button (dev only) */}
+        {onLoadTestData && !allComplete && (
+          <button
+            onClick={onLoadTestData}
+            className="w-full py-3 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors mb-4"
+          >
+            Load Test Data (Football Recruiting Coach)
+          </button>
+        )}
 
         {/* Quick Summary */}
         {allComplete && (

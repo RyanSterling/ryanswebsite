@@ -1038,6 +1038,194 @@ async function sendToN8N(payload: {
 }
 
 // ============================================
+// FLOP-PROOF CONTENT GENERATOR
+// ============================================
+
+interface FlopProofFormData {
+  lesson1: {
+    niche: string
+    core_problem: string
+    what_you_do: string
+    what_you_teach: string
+  }
+  lesson2: {
+    audience_description: string
+    desire_1: { desire_text: string; so_i_can_1: string; so_i_can_2: string; so_i_can_3: string; urgency: number; repeats: number; who_cares: string }
+    desire_2: { desire_text: string; so_i_can_1: string; so_i_can_2: string; so_i_can_3: string; urgency: number; repeats: number; who_cares: string }
+    desire_3: { desire_text: string; so_i_can_1: string; so_i_can_2: string; so_i_can_3: string; urgency: number; repeats: number; who_cares: string }
+  }
+  lesson3: {
+    will_tell_1: string; will_tell_2: string; will_tell_3: string
+    wont_tell_1: string; wont_tell_2: string; wont_tell_3: string
+    cant_tell_1: string; cant_tell_2: string; cant_tell_3: string
+  }
+  lesson4: {
+    unaware_questions: string
+    problem_aware_questions: string
+    solution_aware_questions: string
+    product_aware_questions: string
+  }
+  lesson5: {
+    saturated_topics: string
+    saturated_formats: string
+    competitor_angles: string
+    sophistication_stage: 1 | 2 | 3 | 4 | 5
+  }
+}
+
+app.post('/generate-ideas', async (c) => {
+  const formData = await c.req.json<FlopProofFormData>()
+
+  const stagePrescriptions: Record<number, string> = {
+    1: "You're first. Just say it clearly.",
+    2: "Others have said it. Go bolder — say what they were afraid to.",
+    3: "Everyone's made the claim. Show HOW it works, not just what.",
+    4: "Everyone's explained it. Go where they didn't — the part they oversimplified.",
+    5: "They've tuned out tips. Show what life looks like on the other side.",
+  }
+
+  const { lesson1, lesson2, lesson3, lesson4, lesson5 } = formData
+
+  const systemPrompt = `You are a content strategist who generates viral-worthy content ideas for creators. You understand that content fails not because of bad hooks or editing, but because creators pick topics that only appeal to their existing followers.
+
+Your job is to generate content ideas that reach STRANGERS, not just followers. Every idea must pass "the room size test" — would someone who has never heard of this creator still stop scrolling?
+
+Return valid JSON only. No markdown, no explanation, just the JSON object.`
+
+  const userPrompt = `Generate 100 content ideas for this creator.
+
+## CREATOR PROFILE
+- Niche: ${lesson1.niche}
+- Core problem: ${lesson1.core_problem}
+- What they do: ${lesson1.what_you_do}
+- What they teach: ${lesson1.what_you_teach}
+
+## AUDIENCE
+${lesson2.audience_description}
+
+## DESIRE LADDERS
+
+**Desire 1:** ${lesson2.desire_1.desire_text}
+→ ${lesson2.desire_1.so_i_can_1}
+→ ${lesson2.desire_1.so_i_can_2}
+→ Emotional core: ${lesson2.desire_1.so_i_can_3}
+
+**Desire 2:** ${lesson2.desire_2.desire_text}
+→ ${lesson2.desire_2.so_i_can_1}
+→ ${lesson2.desire_2.so_i_can_2}
+→ Emotional core: ${lesson2.desire_2.so_i_can_3}
+
+**Desire 3:** ${lesson2.desire_3.desire_text}
+→ ${lesson2.desire_3.so_i_can_1}
+→ ${lesson2.desire_3.so_i_can_2}
+→ Emotional core: ${lesson2.desire_3.so_i_can_3}
+
+## TELL LAYERS
+
+**What they say openly:**
+- ${lesson3.will_tell_1}
+- ${lesson3.will_tell_2}
+- ${lesson3.will_tell_3}
+
+**What they think but won't admit:**
+- ${lesson3.wont_tell_1}
+- ${lesson3.wont_tell_2}
+- ${lesson3.wont_tell_3}
+
+**What they don't know:**
+- ${lesson3.cant_tell_1}
+- ${lesson3.cant_tell_2}
+- ${lesson3.cant_tell_3}
+
+## AWARENESS LEVELS
+
+**Unaware:** ${lesson4.unaware_questions}
+**Problem Aware:** ${lesson4.problem_aware_questions}
+**Solution Aware:** ${lesson4.solution_aware_questions}
+**Product Aware:** ${lesson4.product_aware_questions}
+
+## WHAT TO AVOID
+
+**Dead topics:** ${lesson5.saturated_topics}
+**Dead formats:** ${lesson5.saturated_formats}
+**Competitor angles:** ${lesson5.competitor_angles}
+
+**Market Stage:** ${lesson5.sophistication_stage}/5
+Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
+
+## OUTPUT
+
+Return JSON with this structure:
+{
+  "ideas": [
+    {
+      "id": 1,
+      "idea": "The content idea",
+      "room_rationale": "Why strangers would care",
+      "awareness_level": "unaware|problem_aware|solution_aware|product_aware",
+      "urgency": 1-5,
+      "staying_power": 1-5,
+      "scope": 1-5,
+      "hook_will_tell": "Hook based on what they say",
+      "hook_wont_tell": "Hook based on their secret thought",
+      "hook_cant_tell": "Hook based on what they don't know"
+    }
+  ],
+  "meta": {
+    "total_generated": 100,
+    "awareness_distribution": { "unaware": 30, "problem_aware": 35, "solution_aware": 25, "product_aware": 10 }
+  }
+}
+
+Generate 100 ideas now. Return ONLY valid JSON.`
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': c.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 16000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Claude API error:', error)
+      return c.json({ error: 'Generation failed' }, 500)
+    }
+
+    const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
+    const text = result.content[0].text
+
+    // Parse JSON
+    let parsed
+    try {
+      let jsonStr = text
+      const match = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+      if (match) jsonStr = match[1]
+      parsed = JSON.parse(jsonStr)
+    } catch {
+      console.error('Failed to parse JSON:', text.substring(0, 500))
+      return c.json({ error: 'Failed to parse response' }, 500)
+    }
+
+    console.log(`Generated ${parsed.ideas?.length} ideas, tokens: ${result.usage?.input_tokens} in, ${result.usage?.output_tokens} out`)
+
+    return c.json(parsed)
+  } catch (error) {
+    console.error('Generate error:', error)
+    return c.json({ error: 'Generation failed' }, 500)
+  }
+})
+
+// ============================================
 // STRIPE CHECKOUT & WEBHOOK FOR COURSES
 // ============================================
 
