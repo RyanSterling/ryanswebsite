@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
 > **Status:** L1 + L2 content locked. L3-L5 content next, then Prompt A.
-> **Last updated:** 2026-07-23
+> **Last updated:** 2026-07-23 (L2 UI finalized)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -130,13 +130,18 @@ Fields filled progressively across lessons, saved to the student's account, edit
 
 **Desire ladder structure** (repeated for each desire):
 
-Each desire is its own mini-exercise. The UI should present them as three separate "ladders" — not a sequential form.
+Each desire is its own mini-exercise with its own dimensions. The UI presents them as three separate "ladders" with visual indent arrows showing the progressive depth.
 
 ```
 desire_text: "They want to..." (text)
 so_i_can_1: "...so they can..." (text)
 so_i_can_2: "...so they can..." (text)
-so_i_can_3: "...so they can..." (text)
+so_i_can_3: "...so they can..." (text, highlighted as "emotional core")
+
+// Dimensions for THIS desire (appear after ladder is complete):
+urgency: 1-5 slider
+repeats: 1-5 slider
+who_cares: select
 ```
 
 **Prompt copy for the exercise intro (not per-field):**
@@ -144,14 +149,16 @@ so_i_can_3: "...so they can..." (text)
 
 **Teaching point to embed in UI:** "The further up the ladder you go, the more people share the desire. 'I want to lose 10 lbs' is a small room. 'I want to feel confident' is a stadium."
 
-| Field | Type | Prompt copy | Why Prompt A needs it |
-|-------|------|-------------|----------------------|
-| `urgency_read` | 1-5 slider | "How urgent is this for them right now? (1 = mild annoyance, 5 = keeps them up at night)" | Filters ideas toward high-urgency angles |
-| `staying_power_read` | 1-5 slider | "Does this desire repeat, or is it solved once? (1 = one-time fix, 5 = recurring forever)" | Identifies evergreen vs. one-shot content |
-| `scope_estimate` | select | "How many people share this desire?" [Niche specialists only / My followers + some strangers / Most people who scroll past] | Core room-size input |
+**Per-desire dimensions** (inside each ladder card, appear after all 4 rungs filled):
 
-**Field count:** 7 fields (but `desire_1-3` expand to ~12 text inputs)
-**UX note:** The ladder UI should feel like a guided exercise, not a form. Animate the "so I can" prompts to appear after they fill each rung.
+| Field | Type | Label | Scale endpoints | Why Prompt A needs it |
+|-------|------|-------|-----------------|----------------------|
+| `urgency` | 1-5 slider | "How urgent is this for them?" | Mild annoyance ↔ Keeps them up at night | Filters ideas toward high-urgency angles |
+| `repeats` | 1-5 slider | "How often does this come up?" | One-time thing ↔ Comes up constantly | Identifies evergreen vs. one-shot content |
+| `who_cares` | select | "This desire is..." | Very specific / Somewhat common / Nearly universal | Core room-size input |
+
+**Field count:** 7 fields per desire × 3 desires = 21 inputs total
+**UX note:** The ladder UI uses progressive disclosure — each rung appears after the previous is filled, dimensions appear after ladder is complete. Visual indent arrows show the deepening chain.
 
 ---
 
@@ -228,11 +235,11 @@ so_i_can_3: "...so they can..." (text)
 | Lesson | Fields | Total inputs | Purpose |
 |--------|--------|--------------|---------|
 | L1 | 4 | 4 | Creator profile |
-| L2 | 7 (12 text inputs in ladders) | 16 | Desire inventory + room size |
+| L2 | 1 + (7 × 3 desires) | 22 | Audience + desire inventory with per-desire dimensions |
 | L3 | 9 | 9 | Tell layers for hooks |
 | L4 | 4 (12 questions total) | 12 | Awareness targeting |
 | L5 | 4 | ~12 lines | Saturation avoidance |
-| **Total** | **28 fields** | **~53 inputs** | |
+| **Total** | **~30 fields** | **~59 inputs** | |
 
 **Design constraint met:** Each lesson has its own fields. Students fill as they learn, not all at once at the end.
 **All fields required:** No skipping, no partial completion.
@@ -530,9 +537,9 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 5. Score it: urgency, staying power, scope.
 6. Walk through the form with examples.
 
-**Fields filled:** audience_description, desire_1-3 (laddered), urgency_read, staying_power_read, scope_estimate
+**Fields filled:** audience_description, desire_1-3 (each with 4 ladder rungs + 3 dimensions)
 
-**Teaching vs. form:** The laddering concept MUST be explained in video — without it, the form feels like busywork. The dimensions (urgency/staying power/scope) can be handled by HelpDrawer with examples. The ladder UI progressively reveals rungs to guide the exercise.
+**Teaching vs. form:** The laddering concept MUST be explained in video — without it, the form feels like busywork. The dimensions are per-desire (inside each ladder card), with plain-language labels and HelpDrawer examples. The ladder UI progressively reveals rungs and uses visual indent arrows to show the WHY chain. Final rung (emotional core) is highlighted green.
 
 **HelpDrawer examples (consistent across course):**
 - Football recruiting coach: "Get recruited → Keep playing the sport I love → Know the early mornings meant something → Not have the dream die"
@@ -625,6 +632,10 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-23 | **UI built** | Input forms for all 5 lessons + generator UI with tooltips, generation counter, CSV export. Code in `/src/components/flop-proof/` |
 | 2026-07-23 | **Lesson names locked** | Human-readable titles that communicate outcome, not jargon. See §6 |
 | 2026-07-23 | **Added `core_problem` field to L1** | "What is the #1 problem you help people solve?" — anchors content to specific pain point |
+| 2026-07-23 | **Per-desire dimensions** | Moved urgency/repeats/scope into each DesireLadder card instead of global. Removes ambiguity about which desire is being scored |
+| 2026-07-23 | **Renamed dimension labels to plain language** | "Staying power" → "How often does this come up?" / "Scope" → "This desire is..." with options "Very specific / Somewhat common / Nearly universal". No jargon for non-marketers |
+| 2026-07-23 | **Visual indent arrows in ladders** | Progressive indentation with arrow SVG showing the WHY chain depth. Last rung highlighted green as the emotional core |
+| 2026-07-23 | **URL-based lesson navigation** | Each lesson gets a unique URL (`/courses/.../learn/:lessonId`). Persists on refresh |
 
 ### Rejected — don't revisit
 
