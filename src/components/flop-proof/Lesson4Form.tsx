@@ -66,7 +66,7 @@ export default function Lesson4Form({ data, onChange }: Props) {
           <textarea
             value={data.unaware_questions}
             onChange={(e) => updateField('unaware_questions', e.target.value)}
-            placeholder="What do they search before they know they have a problem?"
+            placeholder="What are they curious about before they know your topic matters?"
             rows={2}
             className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
@@ -109,7 +109,7 @@ export default function Lesson4Form({ data, onChange }: Props) {
           <textarea
             value={data.problem_aware_questions}
             onChange={(e) => updateField('problem_aware_questions', e.target.value)}
-            placeholder="What do they search when they feel the problem?"
+            placeholder="How do they describe their struggle before finding solutions?"
             rows={2}
             className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
@@ -152,7 +152,7 @@ export default function Lesson4Form({ data, onChange }: Props) {
           <textarea
             value={data.solution_aware_questions}
             onChange={(e) => updateField('solution_aware_questions', e.target.value)}
-            placeholder="What do they search when they know solutions exist?"
+            placeholder="What are they asking while shopping for a solution?"
             rows={2}
             className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
@@ -196,7 +196,7 @@ export default function Lesson4Form({ data, onChange }: Props) {
           <textarea
             value={data.product_aware_questions}
             onChange={(e) => updateField('product_aware_questions', e.target.value)}
-            placeholder="What do they search when they know about you?"
+            placeholder="What's holding them back from working with you?"
             rows={2}
             className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
