@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** L1 + L2 content locked. L3-L5 content next, then Prompt A.
-> **Last updated:** 2026-07-23 (L2 UI finalized)
+> **Status:** L1-L4 content locked. L5 content next, then Prompt A.
+> **Last updated:** 2026-07-23 (L4 content + UI finalized)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -598,9 +598,63 @@ Keep it short. The model offer is one 20-minute video at $29; anything that feel
 
 ---
 
-#### Lesson 4: Reaching People Who Don't Know You `[OPEN]`
+#### Lesson 4: Reaching People Who Don't Know You `[LOCKED]`
 
-*Content TBD*
+**Core concept:** Awareness levels. Your audience isn't one group — it's a spectrum from "never heard of you" to "ready to buy." Most creators only make content for the bottom of the spectrum: insider content that references their methods, their products, their previous videos. That content lands with followers but dies with strangers. The algorithm can't push it because strangers don't get it. Stranger reach lives at the top of the awareness ladder.
+
+**The aha moment:** "I've been making content for people who already follow me — no wonder it doesn't reach anyone new. The algorithm can't push my video past my followers when the video is *about* my followers. Strangers need content that meets them where they are."
+
+**Key teaching points:**
+1. **Four levels that matter for content** (skip "Most Aware" — they just need a link, no content required):
+   - **Unaware:** They don't even know they have a problem yet. They're searching for identity and general improvement.
+   - **Problem Aware:** They feel the pain but don't know solutions exist. They're describing symptoms.
+   - **Solution Aware:** They know solutions exist but don't know yours. They're comparing options.
+   - **Product Aware:** They know about you but haven't bought in. This is insider content — smallest reach.
+
+2. **Why creators default to the bottom:** You naturally talk about what you know. You reference your method, your approach, your previous videos. That feels like good content but it's invisible to strangers.
+
+3. **Where strangers live:** Problem Aware and Unaware. These people are searching. They have questions. They just don't know you exist yet. Content that answers their questions at this level gets found.
+
+4. **The Google test:** "What would they type into Google at each level?" Makes the abstract concrete. If you can imagine the search query, you can make the content.
+
+**Video structure:**
+1. Why your content only reaches your followers (you're making insider content)
+2. The 4 awareness levels explained — who is this person, what do they know?
+3. Why the top two levels are where strangers live
+4. The Google test: what would they search at each level?
+5. Walk through the form with examples
+
+**Fields filled:** unaware_questions, problem_aware_questions, solution_aware_questions, product_aware_questions
+
+**Teaching vs. form:** The awareness ladder MUST be explained in video — without it, the form is just four random text boxes. The "Google test" framing makes the exercise concrete. HelpDrawer provides examples for each level using the consistent 3 personas.
+
+**HelpDrawer examples (consistent across course):**
+
+**Unaware** (widest reach — identification content, "you are this person"):
+- Football recruiting coach: "How do I make my kid stand out?" / "Is travel ball worth it?" / "Should my son specialize in one sport?"
+- Meal prep mom: "Why am I so tired by 5pm?" / "How do other moms have energy at night?" / "Is it normal to dread dinner time?"
+- Lightroom photographer: "Why don't my photos look like what I saw?" / "How do photographers get those colors?" / "Why does my camera make everything look flat?"
+- *Note: They're not searching for solutions. They're searching for identity and understanding.*
+
+**Problem Aware** (high reach — they feel the problem, don't know solutions):
+- Football recruiting coach: "How does college recruiting actually work?" / "When should my kid start getting recruited?" / "Why aren't coaches reaching out?"
+- Meal prep mom: "How do I stop eating out every night?" / "What can I make that's fast and my kids will eat?" / "How do I stick to a meal plan?"
+- Lightroom photographer: "How do I make my edits look less edited?" / "Why do presets look different on my photos?" / "How do I get consistent edits?"
+- *Note: They're describing symptoms and pain points. No brand names, no specific solutions.*
+
+**Solution Aware** (moderate reach — comparing options):
+- Football recruiting coach: "What recruiting services are worth it?" / "Should I hire a recruiting consultant?" / "What makes a good highlight video?"
+- Meal prep mom: "What's the best meal planning app?" / "Which meal delivery service is best for families?" / "Is batch cooking worth it?"
+- Lightroom photographer: "What Lightroom presets do pros use?" / "Is Lightroom or Photoshop better for editing?" / "Best YouTube channels for photo editing?"
+- *Note: They know the category exists. They're shopping. Still reachable but more competitive.*
+
+**Product Aware** (narrowest reach — insider content):
+- Football recruiting coach: "Does [your name]'s system work?" / "What's different about [your method]?" / "Is [your course] worth it?"
+- Meal prep mom: "Has anyone tried [your meal plan]?" / "What's in [your recipe pack]?" / "Does [your method] work for picky eaters?"
+- Lightroom photographer: "Are [your presets] worth the price?" / "What's different about [your editing style]?" / "Does [your course] cover portraits?"
+- *Note: This content only lands with people who already know you exist. Lowest reach, but necessary for conversion.*
+
+**Why these examples work:** Each level shows progressively more specific knowledge. Unaware = no problem language. Problem Aware = symptoms, not solutions. Solution Aware = category shopping. Product Aware = brand-specific. The progression makes the concept click.
 
 ---
 
@@ -651,7 +705,7 @@ The structural template this offer is built against. What makes it work:
 | 8 | ~~Lesson count and length~~ | ~~Production~~ | **Answered** — 6 lessons, see §6 |
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
 | 10 | Sales page copy — **deliberately parked** until the above are real | Launch | Open |
-| 11 | What exactly gets taught in each lesson? | Video scripts, Prompt A | **In progress** — L1 done, see §6.1 |
+| 11 | What exactly gets taught in each lesson? | Video scripts, Prompt A | **In progress** — L1-L4 done, L5 next, see §6.1 |
 
 **Next step:** Define lesson content for L2-L5. Use `/assets/transcripts/` and `/assets/worksheets/` as source material.
 
@@ -678,6 +732,7 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-23 | **Renamed dimension labels to plain language** | "Staying power" → "How often does this come up?" / "Scope" → "This desire is..." with options "Very specific / Somewhat common / Nearly universal". No jargon for non-marketers |
 | 2026-07-23 | **Visual indent arrows in ladders** | Progressive indentation with arrow SVG showing the WHY chain depth. Last rung highlighted green as the emotional core |
 | 2026-07-23 | **URL-based lesson navigation** | Each lesson gets a unique URL (`/courses/.../learn/:lessonId`). Persists on refresh |
+| 2026-07-23 | **L4 content locked** | Awareness levels — "Google test" framing makes abstract concept concrete. HelpDrawer shows progressively specific knowledge at each level |
 
 ### Rejected — don't revisit
 

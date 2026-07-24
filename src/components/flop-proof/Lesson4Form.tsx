@@ -1,5 +1,5 @@
 import { AwarenessQuestions, isLesson4Complete } from './types'
-import Tooltip from './Tooltip'
+import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: AwarenessQuestions
@@ -16,11 +16,7 @@ export default function Lesson4Form({ data, onChange }: Props) {
   return (
     <div className="bg-brand-card rounded-2xl p-6 md:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-soehne text-xl text-white">
-          <Tooltip text="What questions do people ask at each awareness level? Think: what would they Google?">
-            Awareness Questions
-          </Tooltip>
-        </h3>
+        <h3 className="font-soehne text-xl text-white">Reaching People Who Don't Know You</h3>
         {isComplete && (
           <span className="text-green-400 text-sm flex items-center gap-1">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -32,57 +28,177 @@ export default function Lesson4Form({ data, onChange }: Props) {
       </div>
 
       <div className="space-y-4">
-        <div className="bg-green-500/5 rounded-xl p-4 border border-green-500/20">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded">Unaware</span>
-            <span className="text-gray-500 text-xs">Widest reach</span>
+        {/* Unaware */}
+        <div className="bg-brand-dark/50 rounded-xl p-4 border border-gray-800">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="What do they search before they even know they have a problem? At this level, they're not looking for solutions — they're looking for identity and understanding. They're asking big questions about who they are or why things feel off. This is your widest reach because everyone starts here."
+                examples={[
+                  {
+                    label: "Football recruiting coach",
+                    value: `"How do I make my kid stand out?"
+"Is travel ball worth it?"
+"Should my son specialize in one sport?"`,
+                    note: "Not searching for recruiting help yet. Just parenting a young athlete."
+                  },
+                  {
+                    label: "Meal prep mom",
+                    value: `"Why am I so tired by 5pm?"
+"How do other moms have energy at night?"
+"Is it normal to dread dinner time?"`,
+                    note: "Not looking for meal plans. Just trying to understand the exhaustion."
+                  },
+                  {
+                    label: "Lightroom photographer",
+                    value: `"Why don't my photos look like what I saw?"
+"How do photographers get those colors?"
+"Why does my camera make everything look flat?"`,
+                    note: "Not searching for editing software. Wondering why their photos disappoint."
+                  }
+                ]}
+              >
+                Unaware
+              </HelpDrawer>
+            </span>
+            <span className="text-green-400 text-xs">Widest reach</span>
           </div>
           <textarea
             value={data.unaware_questions}
             onChange={(e) => updateField('unaware_questions', e.target.value)}
             placeholder="What do they search before they know they have a problem?"
             rows={2}
-            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
         </div>
 
-        <div className="bg-yellow-500/5 rounded-xl p-4 border border-yellow-500/20">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded">Problem Aware</span>
+        {/* Problem Aware */}
+        <div className="bg-brand-dark/50 rounded-xl p-4 border border-gray-800">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="What do they search when they feel the problem but don't know solutions exist? They're describing symptoms and pain points — not brand names, not specific solutions. They know something's wrong but haven't found the category of things that could fix it yet."
+                examples={[
+                  {
+                    label: "Football recruiting coach",
+                    value: `"How does college recruiting actually work?"
+"When should my kid start getting recruited?"
+"Why aren't coaches reaching out?"`,
+                    note: "Knows recruiting matters, doesn't know there are systems for it."
+                  },
+                  {
+                    label: "Meal prep mom",
+                    value: `"How do I stop eating out every night?"
+"What can I make that's fast and my kids will eat?"
+"How do I stick to a meal plan?"`,
+                    note: "Knows she needs help with dinner, hasn't found a method yet."
+                  },
+                  {
+                    label: "Lightroom photographer",
+                    value: `"How do I make my edits look less edited?"
+"Why do presets look different on my photos?"
+"How do I get consistent edits?"`,
+                    note: "Knows editing is the issue, doesn't know the solution category."
+                  }
+                ]}
+              >
+                Problem Aware
+              </HelpDrawer>
+            </span>
           </div>
           <textarea
             value={data.problem_aware_questions}
             onChange={(e) => updateField('problem_aware_questions', e.target.value)}
             placeholder="What do they search when they feel the problem?"
             rows={2}
-            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
+            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
         </div>
 
-        <div className="bg-orange-500/5 rounded-xl p-4 border border-orange-500/20">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-0.5 rounded">Solution Aware</span>
+        {/* Solution Aware */}
+        <div className="bg-brand-dark/50 rounded-xl p-4 border border-gray-800">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="What do they search when they know solutions exist but don't know yours? They're comparing options, shopping the category. They know what kind of thing they need — they just haven't found you yet. Still reachable, but more competitive."
+                examples={[
+                  {
+                    label: "Football recruiting coach",
+                    value: `"What recruiting services are worth it?"
+"Should I hire a recruiting consultant?"
+"What makes a good highlight video?"`,
+                    note: "Knows recruiting services exist. Shopping for one."
+                  },
+                  {
+                    label: "Meal prep mom",
+                    value: `"What's the best meal planning app?"
+"Which meal delivery service is best for families?"
+"Is batch cooking worth it?"`,
+                    note: "Knows meal planning methods exist. Comparing them."
+                  },
+                  {
+                    label: "Lightroom photographer",
+                    value: `"What Lightroom presets do pros use?"
+"Is Lightroom or Photoshop better for editing?"
+"Best YouTube channels for photo editing?"`,
+                    note: "Knows editing education exists. Looking for the right source."
+                  }
+                ]}
+              >
+                Solution Aware
+              </HelpDrawer>
+            </span>
           </div>
           <textarea
             value={data.solution_aware_questions}
             onChange={(e) => updateField('solution_aware_questions', e.target.value)}
             placeholder="What do they search when they know solutions exist?"
             rows={2}
-            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
         </div>
 
-        <div className="bg-red-500/5 rounded-xl p-4 border border-red-500/20">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded">Product Aware</span>
-            <span className="text-gray-500 text-xs">Narrowest reach</span>
+        {/* Product Aware */}
+        <div className="bg-brand-dark/50 rounded-xl p-4 border border-gray-800">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-gray-400 text-sm">
+              <HelpDrawer
+                explanation="What do they search when they already know about you? This is insider content — it only lands with people who already follow you. Lowest reach, but necessary for conversion. Don't build your whole content strategy here."
+                examples={[
+                  {
+                    label: "Football recruiting coach",
+                    value: `"Does [your name]'s system work?"
+"What's different about [your method]?"
+"Is [your course] worth it?"`,
+                    note: "They're evaluating YOU. Already know you exist."
+                  },
+                  {
+                    label: "Meal prep mom",
+                    value: `"Has anyone tried [your meal plan]?"
+"What's in [your recipe pack]?"
+"Does [your method] work for picky eaters?"`,
+                    note: "They're deciding whether to buy YOUR thing."
+                  },
+                  {
+                    label: "Lightroom photographer",
+                    value: `"Are [your presets] worth the price?"
+"What's different about [your editing style]?"
+"Does [your course] cover portraits?"`,
+                    note: "Pre-purchase questions. They found you already."
+                  }
+                ]}
+              >
+                Product Aware
+              </HelpDrawer>
+            </span>
+            <span className="text-red-400 text-xs">Narrowest reach</span>
           </div>
           <textarea
             value={data.product_aware_questions}
             onChange={(e) => updateField('product_aware_questions', e.target.value)}
             placeholder="What do they search when they know about you?"
             rows={2}
-            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+            className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
           />
         </div>
       </div>
