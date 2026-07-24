@@ -68,7 +68,7 @@ export default function Lesson2Form({ data, onChange }: Props) {
       <div className="bg-brand-card rounded-2xl p-6 md:p-8">
         <h3 className="font-soehne text-xl text-white mb-4">
           <HelpDrawer
-            explanation="List three things your audience wants. For each one, keep asking 'why do they want that?' until you reach the emotional core. The last rung is always the bigger room — that's where your reach lives."
+            explanation="Start with something your audience wants, then keep asking 'why?' until you hit the emotional core. The surface desire is specific to your niche. The emotional core is something almost everyone can relate to — and that's what makes content spread."
             examples={[
               {
                 label: "High school football recruiting coach",
@@ -203,22 +203,22 @@ export default function Lesson2Form({ data, onChange }: Props) {
           <div>
             <label className="block text-gray-300 text-sm mb-2">
               <HelpDrawer
-                explanation="How many people share this desire? This is your room size — the core concept from Lesson 1. The answer changes which topics will reach past your followers."
+                explanation="How many people would stop scrolling for this desire? The algorithm tests your content on a small group first. If only your niche cares, it stops there. If strangers also care, it keeps pushing. This is why the emotional core (bottom of your ladder) usually has wider scope than the surface desire (top)."
                 examples={[
                   {
                     label: "High school football recruiting coach",
-                    value: "Niche specialists only — Few people care about high school recruiting. But 'making your family proud'? That's universal.",
-                    note: "The surface topic is small. The ladder-top emotion is big."
+                    value: "Niche specialists only — 'Get recruited' only matters to HS athletes. But 'not wanting the dream to die'? Everyone's felt that.",
+                    note: "Surface desire is narrow. Emotional core is wide."
                   },
                   {
                     label: "Helps busy moms meal prep",
-                    value: "Most people who scroll past — Everyone eats. Everyone knows dinner stress. Even non-parents get it.",
-                    note: "Daily universal experience = massive scope"
+                    value: "Most people who scroll past — Everyone eats dinner. Everyone knows the 5pm dread. This desire is massive.",
+                    note: "Daily universal friction = wide scope"
                   },
                   {
                     label: "Teaches photographers to edit in Lightroom",
-                    value: "Followers + some strangers — Lots of hobbyist photographers, but not everyone. Broader than recruiting, narrower than food.",
-                    note: "Middle scope — reach depends on angle"
+                    value: "Followers + some strangers — Hobbyist photography is popular but not universal. More people than recruiting, fewer than food.",
+                    note: "Middle scope"
                   }
                 ]}
               >
