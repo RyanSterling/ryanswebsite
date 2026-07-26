@@ -2,6 +2,10 @@ name = "ryan-website-api"
 main = "src/index.ts"
 compatibility_date = "2024-06-20"
 
+# Extended CPU limits for long-running Claude API calls (requires Workers Paid plan)
+[limits]
+cpu_ms = 300000  # 5 minutes CPU time
+
 # Environment variables (non-secret)
 [vars]
 N8N_EMAIL_WEBHOOK = "https://n8n.srv1369832.hstgr.cloud/webhook/growth-audit-results"

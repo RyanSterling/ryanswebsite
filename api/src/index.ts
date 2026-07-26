@@ -1239,6 +1239,7 @@ Generate 25 ideas now. Return ONLY valid JSON.`
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
+        stream: true,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       }),
@@ -1250,8 +1251,37 @@ Generate 25 ideas now. Return ONLY valid JSON.`
       return c.json({ error: 'Generation failed', details: error }, 500)
     }
 
-    const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
-    const text = result.content[0].text
+    // Accumulate streamed text chunks
+    let text = ''
+    const reader = response.body?.getReader()
+    if (!reader) return c.json({ error: 'No response body' }, 500)
+
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data === '[DONE]') continue
+          try {
+            const event = JSON.parse(data)
+            if (event.type === 'content_block_delta' && event.delta?.text) {
+              text += event.delta.text
+            }
+          } catch {
+            // Skip malformed JSON
+          }
+        }
+      }
+    }
 
     // Parse JSON
     let parsed
@@ -1265,7 +1295,7 @@ Generate 25 ideas now. Return ONLY valid JSON.`
       return c.json({ error: 'Failed to parse response' }, 500)
     }
 
-    console.log(`Generated ${parsed.ideas?.length} ideas, tokens: ${result.usage?.input_tokens} in, ${result.usage?.output_tokens} out`)
+    console.log(`Generated ${parsed.ideas?.length} ideas`)
 
     return c.json(parsed)
   } catch (error) {
@@ -1275,11 +1305,88 @@ Generate 25 ideas now. Return ONLY valid JSON.`
 })
 
 // ============================================
-// FLOP-PROOF BACKGROUND GENERATION (100 ideas)
+// FLOP-PROOF BACKGROUND GENERATION (50 ideas)
 // ============================================
 
-const TOTAL_BATCHES = 4
+const TOTAL_BATCHES = 2
 const IDEAS_PER_BATCH = 25
+
+// Helper to get batch-specific directive for dimensional batching
+function getBatchDirective(batchNumber: number, formData: FlopProofFormData): string {
+  const { lesson2, lesson3, lesson4, lesson5 } = formData
+
+  switch (batchNumber) {
+    case 1:
+      return `## BATCH 1 FOCUS: Universal Experiences (High Scope)
+
+This batch should contain your STRONGEST ideas — ones that make strangers stop scrolling even if they've never heard of nervous system work or chronic illness.
+
+Anchor these ideas to the EMOTIONAL CORES from the desire ladders:
+- "${lesson2.desire_1.so_i_can_3}"
+- "${lesson2.desire_2.so_i_can_3}"
+- "${lesson2.desire_3.so_i_can_3}"
+
+Every idea should tap into an experience that MOST people have had (scope 4-5), then connect it to the creator's expertise. The topic is universally relatable; the explanation is where the niche expertise comes in.
+
+Example: "Why you crash after one good day" — universal experience, nervous system explanation.`
+
+    case 2:
+      return `## BATCH 2 FOCUS: "He's In My Head" Moments
+
+This batch should make the audience feel deeply seen — the thoughts they've never said out loud, the experiences they thought were just them.
+
+Mine these psychological layers:
+
+**What they think but won't admit:**
+- "${lesson3.wont_tell_1}"
+- "${lesson3.wont_tell_2}"
+- "${lesson3.wont_tell_3}"
+
+**What they don't know about their situation:**
+- "${lesson3.cant_tell_1}"
+- "${lesson3.cant_tell_2}"
+- "${lesson3.cant_tell_3}"
+
+Create ideas that NAME these hidden experiences directly. These are callout hooks — content that makes someone say "how did you know?" then explains WHY it happens.`
+
+    case 3:
+      return `## BATCH 3 FOCUS: Questions They're Already Asking
+
+This batch should answer the questions people are ALREADY searching for — meeting them where they are in their awareness journey.
+
+Use these awareness-level questions as starting points:
+
+**Unaware (widest reach):** ${lesson4.unaware_questions}
+
+**Problem Aware:** ${lesson4.problem_aware_questions}
+
+**Solution Aware:** ${lesson4.solution_aware_questions}
+
+Turn these questions into content ideas. The question IS the curiosity gap — the idea answers it in a way that leads to the creator's expertise.
+
+Example question: "Why am I so tired all the time?" → Idea: "The type of tired that sleep can't fix (and what it actually means)"`
+
+    case 4:
+      return `## BATCH 4 FOCUS: Counter-Positioning (What Competitors Won't Say)
+
+This batch should say what others in this space WON'T say — the contrarian angles that differentiate this creator.
+
+**Competitors keep saying:**
+${lesson5.competitor_angles}
+
+**Topics that are overdone:**
+${lesson5.saturated_topics}
+
+Your job: Find the OPPOSITE angle, the uncomfortable truth, the thing everyone else is afraid to say or oversimplifies.
+
+What's being OVERSIMPLIFIED in this niche? What nuance is everyone skipping? What does this creator know that the "just do vagus nerve exercises" crowd doesn't?
+
+These ideas should make the creator stand out, not blend in. Challenge the conventional wisdom of the wellness/chronic illness space.`
+
+    default:
+      return ''
+  }
+}
 
 // Helper to build the base prompt (without deduplication section)
 function buildBasePrompt(formData: FlopProofFormData): { systemPrompt: string; userPromptBase: string } {
@@ -1297,9 +1404,14 @@ function buildBasePrompt(formData: FlopProofFormData): { systemPrompt: string; u
 
 Your job is to generate content ideas that reach STRANGERS, not just followers. Every idea must pass "the room size test" — would someone who has never heard of this creator still stop scrolling?
 
+CRITICAL RULES:
+1. Generate exactly 25 ideas per batch. No more, no less.
+2. Stay in niche. Every idea must clearly serve THIS specific audience — not generic wellness or psychology.
+3. The idea title should work as a hook on its own. Hooks should BUILD on the idea, not water it down.
+
 Return valid JSON only. No markdown, no explanation, just the JSON object.`
 
-  const userPromptBase = `Generate 25 content ideas for this creator.
+  const userPromptBase = `Generate content ideas for this creator.
 
 ## CREATOR PROFILE
 - Niche: ${lesson1.niche}
@@ -1307,8 +1419,23 @@ Return valid JSON only. No markdown, no explanation, just the JSON object.`
 - What they do: ${lesson1.what_you_do}
 - What they teach: ${lesson1.what_you_teach}
 
-## AUDIENCE
+## TARGET AUDIENCE
 ${lesson2.audience_description}
+
+## NICHE BOUNDARIES — CRITICAL
+
+Every idea MUST pass this test: Would someone matching this exact audience description immediately think "this is for me"?
+
+If an idea could work equally well for:
+- A general psychology account
+- A productivity coach
+- A generic wellness page
+- A therapy practice
+- A meditation teacher
+
+...then it's TOO BROAD or OUT OF NICHE. Skip it.
+
+The TOPIC can be universal (everyone experiences it), but the ANGLE must clearly serve THIS specific audience. "Why you wake up at 3am" is universal; "Why you wake up at 3am when you have chronic symptoms" serves this niche.
 
 ## DESIRE LADDERS
 
@@ -1353,26 +1480,46 @@ ${lesson2.audience_description}
 
 ## WHAT TO AVOID
 
-**Dead topics:** ${lesson5.saturated_topics}
-**Dead formats:** ${lesson5.saturated_formats}
-**Competitor angles:** ${lesson5.competitor_angles}
+**Dead topics (overdone, skip entirely):** ${lesson5.saturated_topics}
+
+**Dead formats (skip these structures):** ${lesson5.saturated_formats}
+
+**Competitor angles — DO NOT USE THESE FRAMINGS even if the topic is different:**
+${lesson5.competitor_angles}
 
 **Market Stage:** ${lesson5.sophistication_stage}/5
 Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
 
 ## HOOK FORMATS
 
-For each idea, write 5 different hooks using these formats. Each format creates contrast differently:
+For each idea, write 5 opening hooks. Each hook should be the OPENING LINE(S) of the actual video — not a rewritten title.
 
-1. **Fortune Teller** (Present vs Future): Frame the idea as something that will change the future. "This is going to change how you X forever" or "In 6 months, everyone will be doing this"
+CRITICAL HOOK RULES:
+1. The idea title is already a hook. Your job is to create opening lines that INCLUDE and BUILD ON the specific detail, not replace it with generic language.
+2. BANNED PHRASES: "forever," "completely change," "shocked me," "nobody's talking about," "what nobody tells you," "here's what," "the real reason" — these are content marketing clichés that strip specificity.
+3. PRESERVE THE PUNCH: If the idea says "even good ones" or "even when you're doing everything right" — that qualifier IS the hook. Keep it.
 
-2. **Experimenter** (Before vs After): Frame it as an experiment or test you ran. "I tried X for 30 days - here's what happened" or "I tested every method and this one wins"
+**Hook formats:**
 
-3. **Teacher** (Unknown vs Known): Frame it as a lesson or how-to. "3 things you need to know about X" or "Here's how the pros actually do X"
+1. **Fortune Teller** (Present vs Future): Show what's coming. Be SPECIFIC about what changes and why it matters to THIS audience.
+   BAD: "This will change how you think about rest forever"
+   GOOD: "A year from now, you'll wish you understood why rest was making you worse."
 
-4. **Investigator** (Hidden vs Revealed): Frame it as a secret or discovery. "Nobody talks about this..." or "I found the real reason why X happens"
+2. **Experimenter** (Before vs After): Frame as observation or experience. Only claim "I did X" if plausible for this creator. Otherwise use "When people try X..." or "What happens when..."
+   BAD: "I tracked my symptoms for 3 months and the results shocked me"
+   GOOD: "I tracked my symptoms around doctor appointments for 3 months. They spiked after every visit — even the good ones."
 
-5. **Contrarian** (Belief A vs Belief B): Challenge conventional wisdom directly. "You're doing X completely wrong" or "Everyone says Y but actually..."
+3. **Teacher** (Unknown vs Known): Lead with the INSIGHT, not filler words. State the surprising fact directly.
+   BAD: "Here's what's actually happening in your body after appointments"
+   GOOD: "Your symptoms spike after doctor appointments because your nervous system reads medical settings as threat — even when the news is good."
+
+4. **Investigator** (Hidden vs Revealed): Name the specific hidden thing IN the hook. Don't tease — deliver.
+   BAD: "Nobody talks about why you feel worse after appointments"
+   GOOD: "Medical settings trigger your nervous system the same way danger does. That's why you crash after appointments."
+
+5. **Contrarian** (Belief A vs Belief B): State the contrarian position directly and specifically. Challenge the belief, then land the counter.
+   BAD: "Everyone's wrong about doctor appointments"
+   GOOD: "Doctor appointments make your symptoms worse — and the 'good' ones are the worst. Here's the survival mechanism behind it."
 
 ## OUTPUT
 
@@ -1381,17 +1528,17 @@ Return JSON with this structure:
   "ideas": [
     {
       "id": 1,
-      "idea": "The content idea",
-      "room_rationale": "Why strangers would care",
+      "idea": "The content idea — should work as a hook on its own",
+      "room_rationale": "Why STRANGERS (not followers) would stop scrolling for this",
       "awareness_level": "unaware|problem_aware|solution_aware|product_aware",
       "urgency": 1-5,
       "staying_power": 1-5,
       "scope": 1-5,
-      "hook_fortune_teller": "Present vs future hook",
-      "hook_experimenter": "Before vs after / experiment hook",
-      "hook_teacher": "Lesson / how-to hook",
-      "hook_investigator": "Secret / discovery hook",
-      "hook_contrarian": "Challenge conventional wisdom hook"
+      "hook_fortune_teller": "Opening line(s) — present vs future angle",
+      "hook_experimenter": "Opening line(s) — observation/experience angle",
+      "hook_teacher": "Opening line(s) — direct insight delivery",
+      "hook_investigator": "Opening line(s) — reveal the hidden thing directly",
+      "hook_contrarian": "Opening line(s) — challenge then land the counter"
     }
   ],
   "meta": {
@@ -1411,6 +1558,7 @@ async function generateBatch(
   apiKey: string
 ): Promise<GeneratedIdea[]> {
   const { systemPrompt, userPromptBase } = buildBasePrompt(formData)
+  const batchDirective = getBatchDirective(batchNumber, formData)
 
   // Build deduplication section if we have previous ideas
   // Escape quotes and newlines in idea titles to prevent prompt injection
@@ -1429,22 +1577,23 @@ async function generateBatch(
 
 ## ALREADY GENERATED — DO NOT DUPLICATE
 
-You have already generated these ideas. Do NOT create variations, rewordings,
-or similar angles on any of these topics:
+You have already generated these ideas. Do NOT create variations, rewordings, or similar angles:
 
 ${previousTitles}
 
-Generate 25 COMPLETELY DIFFERENT ideas. If an idea is even tangentially
-related to one above, skip it and generate something else.
+Generate COMPLETELY DIFFERENT ideas that still serve the SAME specific audience.
+
+CRITICAL: Different topic, same niche. Do NOT drift outside the niche to avoid repetition (e.g., general psychology, random body facts, productivity tips). Find fresh angles WITHIN the niche.
 
 `
   }
 
-  const userPrompt = deduplicationSection + userPromptBase + '\n\nGenerate 25 ideas now. Return ONLY valid JSON.'
+  const userPrompt = batchDirective + '\n\n' + deduplicationSection + userPromptBase + '\n\nGenerate exactly 25 ideas for this batch. Return ONLY valid JSON.'
 
   console.log(`Batch ${batchNumber}: Sending request to Claude API...`)
   console.log(`Batch ${batchNumber}: Deduplication includes ${previousIdeas.length} previous ideas`)
 
+  // Use streaming to prevent Cloudflare timeout on long-running responses
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -1455,6 +1604,7 @@ related to one above, skip it and generate something else.
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
       max_tokens: 16000,
+      stream: true,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }],
     }),
@@ -1483,8 +1633,43 @@ related to one above, skip it and generate something else.
     throw new Error(errorMessage)
   }
 
-  const result = await response.json() as { content: Array<{ type: string; text: string }>, usage?: { input_tokens: number; output_tokens: number } }
-  const text = result.content[0].text
+  // Accumulate streamed text chunks
+  let text = ''
+  let inputTokens = 0
+  let outputTokens = 0
+  const reader = response.body?.getReader()
+  if (!reader) throw new Error(`No response body for batch ${batchNumber}`)
+
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || '' // Keep incomplete line in buffer
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6)
+        if (data === '[DONE]') continue
+        try {
+          const event = JSON.parse(data)
+          if (event.type === 'content_block_delta' && event.delta?.text) {
+            text += event.delta.text
+          } else if (event.type === 'message_delta' && event.usage) {
+            outputTokens = event.usage.output_tokens
+          } else if (event.type === 'message_start' && event.message?.usage) {
+            inputTokens = event.message.usage.input_tokens
+          }
+        } catch {
+          // Skip malformed JSON
+        }
+      }
+    }
+  }
 
   // Parse JSON
   let parsed
@@ -1498,10 +1683,10 @@ related to one above, skip it and generate something else.
     throw new Error(`Failed to parse response for batch ${batchNumber}`)
   }
 
-  console.log(`Batch ${batchNumber}: Generated ${parsed.ideas?.length} ideas, tokens: ${result.usage?.input_tokens} in, ${result.usage?.output_tokens} out`)
+  console.log(`Batch ${batchNumber}: Generated ${parsed.ideas?.length} ideas, tokens: ${inputTokens} in, ${outputTokens} out`)
 
-  // Renumber ideas based on batch
-  const startId = (batchNumber - 1) * IDEAS_PER_BATCH + 1
+  // Renumber ideas based on previous ideas count (handles variable batch sizes)
+  const startId = previousIdeas.length + 1
   const ideas = (parsed.ideas as GeneratedIdea[]).map((idea, index) => ({
     ...idea,
     id: startId + index,

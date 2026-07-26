@@ -37,7 +37,7 @@ export default function GeneratorUI({
   const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>(savedIdeas || [])
   const [expandedIdea, setExpandedIdea] = useState<number | null>(null)
   const [completedBatches, setCompletedBatches] = useState(0)
-  const [totalBatches, setTotalBatches] = useState(4)
+  const [totalBatches, setTotalBatches] = useState(2)
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
   const apiUrl = import.meta.env.DEV

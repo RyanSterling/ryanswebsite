@@ -17,6 +17,7 @@ import Lesson2Form from './Lesson2Form'
 import Lesson3Form from './Lesson3Form'
 import Lesson4Form from './Lesson4Form'
 import Lesson5Form from './Lesson5Form'
+import Lesson6Form from './Lesson6Form'
 import GeneratorUI from './GeneratorUI'
 
 const COURSE_SLUG = 'flop-proof-content-system'
@@ -232,7 +233,7 @@ export default function FlopProofViewer() {
   // Derive current lesson from URL
   const currentLesson = lessonId ? lessons.find(l => l.id === lessonId) : null
   const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
-  const isGeneratorLesson = currentLessonIndex === 5 // 6th lesson (0-indexed)
+  const isGeneratorLesson = currentLessonIndex === 6 // 7th lesson (0-indexed)
   const allComplete = isAllComplete(formData)
 
   const goToLesson = (lesson: Lesson) => {
@@ -312,6 +313,10 @@ export default function FlopProofViewer() {
             data={formData.lesson5}
             onChange={(data) => setFormData({ ...formData, lesson5: data })}
           />
+        )
+      case 5:
+        return (
+          <Lesson6Form formData={formData} />
         )
       default:
         return null
@@ -430,7 +435,8 @@ export default function FlopProofViewer() {
           <nav className="divide-y divide-gray-800">
             {lessons.map((lesson, index) => {
               const isComplete = index < 5 ? getLessonCompletionStatus(index) : false
-              const isGenerator = index === 5
+              const isBrainstorm = index === 5
+              const isGenerator = index === 6
 
               return (
                 <button
@@ -450,6 +456,14 @@ export default function FlopProofViewer() {
                       }`}>
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                    ) : isBrainstorm ? (
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        allComplete ? 'bg-purple-500' : 'bg-gray-700'
+                      }`}>
+                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                       </div>
                     ) : isComplete ? (
