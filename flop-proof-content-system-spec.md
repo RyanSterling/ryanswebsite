@@ -1,7 +1,7 @@
 # The Flop-Proof Content System — Master Spec
 
-> **Status:** SSE streaming working. All 4 batches complete. Persistence to Supabase working. Next: improve output quality.
-> **Last updated:** 2026-07-24 (All batches working, generations saved to Supabase)
+> **Status:** 50-idea generator deployed with Lesson 6 brainstorm page and AI prompt builder
+> **Last updated:** 2026-07-27 (Reduced to 50 ideas, added streaming, Lesson 6, and "Create AI Prompt" drawer)
 > **Owner:** Ryan (R Sterling LLC)
 
 ---
@@ -74,7 +74,7 @@ Lesson 5 ─┘
 Final lesson: THE GENERATOR
     input form (pre-filled from lessons)
     ↓
-    Prompt A → 100 content ideas (4 batches of 25)
+    Prompt A → 50 content ideas (2 batches of 25)
     ↓
     each idea: 5 hook variations + copy button
     ↓
@@ -83,7 +83,7 @@ Final lesson: THE GENERATOR
 
 ### Why this structure
 - **Each lesson earns a better output.** The course isn't "watch 5 videos then use a tool" — every lesson has a tangible payoff, and the finale assembles everything they built. This is what makes a $29 course feel like it overdelivers instead of like filler.
-- **The deliverable is a list, not a skill.** Nobody can see "better ideas." Everyone can see *"I have 100 ideas in a doc and I know none of them will flop."* Tangibility comes from walking out holding something.
+- **The deliverable is a list, not a skill.** Nobody can see "better ideas." Everyone can see *"I have 50 ideas in a doc and I know none of them will flop."* Tangibility comes from walking out holding something.
 - **It's re-runnable.** Positioned as an engine, not a one-time exercise: run it any time the well runs dry.
 
 ### Why the copy button offloads to the user's LLM
@@ -207,7 +207,7 @@ who_cares: select
 
 #### Lesson 5: Saturation Read
 
-**Purpose:** Identify what's already been said to death in their niche, so the generator avoids producing 100 ideas everyone's already made.
+**Purpose:** Identify what's already been said to death in their niche, so the generator avoids producing 50 ideas everyone's already made.
 
 | Field | Type | Prompt copy | Why Prompt A needs it |
 |-------|------|-------------|----------------------|
@@ -261,11 +261,11 @@ who_cares: select
 
 ### 3.1.3 Generation limits `[LOCKED]`
 
-**Decision:** 3 generations per purchase, 100 ideas per generation.
+**Decision:** 3 generations per purchase, 50 ideas per generation.
 
-**Why 4 batches of 25:** Testing showed 25 ideas takes ~2 minutes via Claude API. 100 ideas in a single call would take too long and risk timeout. 4 batches of 25 = ~8 minutes total, delivered incrementally as each batch completes.
+**Why 2 batches of 25:** Testing showed 25 ideas takes ~2 minutes via Claude API. 50 ideas in 2 batches = ~4 minutes total, delivered incrementally as each batch completes. Reduced from 100 to meet fixed-count promise without quality degradation.
 
-**Total per customer:** 3 generations × 100 ideas = 300 ideas maximum.
+**Total per customer:** 3 generations × 50 ideas = 150 ideas maximum.
 
 **Cost estimate:** 12 Claude calls per customer × ~$0.08 = ~$1/customer (3.4% of $29 revenue).
 
@@ -298,9 +298,9 @@ id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_
 
 ### 3.1.5 SSE streaming architecture `[IMPLEMENTED - DEBUGGING]`
 
-**The problem:** Claude API takes ~2 minutes per 25 ideas. 100 ideas = ~8 minutes total.
+**The problem:** Claude API takes ~2 minutes per 25 ideas. 50 ideas = ~4 minutes total.
 
-**Solution:** Server-Sent Events (SSE) streaming. Keep HTTP connection open while generating all 4 batches sequentially. Frontend receives real-time updates as each batch completes.
+**Solution:** Server-Sent Events (SSE) streaming. Keep HTTP connection open while generating both batches sequentially. Frontend receives real-time updates as each batch completes. Claude API calls use streaming mode to prevent Cloudflare timeout.
 
 **Why SSE over background polling:**
 - Real-time updates (no polling delay)
@@ -311,8 +311,9 @@ id,idea,room_rationale,awareness_level,urgency,staying_power,scope,hook_fortune_
 
 #### Current status `[WORKING]`
 
-**All 4 batches complete successfully.** Tested 2026-07-24 with nervous system regulation niche.
-- SSE streaming delivers 100 ideas across 4 batches
+**Both batches complete successfully.** Tested 2026-07-27 with nervous system regulation niche.
+- SSE streaming delivers 50 ideas across 2 batches
+- Claude API uses streaming mode to prevent timeouts
 - 3-second delay between batches prevents rate limiting
 - Ideas persist to Supabase `generations` table
 - Ideas reload on page refresh
@@ -496,7 +497,7 @@ The prompt receives structured data, not a wall of text. Payload shape:
 
 ### 3.3 The two prompts — this is the IP
 
-**Prompt A** — turns the input form into 100 ideas (4 batches of 25).
+**Prompt A** — turns the input form into 50 ideas (2 batches of 25).
 **Prompt B** — the hidden per-idea prompt shipped in the copy button; expands one idea into a script/post.
 
 > **The moat is Prompt A and the input form, not the AI.** If the ideas come back generic, the whole offer reads as a ChatGPT wrapper and dies on refund requests. Prompt A must encode the thesis — room size, desire dimensions, awareness match, saturation avoidance — as hard constraints, not vibes.
@@ -511,18 +512,44 @@ Requirements for Prompt A:
 
 ---
 
-### 3.3.1 Prompt A — The 100-Idea Generator `[TESTING]`
+### 3.3.1 Prompt A — The 100-Idea Generator `[TESTING v2]`
 
-Location: `/src/prompts/prompt-a.ts`
+Location: `api/src/index.ts` — `buildBasePrompt()` and `getBatchDirective()` functions
 
-See file for full prompt. Key design decisions:
+#### Architecture: Dimensional Batching
 
-1. **Structured JSON output** — returns array of idea objects with scores and hooks
-2. **Awareness distribution** — explicitly weights toward unaware/problem-aware (60%+)
-3. **Market stage enforcement** — stage affects execution style, not just topic selection
-4. **Exclusion enforcement** — dead topics/formats/angles are hard blockers
-5. **Hook taxonomy** — 5 structural formats per idea: Fortune Teller, Experimenter, Teacher, Investigator, Contrarian (see §5)
-6. **Quality over quantity** — instruction to return fewer ideas rather than pad
+Each of the 4 batches has a specific focus to prevent quality degradation:
+
+| Batch | Focus | Anchor |
+|-------|-------|--------|
+| 1 | Universal experiences (scope 4-5) | Desire ladder emotional cores |
+| 2 | "He's in my head" moments | Won't-tell and can't-tell layers |
+| 3 | Questions strangers are asking | Awareness-level questions from L4 |
+| 4 | Counter-positioning | What competitors AREN'T saying |
+
+This prevents later batches from drifting into tangential territory just to avoid repetition.
+
+#### Key Design Decisions
+
+1. **Niche anchoring** — explicit "is this for my specific audience?" test. Ideas that could work for a generic wellness/psychology account are rejected.
+
+2. **Competitor framing exclusion** — dead topics are avoided, AND competitor *framings* (e.g., "your body is trying to protect you") are blocked even on fresh topics.
+
+3. **Quality over quantity** — each batch may return fewer than 25 ideas if quality would suffer. Variable batch sizes are handled by the renumbering logic.
+
+4. **Hook specificity rules** — hooks must INCLUDE the compelling detail from the idea, not replace it with generic language. Banned phrases: "forever," "completely change," "shocked me," "nobody's talking about."
+
+5. **Hooks as opening lines** — hooks should be the actual first 1-2 sentences of the video, not rewritten titles.
+
+6. **Hook format enforcement** — each format has BAD/GOOD examples showing the difference between generic and specific execution.
+
+#### Files
+
+| File | Contains |
+|------|----------|
+| `api/src/index.ts` | `buildBasePrompt()` — base system/user prompts |
+| `api/src/index.ts` | `getBatchDirective()` — batch-specific focus instructions |
+| `api/src/index.ts` | `generateBatch()` — adds deduplication + niche drift warning |
 
 ---
 
@@ -897,7 +924,7 @@ The structural template this offer is built against. What makes it work:
 | 3 | ~~Prompt A — the 100-idea generator~~ | ~~Everything~~ | **Testing** — see §3.3.1, file at `/src/prompts/prompt-a.ts` |
 | 4 | Prompt B — hidden per-idea expansion prompt | Copy button | Open |
 | 5 | Are the 1–5 scores shown to the student? | UI | Open |
-| 6 | ~~What happens if the model can't produce 100 good ideas?~~ | ~~Prompt A, UX~~ | **Answered** — 100 ideas per generation via 4 batches of 25. Deduplication via title passing. See §3.1.3 and §3.1.5 |
+| 6 | ~~What happens if the model can't produce 50 good ideas?~~ | ~~Prompt A, UX~~ | **Answered** — 50 ideas per generation via 2 batches of 25. Deduplication via title passing. Fixed count, no quality escape hatch. See §3.1.3 and §3.1.5 |
 | 7 | Worked example — use Maggie's market or build a neutral one? | Lessons | Open |
 | 8 | ~~Lesson count and length~~ | ~~Production~~ | **Answered** — 6 lessons, see §6 |
 | 9 | ~~Does the generator re-run freely, or is it capped?~~ | ~~Cost, positioning~~ | **Answered** — 3 generations, see §3.1.3 |
@@ -916,12 +943,12 @@ The structural template this offer is built against. What makes it work:
 | 2026-07 | Name: **The Flop-Proof Content System** | "System" > "framework" (framework sounds like homework). "Content" > "videos" (broader). "Flop" is the word that resonates and it's honest to the barely-seen reality in a way "viral" isn't |
 | 2026-07 | Target the **views** desire, not followers or sales | Biggest room — most of the market is on that rung. The thesis picks the offer |
 | 2026-07 | Sell **generation**, not repair | Sometimes an idea should just be trashed; "fix your idea" was the wrong mechanic |
-| 2026-07 | Deliverable is **100 ideas** per generation, not a skill | Tangibility comes from walking out holding something. 3 generations = 300 total ideas |
+| 2026-07 | Deliverable is **50 ideas** per generation, not a skill | Tangibility comes from walking out holding something. 3 generations = 150 total ideas |
 | 2026-07 | Expansion offloaded to the **user's LLM** | Protects margin on a $29 product |
 | 2026-07 | **All fields required** — no skipping | Garbage in = garbage out. Lazy inputs cause bad ideas, bad reviews, refunds. Expectation set in intro video |
 | 2026-07 | **3 generations per purchase** | Protects API costs. Creates pressure to review inputs before running. Edge cases handled via support |
 | 2026-07 | **Short-form video assumed** | Audience filtered via sales page. Format variations within short-form can be added later with data |
-| 2026-07 | **CSV export** | Let students download all 100 ideas. Standard deliverable format |
+| 2026-07 | **CSV export** | Let students download all 50 ideas. Standard deliverable format |
 | 2026-07 | **UI before Prompt A** | Can't build the prompt without sign-off on inputs. Wireframes are the next step |
 | 2026-07-23 | **UI built** | Input forms for all 5 lessons + generator UI with tooltips, generation counter, CSV export. Code in `/src/components/flop-proof/` |
 | 2026-07-23 | **Lesson names locked** | Human-readable titles that communicate outcome, not jargon. See §6 |
@@ -941,6 +968,15 @@ The structural template this offer is built against. What makes it work:
 | 2026-07-24 | **SSE streaming architecture** | Replaced polling with Server-Sent Events. Simpler code, real-time updates, no KV state. User must keep page open (~8 min). Batch 1 works; batches 2-4 failing with Claude API error — needs debug |
 | 2026-07-24 | **300 total ideas per customer** | 100 ideas × 3 generations = 300 ideas. ~$1 API cost per customer (3.4% of $29) |
 | 2026-07-24 | **Deduplication via title passing** | Each batch after the first receives all previous idea titles in prompt with explicit "do NOT duplicate" instruction. Keeps context small (~500 tokens for 75 titles), prevents thematic overlap |
+| 2026-07-24 | **Dimensional batching** | Each batch has a specific focus (batch 1: universal experiences, batch 2: "he's in my head" moments, batch 3: awareness-level questions, batch 4: counter-positioning). Prevents quality degradation in later batches by giving Claude a mining directive, not just "generate more different ideas" |
+| 2026-07-24 | **Niche anchoring** | Added explicit "is this for my specific audience?" test. Ideas that could work for generic wellness/psychology accounts are rejected. Deduplication section now warns against drifting outside niche to avoid repetition |
+| 2026-07-24 | **Hook specificity rules** | Banned generic phrases ("forever," "shocked me," "nobody's talking about"). Hooks must preserve the specific detail from the idea title. Added BAD/GOOD examples for each hook format |
+| 2026-07-24 | **Variable batch sizes** | Batches may return fewer than 25 ideas if quality would suffer. Renumbering logic updated to handle variable sizes. Quality > round numbers |
+| 2026-07-24 | **Competitor framing exclusion** | Dead topics AND competitor framings (e.g., "your body is trying to protect you") are blocked even when the topic itself is fresh |
+| 2026-07-27 | **Reduced to 50 ideas (2 batches)** | Changed from 100 ideas to 50 to ensure quality without "escape hatch" language. 2 batches × 25 ideas = fixed deliverable. Total: 3 generations × 50 = 150 ideas per customer |
+| 2026-07-27 | **Claude API streaming mode** | Added streaming to Claude API calls to prevent Cloudflare timeout on long responses. Keeps connection alive with incremental data. Fixed model name to use `claude-sonnet-4-5` alias |
+| 2026-07-27 | **Lesson 6: Unlimited AI Brainstorming** | New lesson page with brain dump textarea + copy-all prompt feature. Combines all form data with user context into ready-to-paste prompt for ChatGPT/Claude. Unlimited free brainstorming beyond the 50 generated ideas |
+| 2026-07-27 | **"Create AI Prompt" drawer** | Purple button on each expanded idea opens drawer with 3-step flow: add context → preview prompt → copy. Prompt asks for hook variations + talking points, NOT word-for-word scripts. Emphasizes 40-second constraint and "give me bones, not teleprompter" |
 
 ### Rejected — don't revisit
 
