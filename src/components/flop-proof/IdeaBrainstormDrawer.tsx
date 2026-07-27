@@ -44,15 +44,17 @@ ${userContext || '(Add your personal angle, recent examples, or why this matters
 
 This idea needs to become a 40-second video that stops scrollers and delivers value fast.
 
+**IMPORTANT:** Use my context heavily. The examples, observations, and beliefs I shared above are gold — work them into the suggestions. Don't give me generic advice. Give me angles that sound like ME.
+
 Give me:
 
-1. **3-5 Hook Variations** - NOT word-for-word scripts. Give me different angles or framings I can riff on in my own voice. Think of these as "ways in" to the topic.
+1. **3-5 Hook Variations** - NOT word-for-word scripts. Give me different angles or framings I can riff on in my own voice. If I shared examples or stories in my context, reference them. Think of these as "ways in" to the topic.
 
-2. **2-4 Key Points** - The actual value/insight I need to deliver. What are the critical things my audience needs to understand? Give me the bones, not exact phrasing.
+2. **2-4 Key Points** - The actual value/insight I need to deliver. Pull from my context where possible. What are the critical things my audience needs to understand? Give me the bones, not exact phrasing.
 
-3. **A Suggested Close** - How should I wrap this up without being cringe? One sentence.
+3. **A Suggested Close** - How should I wrap this up without being cringe? One sentence that feels like my voice.
 
-Remember: I'm talking to real people, not reading a script. Give me structure and direction, not a teleprompter.
+Remember: I'm talking to real people, not reading a script. Give me structure and direction, not a teleprompter. Make it sound like ME, not generic content advice.
 `
   }
 
@@ -122,16 +124,21 @@ Remember: I'm talking to real people, not reading a script. Give me structure an
           {/* Context Input */}
           <div>
             <label className="block text-white font-medium mb-2">
-              Add Your Context
+              Brain Dump Everything You Know About This Idea
             </label>
             <p className="text-gray-400 text-sm mb-3">
-              What makes this idea resonate with you? Any recent examples, client stories, or personal angles? This helps the AI give you better, more specific suggestions.
+              <strong className="text-white">The more context you give, the better the AI output.</strong> Don't hold back. What do you believe about this topic? What have you seen? What do you want to say? Use dictation (voice-to-text) if typing feels slow — just talk through everything.
             </p>
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 mb-3">
+              <p className="text-purple-200 text-xs">
+                <strong>Tip:</strong> Aim for 3-5 sentences minimum. Include examples, stories, observations, beliefs, frustrations, or anything that comes to mind about this topic. The AI can only work with what you give it.
+              </p>
+            </div>
             <textarea
               value={userContext}
               onChange={(e) => setUserContext(e.target.value)}
-              rows={6}
-              placeholder="e.g., Had a client last week who... I keep seeing people struggle with... What I wish more people understood is..."
+              rows={8}
+              placeholder="Example: Had a client last week who said... I keep seeing people do X when they should... What frustrates me is... The thing nobody talks about is... I've noticed that... My take on this is..."
               className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none border border-gray-800"
             />
           </div>
