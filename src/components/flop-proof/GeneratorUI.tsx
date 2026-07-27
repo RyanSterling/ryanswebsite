@@ -398,7 +398,7 @@ Hook (${hookLabels[hookType]}): ${hook}
             ) : !allComplete ? (
               'Complete All Lessons First'
             ) : (
-              'Generate 100 Content Ideas'
+              'Generate 50 Content Ideas'
             )}
           </button>
         ) : (
