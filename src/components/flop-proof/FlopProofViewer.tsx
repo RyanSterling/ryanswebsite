@@ -235,7 +235,7 @@ export default function FlopProofViewer() {
   // Derive current lesson from URL
   const currentLesson = lessonId ? lessons.find(l => l.id === lessonId) : null
   const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
-  const isGeneratorLesson = currentLessonIndex === 6 // 7th lesson (0-indexed)
+  const isGeneratorLesson = currentLessonIndex === 7 // 8th lesson (0-indexed, after Start Here)
   const allComplete = isAllComplete(formData)
 
   const goToLesson = (lesson: Lesson) => {
@@ -282,13 +282,16 @@ export default function FlopProofViewer() {
 
     switch (currentLessonIndex) {
       case 0:
+        // Start Here - just video, no form
+        return null
+      case 1:
         return (
           <Lesson1Form
             data={formData.lesson1}
             onChange={(data) => setFormData({ ...formData, lesson1: data })}
           />
         )
-      case 1:
+      case 2:
         return (
           <Lesson2Form
             data={formData.lesson2}
@@ -296,7 +299,7 @@ export default function FlopProofViewer() {
             formData={formData}
           />
         )
-      case 2:
+      case 3:
         return (
           <Lesson3Form
             data={formData.lesson3}
@@ -304,7 +307,7 @@ export default function FlopProofViewer() {
             formData={formData}
           />
         )
-      case 3:
+      case 4:
         return (
           <Lesson4Form
             data={formData.lesson4}
@@ -312,7 +315,7 @@ export default function FlopProofViewer() {
             formData={formData}
           />
         )
-      case 4:
+      case 5:
         return (
           <Lesson5Form
             data={formData.lesson5}
@@ -320,7 +323,7 @@ export default function FlopProofViewer() {
             formData={formData}
           />
         )
-      case 5:
+      case 6:
         return (
           <Lesson6Form formData={formData} />
         )
@@ -440,9 +443,10 @@ export default function FlopProofViewer() {
 
           <nav className="divide-y divide-gray-800">
             {lessons.map((lesson, index) => {
-              const isComplete = index < 5 ? getLessonCompletionStatus(index) : false
-              const isBrainstorm = index === 5
-              const isGenerator = index === 6
+              // Index 0 is "Start Here" (no form), indices 1-5 have forms
+              const isComplete = (index > 0 && index < 6) ? getLessonCompletionStatus(index - 1) : false
+              const isBrainstorm = index === 6
+              const isGenerator = index === 7
 
               return (
                 <button
