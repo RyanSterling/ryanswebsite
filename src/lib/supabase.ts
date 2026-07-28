@@ -53,7 +53,7 @@ export interface GeneratedIdea {
   urgency: number
   staying_power: number
   scope: number
-  hook_fortune_teller: string
+  resolution_preview: string
   hook_experimenter: string
   hook_teacher: string
   hook_investigator: string

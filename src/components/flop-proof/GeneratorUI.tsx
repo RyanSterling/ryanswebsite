@@ -219,7 +219,7 @@ export default function GeneratorUI({
       'urgency',
       'staying_power',
       'scope',
-      'hook_fortune_teller',
+      'resolution_preview',
       'hook_experimenter',
       'hook_teacher',
       'hook_investigator',
@@ -237,7 +237,7 @@ export default function GeneratorUI({
           idea.urgency,
           idea.staying_power,
           idea.scope,
-          `"${idea.hook_fortune_teller.replace(/"/g, '""')}"`,
+          `"${(idea.resolution_preview || '').replace(/"/g, '""')}"`,
           `"${idea.hook_experimenter.replace(/"/g, '""')}"`,
           `"${idea.hook_teacher.replace(/"/g, '""')}"`,
           `"${idea.hook_investigator.replace(/"/g, '""')}"`,
@@ -254,10 +254,9 @@ export default function GeneratorUI({
     URL.revokeObjectURL(link.href)
   }
 
-  type HookType = 'fortune_teller' | 'experimenter' | 'teacher' | 'investigator' | 'contrarian'
+  type HookType = 'experimenter' | 'teacher' | 'investigator' | 'contrarian'
 
   const hookLabels: Record<HookType, string> = {
-    fortune_teller: 'Fortune Teller',
     experimenter: 'Experimenter',
     teacher: 'Teacher',
     investigator: 'Investigator',
@@ -266,7 +265,6 @@ export default function GeneratorUI({
 
   const copyIdeaToClipboard = (idea: GeneratedIdea, hookType: HookType) => {
     const hookMap: Record<HookType, string> = {
-      fortune_teller: idea.hook_fortune_teller,
       experimenter: idea.hook_experimenter,
       teacher: idea.hook_teacher,
       investigator: idea.hook_investigator,
@@ -274,8 +272,10 @@ export default function GeneratorUI({
     }
     const hook = hookMap[hookType]
 
-    // Prompt B would be included here
+    // Include resolution preview in the copy
     const copyText = `Idea: ${idea.idea}
+
+Resolution: ${idea.resolution_preview || 'N/A'}
 
 Hook (${hookLabels[hookType]}): ${hook}
 
@@ -523,25 +523,18 @@ Hook (${hookLabels[hookType]}): ${hook}
                     </div>
 
                     <div className="space-y-3">
-                      {/* Fortune Teller Hook */}
-                      <div className="flex items-start gap-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                        <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-amber-400 text-xs font-bold">F</span>
+                      {/* Resolution Preview */}
+                      {idea.resolution_preview && (
+                        <div className="flex items-start gap-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-amber-400 text-xs font-bold">R</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-gray-400 text-xs mb-1">Resolution Preview</p>
+                            <p className="text-white text-sm">{idea.resolution_preview}</p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-gray-400 text-xs mb-1">Fortune Teller</p>
-                          <p className="text-white text-sm">{idea.hook_fortune_teller}</p>
-                        </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'fortune_teller')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
-                      </div>
+                      )}
 
                       {/* Experimenter Hook */}
                       <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">

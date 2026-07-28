@@ -1308,34 +1308,47 @@ Generate 25 ideas now. Return ONLY valid JSON.`
 // FLOP-PROOF BACKGROUND GENERATION (50 ideas)
 // ============================================
 
-const TOTAL_BATCHES = 2
-const IDEAS_PER_BATCH = 25
+// Awareness-level batch configuration
+const AWARENESS_BATCHES = [
+  { level: 'unaware', count: 14 },
+  { level: 'problem_aware', count: 18 },
+  { level: 'solution_aware', count: 12 },
+  { level: 'product_aware', count: 6 },
+] as const
 
-// Helper to get batch-specific directive for dimensional batching
-function getBatchDirective(batchNumber: number, formData: FlopProofFormData): string {
-  const { lesson2, lesson3, lesson4, lesson5 } = formData
+const TOTAL_BATCHES = AWARENESS_BATCHES.length
 
-  switch (batchNumber) {
-    case 1:
-      return `## BATCH 1 FOCUS: Universal Experiences (High Scope)
+// Helper to get batch-specific directive based on awareness level
+function getBatchDirective(awarenessLevel: string, targetCount: number, formData: FlopProofFormData): string {
+  const { lesson1, lesson2, lesson3, lesson4, lesson5 } = formData
 
-This batch should contain your STRONGEST ideas — ones that make strangers stop scrolling even if they've never heard of nervous system work or chronic illness.
+  switch (awarenessLevel) {
+    case 'unaware':
+      return `## BATCH FOCUS: UNAWARE (Generate exactly ${targetCount} ideas)
 
-Anchor these ideas to the EMOTIONAL CORES from the desire ladders:
+These people don't know they have a named problem yet. They're experiencing symptoms or feelings but haven't connected them to a cause.
+
+Questions they're asking themselves:
+${lesson4.unaware_questions}
+
+Anchor ideas to UNIVERSAL EXPERIENCES that this audience has (scope 4-5). The topic is universally relatable; the explanation connects to THIS creator's expertise.
+
+Emotional cores to tap into:
 - "${lesson2.desire_1.so_i_can_3}"
 - "${lesson2.desire_2.so_i_can_3}"
 - "${lesson2.desire_3.so_i_can_3}"
 
-Every idea should tap into an experience that MOST people have had (scope 4-5), then connect it to the creator's expertise. The topic is universally relatable; the explanation is where the niche expertise comes in.
+ALL ${targetCount} ideas in this batch MUST be awareness_level: "unaware".`
 
-Example: "Why you crash after one good day" — universal experience, nervous system explanation.`
+    case 'problem_aware':
+      return `## BATCH FOCUS: PROBLEM AWARE (Generate exactly ${targetCount} ideas)
 
-    case 2:
-      return `## BATCH 2 FOCUS: "He's In My Head" Moments
+These people know their problem but haven't found solutions. They understand something is wrong but don't know what to do about it.
 
-This batch should make the audience feel deeply seen — the thoughts they've never said out loud, the experiences they thought were just them.
+Questions they're asking:
+${lesson4.problem_aware_questions}
 
-Mine these psychological layers:
+Mine these psychological layers — make them feel SEEN:
 
 **What they think but won't admit:**
 - "${lesson3.wont_tell_1}"
@@ -1347,41 +1360,50 @@ Mine these psychological layers:
 - "${lesson3.cant_tell_2}"
 - "${lesson3.cant_tell_3}"
 
-Create ideas that NAME these hidden experiences directly. These are callout hooks — content that makes someone say "how did you know?" then explains WHY it happens.`
+Create ideas that NAME hidden experiences directly. These are callout hooks — content that makes someone say "how did you know?"
 
-    case 3:
-      return `## BATCH 3 FOCUS: Questions They're Already Asking
+ALL ${targetCount} ideas in this batch MUST be awareness_level: "problem_aware".`
 
-This batch should answer the questions people are ALREADY searching for — meeting them where they are in their awareness journey.
+    case 'solution_aware':
+      return `## BATCH FOCUS: SOLUTION AWARE (Generate exactly ${targetCount} ideas)
 
-Use these awareness-level questions as starting points:
+These people are comparing approaches and evaluating methods. They know the problem and are looking for the right solution.
 
-**Unaware (widest reach):** ${lesson4.unaware_questions}
+Questions they're asking:
+${lesson4.solution_aware_questions}
 
-**Problem Aware:** ${lesson4.problem_aware_questions}
+Create ideas that:
+- Compare approaches: "Why X works better than Y for bodies like yours"
+- Evaluate methods: "The difference between [common approach] and what actually works post-surgery"
+- Help them choose: "How to know if [approach] will work for your specific limitations"
 
-**Solution Aware:** ${lesson4.solution_aware_questions}
+Reference THIS creator's unique positioning:
+- What they teach: ${lesson1.what_you_teach}
 
-Turn these questions into content ideas. The question IS the curiosity gap — the idea answers it in a way that leads to the creator's expertise.
-
-Example question: "Why am I so tired all the time?" → Idea: "The type of tired that sleep can't fix (and what it actually means)"`
-
-    case 4:
-      return `## BATCH 4 FOCUS: Counter-Positioning (What Competitors Won't Say)
-
-This batch should say what others in this space WON'T say — the contrarian angles that differentiate this creator.
-
-**Competitors keep saying:**
+What's being OVERSIMPLIFIED by competitors that this creator can address?
 ${lesson5.competitor_angles}
 
-**Topics that are overdone:**
-${lesson5.saturated_topics}
+ALL ${targetCount} ideas in this batch MUST be awareness_level: "solution_aware".`
 
-Your job: Find the OPPOSITE angle, the uncomfortable truth, the thing everyone else is afraid to say or oversimplifies.
+    case 'product_aware':
+      return `## BATCH FOCUS: PRODUCT AWARE (Generate exactly ${targetCount} ideas)
 
-What's being OVERSIMPLIFIED in this niche? What nuance is everyone skipping? What does this creator know that the "just do vagus nerve exercises" crowd doesn't?
+These people are deciding whether THIS CREATOR is for them. They're considering following, joining, or buying.
 
-These ideas should make the creator stand out, not blend in. Challenge the conventional wisdom of the wellness/chronic illness space.`
+Questions they're asking about this creator specifically:
+${lesson4.product_aware_questions}
+
+Create ideas that:
+- Address objections: "Why my approach is different from generic [niche] content"
+- Show proof of authority: Content that demonstrates THIS creator's unique positioning and experience
+- Build trust: Behind-the-scenes, methodology explanations, "why I do it this way"
+
+Emphasize what makes this creator UNIQUE in the space:
+- What they do: ${lesson1.what_you_do}
+- What they teach: ${lesson1.what_you_teach}
+- Their position vs competitors: ${lesson5.competitor_angles}
+
+ALL ${targetCount} ideas in this batch MUST be awareness_level: "product_aware".`
 
     default:
       return ''
@@ -1492,7 +1514,7 @@ Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
 
 ## HOOK FORMATS
 
-For each idea, write 5 opening hooks. Each hook should be the OPENING LINE(S) of the actual video — not a rewritten title.
+For each idea, write 4 opening hooks. Each hook should be the OPENING LINE(S) of the actual video — not a rewritten title.
 
 CRITICAL HOOK RULES:
 1. The idea title is already a hook. Your job is to create opening lines that INCLUDE and BUILD ON the specific detail, not replace it with generic language.
@@ -1501,25 +1523,52 @@ CRITICAL HOOK RULES:
 
 **Hook formats:**
 
-1. **Fortune Teller** (Present vs Future): Show what's coming. Be SPECIFIC about what changes and why it matters to THIS audience.
-   BAD: "This will change how you think about rest forever"
-   GOOD: "A year from now, you'll wish you understood why rest was making you worse."
-
-2. **Experimenter** (Before vs After): Frame as observation or experience. Only claim "I did X" if plausible for this creator. Otherwise use "When people try X..." or "What happens when..."
+1. **Experimenter** (Before vs After): Frame as observation or experience. Only claim "I did X" if plausible for this creator. Otherwise use "When people try X..." or "What happens when..."
    BAD: "I tracked my symptoms for 3 months and the results shocked me"
    GOOD: "I tracked my symptoms around doctor appointments for 3 months. They spiked after every visit — even the good ones."
 
-3. **Teacher** (Unknown vs Known): Lead with the INSIGHT, not filler words. State the surprising fact directly.
+2. **Teacher** (Unknown vs Known): Lead with the INSIGHT, not filler words. State the surprising fact directly.
    BAD: "Here's what's actually happening in your body after appointments"
    GOOD: "Your symptoms spike after doctor appointments because your nervous system reads medical settings as threat — even when the news is good."
 
-4. **Investigator** (Hidden vs Revealed): Name the specific hidden thing IN the hook. Don't tease — deliver.
+3. **Investigator** (Hidden vs Revealed): Name the specific hidden thing IN the hook. Don't tease — deliver.
    BAD: "Nobody talks about why you feel worse after appointments"
    GOOD: "Medical settings trigger your nervous system the same way danger does. That's why you crash after appointments."
 
-5. **Contrarian** (Belief A vs Belief B): State the contrarian position directly and specifically. Challenge the belief, then land the counter.
+4. **Contrarian** (Belief A vs Belief B): State the contrarian position directly and specifically. Challenge the belief, then land the counter.
    BAD: "Everyone's wrong about doctor appointments"
    GOOD: "Doctor appointments make your symptoms worse — and the 'good' ones are the worst. Here's the survival mechanism behind it."
+
+## RESOLUTION REQUIREMENT
+
+Every idea MUST include a resolution_preview — what the viewer will understand or be able to do after watching.
+
+NOT just "here's a painful pattern you hadn't named" but "here's a painful pattern + what changes it."
+
+The resolution should hint at THIS CREATOR's unique angle, not generic advice.
+
+Example:
+- IDEA: "Why you crash the day after you felt almost normal"
+- RESOLUTION: "The crash isn't punishment—it's your body equalizing what it borrowed. Once you see it as debt repayment, you can plan for it instead of fighting it."
+
+## FORMAT DIVERSITY RULES
+
+- Maximum 25% of ideas can start with "Why you"
+- Maximum 15% can start with "The specific" or "The moment" or "The exact"
+- Vary sentence structures: questions, statements, second-person, third-person observations
+- Each batch must use at least 4 different opener patterns
+
+## SCORING RULES
+
+Link scores to the desire metadata provided above:
+- urgency (1-5): How urgent is this for the audience right now?
+- staying_power (1-5): Does this matter on day 1 vs day 1000?
+- scope (1-5): How many people does this apply to? (1=very niche, 5=universal)
+
+CRITICAL: Scores MUST use the full 1-5 range across the batch:
+- At least 20% of ideas should score 2-3 on each dimension
+- Not everything is a 5. If an idea only matters to people with THIS exact condition, scope is 2.
+- If an idea is universally relatable, scope is 5.
 
 ## OUTPUT
 
@@ -1534,31 +1583,28 @@ Return JSON with this structure:
       "urgency": 1-5,
       "staying_power": 1-5,
       "scope": 1-5,
-      "hook_fortune_teller": "Opening line(s) — present vs future angle",
+      "resolution_preview": "What the viewer will understand or be able to do after — the shift or next step",
       "hook_experimenter": "Opening line(s) — observation/experience angle",
       "hook_teacher": "Opening line(s) — direct insight delivery",
       "hook_investigator": "Opening line(s) — reveal the hidden thing directly",
       "hook_contrarian": "Opening line(s) — challenge then land the counter"
     }
-  ],
-  "meta": {
-    "total_generated": 25,
-    "awareness_distribution": { "unaware": 8, "problem_aware": 9, "solution_aware": 6, "product_aware": 2 }
-  }
+  ]
 }`
 
   return { systemPrompt, userPromptBase }
 }
 
-// Helper to generate a single batch
+// Helper to generate a single batch at a specific awareness level
 async function generateBatch(
   formData: FlopProofFormData,
-  batchNumber: number,
+  awarenessLevel: string,
+  targetCount: number,
   previousIdeas: GeneratedIdea[],
   apiKey: string
 ): Promise<GeneratedIdea[]> {
   const { systemPrompt, userPromptBase } = buildBasePrompt(formData)
-  const batchDirective = getBatchDirective(batchNumber, formData)
+  const batchDirective = getBatchDirective(awarenessLevel, targetCount, formData)
 
   // Build deduplication section if we have previous ideas
   // Escape quotes and newlines in idea titles to prevent prompt injection
@@ -1588,10 +1634,10 @@ CRITICAL: Different topic, same niche. Do NOT drift outside the niche to avoid r
 `
   }
 
-  const userPrompt = batchDirective + '\n\n' + deduplicationSection + userPromptBase + '\n\nGenerate exactly 25 ideas for this batch. Return ONLY valid JSON.'
+  const userPrompt = batchDirective + '\n\n' + deduplicationSection + userPromptBase + `\n\nGenerate exactly ${targetCount} ideas for this batch. ALL ideas must be awareness_level: "${awarenessLevel}". Return ONLY valid JSON.`
 
-  console.log(`Batch ${batchNumber}: Sending request to Claude API...`)
-  console.log(`Batch ${batchNumber}: Deduplication includes ${previousIdeas.length} previous ideas`)
+  console.log(`Batch ${awarenessLevel}: Sending request to Claude API for ${targetCount} ideas...`)
+  console.log(`Batch ${awarenessLevel}: Deduplication includes ${previousIdeas.length} previous ideas`)
 
   // Use streaming to prevent Cloudflare timeout on long-running responses
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1618,14 +1664,14 @@ CRITICAL: Different topic, same niche. Do NOT drift outside the niche to avoid r
       body: errorBody,
       headers: Object.fromEntries(response.headers.entries()),
     }
-    console.error(`Batch ${batchNumber} Claude API error:`, JSON.stringify(errorDetails, null, 2))
+    console.error(`Batch ${awarenessLevel} Claude API error:`, JSON.stringify(errorDetails, null, 2))
 
     // Include more details in the error message for debugging
     let errorMessage = `Claude API failed for batch ${batchNumber} (${response.status})`
     try {
       const parsed = JSON.parse(errorBody)
       if (parsed.error?.message) {
-        errorMessage = `Batch ${batchNumber}: ${parsed.error.message}`
+        errorMessage = `Batch ${awarenessLevel}: ${parsed.error.message}`
       }
     } catch {
       // Use generic message if we can't parse
@@ -1679,11 +1725,11 @@ CRITICAL: Different topic, same niche. Do NOT drift outside the niche to avoid r
     if (match) jsonStr = match[1]
     parsed = JSON.parse(jsonStr)
   } catch {
-    console.error(`Batch ${batchNumber} failed to parse JSON:`, text.substring(0, 500))
+    console.error(`Batch ${awarenessLevel} failed to parse JSON:`, text.substring(0, 500))
     throw new Error(`Failed to parse response for batch ${batchNumber}`)
   }
 
-  console.log(`Batch ${batchNumber}: Generated ${parsed.ideas?.length} ideas, tokens: ${inputTokens} in, ${outputTokens} out`)
+  console.log(`Batch ${awarenessLevel}: Generated ${parsed.ideas?.length} ideas, tokens: ${inputTokens} in, ${outputTokens} out`)
 
   // Renumber ideas based on previous ideas count (handles variable batch sizes)
   const startId = previousIdeas.length + 1
@@ -1746,14 +1792,17 @@ app.post('/generate-ideas-start', async (c) => {
       try {
         let allIdeas: GeneratedIdea[] = []
 
-        for (let batchNum = 1; batchNum <= TOTAL_BATCHES; batchNum++) {
+        for (let batchIndex = 0; batchIndex < AWARENESS_BATCHES.length; batchIndex++) {
+          const { level: awarenessLevel, count: targetCount } = AWARENESS_BATCHES[batchIndex]
+          const batchNum = batchIndex + 1
+
           try {
-            console.log(`Job ${jobId}: Starting batch ${batchNum} at ${new Date().toISOString()}`)
-            console.log(`Job ${jobId}: About to call generateBatch for batch ${batchNum}`)
+            console.log(`Job ${jobId}: Starting ${awarenessLevel} batch (${targetCount} ideas) at ${new Date().toISOString()}`)
 
           const batchIdeas = await generateBatch(
             formData,
-            batchNum,
+            awarenessLevel,
+            targetCount,
             allIdeas,
             c.env.ANTHROPIC_API_KEY
           )
@@ -1774,7 +1823,7 @@ app.post('/generate-ideas-start', async (c) => {
           })
           currentState.completedBatches = batchNum
 
-          if (batchNum === TOTAL_BATCHES) {
+          if (batchNum === AWARENESS_BATCHES.length) {
             currentState.status = 'complete'
             currentState.completedAt = new Date().toISOString()
           }
@@ -1785,15 +1834,15 @@ app.post('/generate-ideas-start', async (c) => {
             { expirationTtl: 24 * 60 * 60 }
           )
 
-          console.log(`Job ${jobId}: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
+          console.log(`Job ${jobId}: ${awarenessLevel} batch complete (${batchIdeas.length} ideas), ${allIdeas.length} total`)
 
         } catch (error) {
-          console.error(`Job ${jobId}: Batch ${batchNum} failed:`, error)
+          console.error(`Job ${jobId}: ${awarenessLevel} batch failed:`, error)
 
-          // Mark as partial_complete (or failed if batch 1)
+          // Mark as partial_complete
           const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
           if (currentState) {
-            currentState.status = batchNum === 1 ? 'partial_complete' : 'partial_complete'
+            currentState.status = 'partial_complete'
             currentState.completedAt = new Date().toISOString()
             currentState.error = {
               batch: batchNum,
@@ -1893,25 +1942,29 @@ app.post('/generate-ideas-stream', async (c) => {
         console.log('Starting SSE idea generation')
         let allIdeas: GeneratedIdea[] = []
 
-        for (let batchNum = 1; batchNum <= TOTAL_BATCHES; batchNum++) {
+        for (let batchIndex = 0; batchIndex < AWARENESS_BATCHES.length; batchIndex++) {
+          const { level: awarenessLevel, count: targetCount } = AWARENESS_BATCHES[batchIndex]
+          const batchNum = batchIndex + 1
+
           // Add delay between batches to avoid rate limiting (skip for batch 1)
-          if (batchNum > 1) {
-            console.log(`SSE: Waiting 3 seconds before batch ${batchNum} to avoid rate limiting...`)
+          if (batchIndex > 0) {
+            console.log(`SSE: Waiting 3 seconds before ${awarenessLevel} batch to avoid rate limiting...`)
             await new Promise(resolve => setTimeout(resolve, 3000))
           }
 
           sendEvent({
             type: 'progress',
             batch: batchNum,
-            totalBatches: TOTAL_BATCHES,
+            totalBatches: AWARENESS_BATCHES.length,
           })
 
-          console.log(`SSE: Starting batch ${batchNum}/${TOTAL_BATCHES}`)
+          console.log(`SSE: Starting ${awarenessLevel} batch (${targetCount} ideas)`)
 
           try {
             const batchIdeas = await generateBatch(
               formData,
-              batchNum,
+              awarenessLevel,
+              targetCount,
               allIdeas,
               c.env.ANTHROPIC_API_KEY
             )
@@ -1922,15 +1975,15 @@ app.post('/generate-ideas-stream', async (c) => {
             sendEvent({
               type: 'batch_complete',
               batch: batchNum,
-              totalBatches: TOTAL_BATCHES,
+              totalBatches: AWARENESS_BATCHES.length,
               ideas: batchIdeas,
               allIdeas: allIdeas,
             })
 
-            console.log(`SSE: Batch ${batchNum} complete, ${allIdeas.length} total ideas`)
+            console.log(`SSE: ${awarenessLevel} batch complete (${batchIdeas.length} ideas), ${allIdeas.length} total`)
 
           } catch (error) {
-            console.error(`SSE: Batch ${batchNum} failed:`, error)
+            console.error(`SSE: ${awarenessLevel} batch failed:`, error)
             sendEvent({
               type: 'error',
               batch: batchNum,
@@ -1945,11 +1998,11 @@ app.post('/generate-ideas-stream', async (c) => {
         // All batches complete
         sendEvent({
           type: 'complete',
-          totalBatches: TOTAL_BATCHES,
+          totalBatches: AWARENESS_BATCHES.length,
           allIdeas: allIdeas,
         })
 
-        console.log(`SSE: All ${TOTAL_BATCHES} batches complete, ${allIdeas.length} total ideas`)
+        console.log(`SSE: All ${AWARENESS_BATCHES.length} batches complete, ${allIdeas.length} total ideas`)
         controller.close()
 
       } catch (error) {
