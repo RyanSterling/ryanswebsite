@@ -323,7 +323,7 @@ Hook (${hookLabels[hookType]}): ${hook}
             onClick={onLoadTestData}
             className="w-full py-3 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors mb-4"
           >
-            Load Test Data (Chronic Illness + Fitness)
+            Load Test Data (Ostomy/Cancer Alteration)
           </button>
         )}
 
