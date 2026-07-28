@@ -291,6 +291,7 @@ export default function FlopProofViewer() {
           <Lesson2Form
             data={formData.lesson2}
             onChange={(data) => setFormData({ ...formData, lesson2: data })}
+            formData={formData}
           />
         )
       case 2:
@@ -298,6 +299,7 @@ export default function FlopProofViewer() {
           <Lesson3Form
             data={formData.lesson3}
             onChange={(data) => setFormData({ ...formData, lesson3: data })}
+            formData={formData}
           />
         )
       case 3:
@@ -305,6 +307,7 @@ export default function FlopProofViewer() {
           <Lesson4Form
             data={formData.lesson4}
             onChange={(data) => setFormData({ ...formData, lesson4: data })}
+            formData={formData}
           />
         )
       case 4:
@@ -312,6 +315,7 @@ export default function FlopProofViewer() {
           <Lesson5Form
             data={formData.lesson5}
             onChange={(data) => setFormData({ ...formData, lesson5: data })}
+            formData={formData}
           />
         )
       case 5:

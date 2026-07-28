@@ -1,9 +1,10 @@
-import { SaturationRead, isLesson5Complete, SOPHISTICATION_PRESCRIPTIONS } from './types'
+import { SaturationRead, FlopProofFormData, isLesson5Complete, SOPHISTICATION_PRESCRIPTIONS } from './types'
 import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: SaturationRead
   onChange: (data: SaturationRead) => void
+  formData?: FlopProofFormData
 }
 
 const SOPHISTICATION_OPTIONS: Array<{ value: 1 | 2 | 3 | 4 | 5; label: string }> = [
@@ -14,7 +15,7 @@ const SOPHISTICATION_OPTIONS: Array<{ value: 1 | 2 | 3 | 4 | 5; label: string }>
   { value: 5, label: 'Burned out — they have heard it all' },
 ]
 
-export default function Lesson5Form({ data, onChange }: Props) {
+export default function Lesson5Form({ data, onChange, formData }: Props) {
   const updateField = <K extends keyof SaturationRead>(field: K, value: SaturationRead[K]) => {
     onChange({ ...data, [field]: value })
   }
@@ -65,6 +66,8 @@ export default function Lesson5Form({ data, onChange }: Props) {
                     note: "The format worked once. Now it's background noise."
                   }
                 ]}
+                fieldId="lesson5_saturated_topics"
+                formData={formData}
               >
                 Dead topics
               </HelpDrawer>
@@ -108,6 +111,8 @@ export default function Lesson5Form({ data, onChange }: Props) {
                     note: "The hook is invisible now. Nobody stops."
                   }
                 ]}
+                fieldId="lesson5_saturated_formats"
+                formData={formData}
               >
                 Dead formats
               </HelpDrawer>
@@ -151,6 +156,8 @@ export default function Lesson5Form({ data, onChange }: Props) {
                     note: "True advice that now sounds like noise."
                   }
                 ]}
+                fieldId="lesson5_competitor_angles"
+                formData={formData}
               >
                 Competitor angles
               </HelpDrawer>

@@ -1,12 +1,13 @@
-import { TellLayers, isLesson3Complete } from './types'
+import { TellLayers, FlopProofFormData, isLesson3Complete } from './types'
 import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: TellLayers
   onChange: (data: TellLayers) => void
+  formData?: FlopProofFormData
 }
 
-export default function Lesson3Form({ data, onChange }: Props) {
+export default function Lesson3Form({ data, onChange, formData }: Props) {
   const updateField = (field: keyof TellLayers, value: string) => {
     onChange({ ...data, [field]: value })
   }
@@ -57,6 +58,8 @@ export default function Lesson3Form({ data, onChange }: Props) {
                     note: "The surface-level frustration they're comfortable sharing."
                   }
                 ]}
+                fieldId="lesson3_will_tell"
+                formData={formData}
               >
                 What they say
               </HelpDrawer>
@@ -116,6 +119,8 @@ export default function Lesson3Form({ data, onChange }: Props) {
                     note: "The secret doubt they'd never post about."
                   }
                 ]}
+                fieldId="lesson3_wont_tell"
+                formData={formData}
               >
                 What they hide
               </HelpDrawer>
@@ -175,6 +180,8 @@ export default function Lesson3Form({ data, onChange }: Props) {
                     note: "The blind spot only an expert can see."
                   }
                 ]}
+                fieldId="lesson3_cant_tell"
+                formData={formData}
               >
                 What they don't know
               </HelpDrawer>

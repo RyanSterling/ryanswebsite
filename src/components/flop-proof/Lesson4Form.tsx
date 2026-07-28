@@ -1,12 +1,13 @@
-import { AwarenessQuestions, isLesson4Complete } from './types'
+import { AwarenessQuestions, FlopProofFormData, isLesson4Complete } from './types'
 import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: AwarenessQuestions
   onChange: (data: AwarenessQuestions) => void
+  formData?: FlopProofFormData
 }
 
-export default function Lesson4Form({ data, onChange }: Props) {
+export default function Lesson4Form({ data, onChange, formData }: Props) {
   const updateField = (field: keyof AwarenessQuestions, value: string) => {
     onChange({ ...data, [field]: value })
   }
@@ -57,6 +58,8 @@ export default function Lesson4Form({ data, onChange }: Props) {
                     note: "Not searching for editing software. Wondering why their photos disappoint."
                   }
                 ]}
+                fieldId="lesson4_unaware"
+                formData={formData}
               >
                 Unaware
               </HelpDrawer>
@@ -101,6 +104,8 @@ export default function Lesson4Form({ data, onChange }: Props) {
                     note: "Knows editing is the issue, doesn't know the solution category."
                   }
                 ]}
+                fieldId="lesson4_problem_aware"
+                formData={formData}
               >
                 Problem Aware
               </HelpDrawer>
@@ -144,6 +149,8 @@ export default function Lesson4Form({ data, onChange }: Props) {
                     note: "Knows editing education exists. Looking for the right source."
                   }
                 ]}
+                fieldId="lesson4_solution_aware"
+                formData={formData}
               >
                 Solution Aware
               </HelpDrawer>
@@ -187,6 +194,8 @@ export default function Lesson4Form({ data, onChange }: Props) {
                     note: "Pre-purchase questions. They found you already."
                   }
                 ]}
+                fieldId="lesson4_product_aware"
+                formData={formData}
               >
                 Product Aware
               </HelpDrawer>

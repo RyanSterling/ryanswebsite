@@ -1,13 +1,14 @@
-import { AudienceData, isLesson2Complete } from './types'
+import { AudienceData, FlopProofFormData, isLesson2Complete } from './types'
 import DesireLadder from './DesireLadder'
 import HelpDrawer from './HelpDrawer'
 
 interface Props {
   data: AudienceData
   onChange: (data: AudienceData) => void
+  formData?: FlopProofFormData
 }
 
-export default function Lesson2Form({ data, onChange }: Props) {
+export default function Lesson2Form({ data, onChange, formData }: Props) {
   const updateField = <K extends keyof AudienceData>(field: K, value: AudienceData[K]) => {
     onChange({ ...data, [field]: value })
   }
@@ -51,6 +52,8 @@ export default function Lesson2Form({ data, onChange }: Props) {
                   note: "Where they're stuck, not just who they are"
                 }
               ]}
+              fieldId="lesson2_audience_description"
+              formData={formData}
             >
               Describe your target person
             </HelpDrawer>
@@ -95,6 +98,8 @@ export default function Lesson2Form({ data, onChange }: Props) {
                 note: "The core is identity — am I actually this thing, or just pretending?"
               }
             ]}
+            fieldId="lesson2_desire_ladders"
+            formData={formData}
           >
             Desire Ladders
           </HelpDrawer>
