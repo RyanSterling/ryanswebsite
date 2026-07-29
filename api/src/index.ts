@@ -1038,10 +1038,10 @@ async function sendToN8N(payload: {
 }
 
 // ============================================
-// FLOP-PROOF CONTENT GENERATOR
+// BREAKTHROUGH CONTENT STRATEGY GENERATOR
 // ============================================
 
-interface FlopProofFormData {
+interface BreakthroughFormData {
   lesson1: {
     niche: string
     core_problem: string
@@ -1090,7 +1090,7 @@ interface GeneratedIdea {
 }
 
 // Job state for background generation (stored in KV)
-interface FlopProofJobState {
+interface BreakthroughJobState {
   jobId: string
   status: 'in_progress' | 'partial_complete' | 'complete'
   totalBatches: number
@@ -1100,14 +1100,14 @@ interface FlopProofJobState {
     ideas: GeneratedIdea[]
     completedAt: string
   }>
-  formData: FlopProofFormData
+  formData: BreakthroughFormData
   startedAt: string
   completedAt: string | null
   error: { batch: number; message: string } | null
 }
 
 app.post('/generate-ideas', async (c) => {
-  const formData = await c.req.json<FlopProofFormData>()
+  const formData = await c.req.json<BreakthroughFormData>()
 
   const stagePrescriptions: Record<number, string> = {
     1: "You're first. Just say it clearly.",
@@ -1319,7 +1319,7 @@ const AWARENESS_BATCHES = [
 const TOTAL_BATCHES = AWARENESS_BATCHES.length
 
 // Helper to get batch-specific directive based on awareness level
-function getBatchDirective(awarenessLevel: string, targetCount: number, formData: FlopProofFormData): string {
+function getBatchDirective(awarenessLevel: string, targetCount: number, formData: BreakthroughFormData): string {
   const { lesson1, lesson2, lesson3, lesson4, lesson5 } = formData
 
   switch (awarenessLevel) {
@@ -1411,7 +1411,7 @@ ALL ${targetCount} ideas in this batch MUST be awareness_level: "product_aware".
 }
 
 // Helper to build the base prompt (without deduplication section)
-function buildBasePrompt(formData: FlopProofFormData): { systemPrompt: string; userPromptBase: string } {
+function buildBasePrompt(formData: BreakthroughFormData): { systemPrompt: string; userPromptBase: string } {
   const stagePrescriptions: Record<number, string> = {
     1: "You're first. Just say it clearly.",
     2: "Others have said it. Go bolder — say what they were afraid to.",
@@ -1595,9 +1595,23 @@ Return JSON with this structure:
   return { systemPrompt, userPromptBase }
 }
 
-// Helper to generate a single batch at a specific awareness level
+// Retry configuration
+const RETRY_CONFIG = {
+  maxAttempts: 3,
+  baseDelayMs: 2000, // 2 seconds
+  maxDelayMs: 30000, // 30 seconds max
+  timeoutMs: 120000, // 2 minute timeout per attempt
+}
+
+// Helper to sleep with exponential backoff
+function getRetryDelay(attempt: number): number {
+  const delay = RETRY_CONFIG.baseDelayMs * Math.pow(2, attempt)
+  return Math.min(delay, RETRY_CONFIG.maxDelayMs)
+}
+
+// Helper to generate a single batch at a specific awareness level (with retry + timeout)
 async function generateBatch(
-  formData: FlopProofFormData,
+  formData: BreakthroughFormData,
   awarenessLevel: string,
   targetCount: number,
   previousIdeas: GeneratedIdea[],
@@ -1639,117 +1653,173 @@ CRITICAL: Different topic, same niche. Do NOT drift outside the niche to avoid r
   console.log(`Batch ${awarenessLevel}: Sending request to Claude API for ${targetCount} ideas...`)
   console.log(`Batch ${awarenessLevel}: Deduplication includes ${previousIdeas.length} previous ideas`)
 
-  // Use streaming to prevent Cloudflare timeout on long-running responses
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 16000,
-      stream: true,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-    }),
-  })
+  // Retry loop with exponential backoff
+  let lastError: Error | null = null
 
-  if (!response.ok) {
-    const errorBody = await response.text()
-    const errorDetails = {
-      status: response.status,
-      statusText: response.statusText,
-      body: errorBody,
-      headers: Object.fromEntries(response.headers.entries()),
+  for (let attempt = 0; attempt < RETRY_CONFIG.maxAttempts; attempt++) {
+    if (attempt > 0) {
+      const delay = getRetryDelay(attempt - 1)
+      console.log(`Batch ${awarenessLevel}: Retry attempt ${attempt + 1}/${RETRY_CONFIG.maxAttempts} after ${delay}ms delay`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
-    console.error(`Batch ${awarenessLevel} Claude API error:`, JSON.stringify(errorDetails, null, 2))
 
-    // Include more details in the error message for debugging
-    let errorMessage = `Claude API failed for batch ${batchNumber} (${response.status})`
     try {
-      const parsed = JSON.parse(errorBody)
-      if (parsed.error?.message) {
-        errorMessage = `Batch ${awarenessLevel}: ${parsed.error.message}`
-      }
-    } catch {
-      // Use generic message if we can't parse
-    }
-    throw new Error(errorMessage)
-  }
+      // Create AbortController for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), RETRY_CONFIG.timeoutMs)
 
-  // Accumulate streamed text chunks
-  let text = ''
-  let inputTokens = 0
-  let outputTokens = 0
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error(`No response body for batch ${batchNumber}`)
+      // Use streaming to prevent Cloudflare timeout on long-running responses
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 16000,
+          stream: true,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+        signal: controller.signal,
+      })
 
-  const decoder = new TextDecoder()
-  let buffer = ''
+      clearTimeout(timeoutId)
 
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
+      if (!response.ok) {
+        const errorBody = await response.text()
+        const errorDetails = {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorBody,
+          headers: Object.fromEntries(response.headers.entries()),
+        }
+        console.error(`Batch ${awarenessLevel} Claude API error (attempt ${attempt + 1}):`, JSON.stringify(errorDetails, null, 2))
 
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    buffer = lines.pop() || '' // Keep incomplete line in buffer
+        // Check if this is a retryable error (5xx or rate limit)
+        const isRetryable = response.status >= 500 || response.status === 429
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6)
-        if (data === '[DONE]') continue
+        let errorMessage = `Claude API failed for batch ${awarenessLevel} (${response.status})`
         try {
-          const event = JSON.parse(data)
-          if (event.type === 'content_block_delta' && event.delta?.text) {
-            text += event.delta.text
-          } else if (event.type === 'message_delta' && event.usage) {
-            outputTokens = event.usage.output_tokens
-          } else if (event.type === 'message_start' && event.message?.usage) {
-            inputTokens = event.message.usage.input_tokens
+          const parsed = JSON.parse(errorBody)
+          if (parsed.error?.message) {
+            errorMessage = `Batch ${awarenessLevel}: ${parsed.error.message}`
           }
         } catch {
-          // Skip malformed JSON
+          // Use generic message if we can't parse
         }
+
+        lastError = new Error(errorMessage)
+
+        if (!isRetryable) {
+          throw lastError // Don't retry client errors (4xx except 429)
+        }
+        continue // Retry on server errors or rate limits
       }
+
+      // Accumulate streamed text chunks
+      let text = ''
+      let inputTokens = 0
+      let outputTokens = 0
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error(`No response body for batch ${awarenessLevel}`)
+
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      // Stream reading with timeout protection
+      const streamTimeoutId = setTimeout(() => controller.abort(), RETRY_CONFIG.timeoutMs)
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || '' // Keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6)
+              if (data === '[DONE]') continue
+              try {
+                const event = JSON.parse(data)
+                if (event.type === 'content_block_delta' && event.delta?.text) {
+                  text += event.delta.text
+                } else if (event.type === 'message_delta' && event.usage) {
+                  outputTokens = event.usage.output_tokens
+                } else if (event.type === 'message_start' && event.message?.usage) {
+                  inputTokens = event.message.usage.input_tokens
+                }
+              } catch {
+                // Skip malformed JSON
+              }
+            }
+          }
+        }
+      } finally {
+        clearTimeout(streamTimeoutId)
+      }
+
+      // Parse JSON
+      let parsed
+      try {
+        let jsonStr = text
+        const match = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+        if (match) jsonStr = match[1]
+        parsed = JSON.parse(jsonStr)
+      } catch {
+        console.error(`Batch ${awarenessLevel} failed to parse JSON (attempt ${attempt + 1}):`, text.substring(0, 500))
+        lastError = new Error(`Failed to parse response for batch ${awarenessLevel}`)
+        continue // Retry on parse errors
+      }
+
+      // Validate we got ideas
+      if (!parsed.ideas || !Array.isArray(parsed.ideas) || parsed.ideas.length === 0) {
+        console.error(`Batch ${awarenessLevel}: Got empty or invalid ideas array (attempt ${attempt + 1})`)
+        lastError = new Error(`Batch ${awarenessLevel} returned no ideas`)
+        continue // Retry
+      }
+
+      console.log(`Batch ${awarenessLevel}: Generated ${parsed.ideas.length} ideas, tokens: ${inputTokens} in, ${outputTokens} out`)
+
+      // Success! Renumber and return
+      const startId = previousIdeas.length + 1
+      const ideas = (parsed.ideas as GeneratedIdea[]).map((idea, index) => ({
+        ...idea,
+        id: startId + index,
+      }))
+
+      return ideas
+
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error(`Batch ${awarenessLevel}: Request timed out (attempt ${attempt + 1})`)
+        lastError = new Error(`Batch ${awarenessLevel} timed out after ${RETRY_CONFIG.timeoutMs}ms`)
+      } else {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        console.error(`Batch ${awarenessLevel}: Error (attempt ${attempt + 1}):`, lastError.message)
+      }
+      // Continue to next retry attempt
     }
   }
 
-  // Parse JSON
-  let parsed
-  try {
-    let jsonStr = text
-    const match = text.match(/```(?:json)?\s*([\s\S]*?)```/)
-    if (match) jsonStr = match[1]
-    parsed = JSON.parse(jsonStr)
-  } catch {
-    console.error(`Batch ${awarenessLevel} failed to parse JSON:`, text.substring(0, 500))
-    throw new Error(`Failed to parse response for batch ${batchNumber}`)
-  }
-
-  console.log(`Batch ${awarenessLevel}: Generated ${parsed.ideas?.length} ideas, tokens: ${inputTokens} in, ${outputTokens} out`)
-
-  // Renumber ideas based on previous ideas count (handles variable batch sizes)
-  const startId = previousIdeas.length + 1
-  const ideas = (parsed.ideas as GeneratedIdea[]).map((idea, index) => ({
-    ...idea,
-    id: startId + index,
-  }))
-
-  return ideas
+  // All retries exhausted
+  throw lastError || new Error(`Batch ${awarenessLevel} failed after ${RETRY_CONFIG.maxAttempts} attempts`)
 }
 
 // POST /generate-ideas-start - Return immediately, generate ALL batches in background
 app.post('/generate-ideas-start', async (c) => {
-  const formData = await c.req.json<FlopProofFormData>()
+  const formData = await c.req.json<BreakthroughFormData>()
   const jobId = crypto.randomUUID()
 
   console.log(`Starting job ${jobId} - spawning ${TOTAL_BATCHES} batches in background`)
 
   // Create initial job state (no ideas yet)
-  const jobState: FlopProofJobState = {
+  const jobState: BreakthroughJobState = {
     jobId,
     status: 'in_progress',
     totalBatches: TOTAL_BATCHES,
@@ -1763,7 +1833,7 @@ app.post('/generate-ideas-start', async (c) => {
 
   // Save initial state to KV
   await c.env.RESULTS_KV.put(
-    `flop-proof-job:${jobId}`,
+    `breakthrough-job:${jobId}`,
     JSON.stringify(jobState),
     { expirationTtl: 24 * 60 * 60 } // 24 hours
   )
@@ -1778,12 +1848,12 @@ app.post('/generate-ideas-start', async (c) => {
       // Check if API key is available
       if (!c.env.ANTHROPIC_API_KEY) {
         console.error(`Job ${jobId}: ANTHROPIC_API_KEY is not set!`)
-        const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+        const currentState = await c.env.RESULTS_KV.get(`breakthrough-job:${jobId}`, 'json') as BreakthroughJobState
         if (currentState) {
           currentState.status = 'partial_complete'
           currentState.completedAt = new Date().toISOString()
           currentState.error = { batch: 0, message: 'API key not configured' }
-          await c.env.RESULTS_KV.put(`flop-proof-job:${jobId}`, JSON.stringify(currentState), { expirationTtl: 24 * 60 * 60 })
+          await c.env.RESULTS_KV.put(`breakthrough-job:${jobId}`, JSON.stringify(currentState), { expirationTtl: 24 * 60 * 60 })
         }
         return
       }
@@ -1810,7 +1880,7 @@ app.post('/generate-ideas-start', async (c) => {
           allIdeas = [...allIdeas, ...batchIdeas]
 
           // Read current state, update, and save
-          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          const currentState = await c.env.RESULTS_KV.get(`breakthrough-job:${jobId}`, 'json') as BreakthroughJobState
           if (!currentState) {
             console.error(`Job ${jobId}: State not found in KV`)
             return
@@ -1829,7 +1899,7 @@ app.post('/generate-ideas-start', async (c) => {
           }
 
           await c.env.RESULTS_KV.put(
-            `flop-proof-job:${jobId}`,
+            `breakthrough-job:${jobId}`,
             JSON.stringify(currentState),
             { expirationTtl: 24 * 60 * 60 }
           )
@@ -1840,7 +1910,7 @@ app.post('/generate-ideas-start', async (c) => {
           console.error(`Job ${jobId}: ${awarenessLevel} batch failed:`, error)
 
           // Mark as partial_complete
-          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          const currentState = await c.env.RESULTS_KV.get(`breakthrough-job:${jobId}`, 'json') as BreakthroughJobState
           if (currentState) {
             currentState.status = 'partial_complete'
             currentState.completedAt = new Date().toISOString()
@@ -1849,7 +1919,7 @@ app.post('/generate-ideas-start', async (c) => {
               message: error instanceof Error ? error.message : 'Unknown error',
             }
             await c.env.RESULTS_KV.put(
-              `flop-proof-job:${jobId}`,
+              `breakthrough-job:${jobId}`,
               JSON.stringify(currentState),
               { expirationTtl: 24 * 60 * 60 }
             )
@@ -1863,7 +1933,7 @@ app.post('/generate-ideas-start', async (c) => {
         console.error(`Job ${jobId}: Fatal error in background work:`, outerError)
         // Try to mark job as failed
         try {
-          const currentState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState
+          const currentState = await c.env.RESULTS_KV.get(`breakthrough-job:${jobId}`, 'json') as BreakthroughJobState
           if (currentState && currentState.status === 'in_progress') {
             currentState.status = 'partial_complete'
             currentState.completedAt = new Date().toISOString()
@@ -1872,7 +1942,7 @@ app.post('/generate-ideas-start', async (c) => {
               message: outerError instanceof Error ? outerError.message : 'Background task failed',
             }
             await c.env.RESULTS_KV.put(
-              `flop-proof-job:${jobId}`,
+              `breakthrough-job:${jobId}`,
               JSON.stringify(currentState),
               { expirationTtl: 24 * 60 * 60 }
             )
@@ -1898,7 +1968,7 @@ app.post('/generate-ideas-start', async (c) => {
 app.get('/generation-status/:jobId', async (c) => {
   const jobId = c.req.param('jobId')
 
-  const jobState = await c.env.RESULTS_KV.get(`flop-proof-job:${jobId}`, 'json') as FlopProofJobState | null
+  const jobState = await c.env.RESULTS_KV.get(`breakthrough-job:${jobId}`, 'json') as BreakthroughJobState | null
 
   if (!jobState) {
     return c.json({ error: 'Job not found or expired' }, 404)
@@ -1922,8 +1992,42 @@ app.get('/generation-status/:jobId', async (c) => {
 // This keeps the connection open and streams batches as they complete
 // Works on free tier since it's a single long-running request, not background work
 
+interface GenerateStreamRequest extends BreakthroughFormData {
+  userId?: string
+  courseId?: string
+}
+
+// Generation credit limit per user per course
+const MAX_GENERATIONS_PER_COURSE = 3
+
 app.post('/generate-ideas-stream', async (c) => {
-  const formData = await c.req.json<FlopProofFormData>()
+  const requestData = await c.req.json<GenerateStreamRequest>()
+  const { userId, courseId, ...formData } = requestData
+
+  // Extract Supabase client for credit checking
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  // Server-side credit check BEFORE starting generation
+  if (userId && courseId) {
+    const { count, error } = await supabase
+      .from('generations')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+
+    if (error) {
+      console.error('Failed to check generation credits:', error)
+      return c.json({ error: 'Failed to verify generation credits' }, 500)
+    }
+
+    const used = count || 0
+    if (used >= MAX_GENERATIONS_PER_COURSE) {
+      console.log(`User ${userId} has no credits remaining (${used}/${MAX_GENERATIONS_PER_COURSE})`)
+      return c.json({ error: 'No generation credits remaining' }, 403)
+    }
+
+    console.log(`User ${userId} has ${MAX_GENERATIONS_PER_COURSE - used} credits remaining`)
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1934,6 +2038,7 @@ app.post('/generate-ideas-stream', async (c) => {
         ideas?: GeneratedIdea[]
         allIdeas?: GeneratedIdea[]
         error?: string
+        creditsRemaining?: number
       }) => {
         controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(event)}\n\n`))
       }
@@ -1995,14 +2100,45 @@ app.post('/generate-ideas-stream', async (c) => {
           }
         }
 
-        // All batches complete
+        // All batches complete - NOW save the generation (consumes credit)
+        let creditsRemaining = MAX_GENERATIONS_PER_COURSE
+
+        if (userId && courseId) {
+          // Save generation to Supabase - this is what "consumes" the credit
+          const { error: saveError } = await supabase
+            .from('generations')
+            .insert({
+              user_id: userId,
+              course_id: courseId,
+              ideas: allIdeas,
+            })
+
+          if (saveError) {
+            console.error('Failed to save generation:', saveError)
+            // Don't fail the whole request - ideas are generated, just saving failed
+            // User will still see their ideas
+          } else {
+            console.log(`Saved generation for user ${userId}, course ${courseId}, ${allIdeas.length} ideas`)
+          }
+
+          // Get updated credit count
+          const { count } = await supabase
+            .from('generations')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('course_id', courseId)
+
+          creditsRemaining = Math.max(0, MAX_GENERATIONS_PER_COURSE - (count || 0))
+        }
+
         sendEvent({
           type: 'complete',
           totalBatches: AWARENESS_BATCHES.length,
           allIdeas: allIdeas,
+          creditsRemaining: creditsRemaining,
         })
 
-        console.log(`SSE: All ${AWARENESS_BATCHES.length} batches complete, ${allIdeas.length} total ideas`)
+        console.log(`SSE: All ${AWARENESS_BATCHES.length} batches complete, ${allIdeas.length} total ideas, ${creditsRemaining} credits remaining`)
         controller.close()
 
       } catch (error) {
@@ -2175,6 +2311,43 @@ app.post('/webhooks/stripe', async (c) => {
   }
 
   return c.json({ received: true })
+})
+
+// ============================================
+// GENERATION CREDITS (Server-side tracking)
+// ============================================
+
+// Get remaining generation credits for a user/course
+app.get('/generation-credits/:courseId', async (c) => {
+  const courseId = c.req.param('courseId')
+  const userId = c.req.query('userId')
+
+  if (!userId) {
+    return c.json({ error: 'Missing userId' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  // Count how many generations this user has for this course
+  const { count, error } = await supabase
+    .from('generations')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+
+  if (error) {
+    console.error('Failed to count generations:', error)
+    return c.json({ error: 'Failed to check credits' }, 500)
+  }
+
+  const used = count || 0
+  const remaining = Math.max(0, MAX_GENERATIONS_PER_COURSE - used)
+
+  return c.json({
+    used,
+    remaining,
+    max: MAX_GENERATIONS_PER_COURSE,
+  })
 })
 
 // ============================================
