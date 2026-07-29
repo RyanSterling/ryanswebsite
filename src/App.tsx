@@ -23,7 +23,8 @@ import SignUp from './pages/SignUp'
 import ProtectedRoute from './components/ProtectedRoute'
 
 // Custom course viewers
-import { FlopProofViewer } from './components/flop-proof'
+import { BreakthroughContentViewer } from './components/breakthrough-content'
+import BreakthroughSalesPage from './pages/BreakthroughSalesPage'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
 
       {/* Courses - Public */}
       <Route path="/courses" element={<Courses />} />
+      <Route path="/breakthrough" element={<BreakthroughSalesPage />} />
       <Route path="/courses/:slug" element={<CourseLanding />} />
 
       {/* Courses - Protected */}
@@ -59,10 +61,10 @@ function App() {
         }
       />
       <Route
-        path="/courses/flop-proof-content-system/learn/:lessonId?"
+        path="/courses/breakthrough-content-strategy/learn/:lessonId?"
         element={
           <ProtectedRoute>
-            <FlopProofViewer />
+            <BreakthroughContentViewer />
           </ProtectedRoute>
         }
       />
