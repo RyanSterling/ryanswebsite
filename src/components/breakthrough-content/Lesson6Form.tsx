@@ -72,24 +72,23 @@ ${lesson2.audience_description}
 
 ---
 
-## MY BRAIN DUMP
+## MY BRAIN DUMP FOR THIS IDEA
 
-${brainDump || '(Add your ideas, observations, or rough thoughts above)'}
+${brainDump || '(Brain dump everything you know about ONE content idea above)'}
 
 ---
 
 ## YOUR TASK
 
-Using everything above, help me brainstorm content ideas and hooks for my audience.
+I've brain dumped everything I know about ONE content idea above. Using my creator profile and audience data, help me develop this idea into a piece of content.
 
-For each idea:
-1. Give me the topic/idea as a working title
+1. Refine the core angle — what's the sharpest version of this idea?
 2. Explain why THIS audience would care (not just anyone — MY people)
-3. Write 2-3 hook options I could use to open the video
+3. Write 3-4 hook options I could use to open the video
+4. Suggest a structure or flow for the content
+5. Flag anything that might drift into the saturated topics/formats I listed
 
-Stay within my niche. Don't drift into generic wellness/productivity/psychology unless it directly connects to my specific topic. The ideas should feel like "this creator GETS me" not "this could be from anyone."
-
-Avoid the saturated topics, formats, and competitor angles I listed. Find fresh angles.
+Stay within my niche. The final piece should feel like "this creator GETS me" not "this could be from anyone."
 `
   }
 
@@ -117,13 +116,13 @@ Avoid the saturated topics, formats, and competitor angles I listed. Find fresh 
       <div className="bg-brand-card rounded-2xl p-6 md:p-8">
         <h3 className="font-soehne text-lg text-white mb-2">Your Brain Dump</h3>
         <p className="text-gray-400 text-sm mb-4">
-          What topics are on your mind? What did a client say recently? What questions keep coming up? What do you wish people understood? Dump it all here.
+          Pick ONE content idea you want to develop. Then dump everything you know about it here — your take, what most people get wrong, examples you've seen, things you'd want to say, related stories, anything. The more you put in, the better the AI can help you shape it.
         </p>
         <textarea
           value={brainDump}
           onChange={(e) => setBrainDump(e.target.value)}
           rows={6}
-          placeholder="e.g., I keep seeing people try X and fail because they don't realize Y... Had a client last week who said... I want to make something about..."
+          placeholder="e.g., I want to make something about [topic]. My take is... Most people think X but actually Y... I had a client who... The thing people don't realize is..."
           className="w-full px-4 py-3 rounded-xl bg-brand-dark text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange resize-none"
         />
       </div>
