@@ -235,51 +235,51 @@ ${formattedExamples}
                 ))}
               </div>
             </div>
-
-            {/* AI Help Section - Only show if fieldId and formData provided */}
-            {fieldId && formData && isLesson1Complete(formData.lesson1) && (
-              <div className="border-t border-gray-800 pt-6 space-y-3">
-                <h5 className="text-white text-sm font-medium">Still Stuck?</h5>
-                <p className="text-gray-400 text-sm">
-                  Copy this prompt and paste it into ChatGPT or Claude. The AI will give you multiple examples to choose from based on your creator profile. Pick the ones that feel most accurate to your audience.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className={`w-full py-3 px-4 rounded-xl font-medium text-sm transition-all ${
-                    copied
-                      ? 'bg-green-500 text-white'
-                      : 'bg-brand-orange text-white hover:opacity-90'
-                  }`}
-                >
-                  {copied ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Copied to Clipboard!
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Copy AI Prompt
-                    </span>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Show hint if Lesson 1 not complete */}
-            {fieldId && formData && !isLesson1Complete(formData.lesson1) && (
-              <div className="border-t border-gray-800 pt-6">
-                <p className="text-gray-500 text-sm italic">
-                  Complete Lesson 1 to unlock AI help for this field
-                </p>
-              </div>
-            )}
           </div>
+
+          {/* AI Help Section - Fixed at bottom */}
+          {fieldId && formData && isLesson1Complete(formData.lesson1) && (
+            <div className="border-t border-gray-800 p-5 space-y-3 bg-brand-card">
+              <h5 className="text-white text-sm font-medium">Still Stuck?</h5>
+              <p className="text-gray-400 text-sm">
+                Copy this prompt and paste it into ChatGPT or Claude. The AI will give you multiple examples to choose from based on your creator profile.
+              </p>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className={`w-full py-3 px-4 rounded-xl font-medium text-sm transition-all ${
+                  copied
+                    ? 'bg-green-500 text-white'
+                    : 'bg-brand-orange text-white hover:opacity-90'
+                }`}
+              >
+                {copied ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Copied to Clipboard!
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy AI Prompt
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Show hint if Lesson 1 not complete - Fixed at bottom */}
+          {fieldId && formData && !isLesson1Complete(formData.lesson1) && (
+            <div className="border-t border-gray-800 p-5 bg-brand-card">
+              <p className="text-gray-500 text-sm italic">
+                Complete Lesson 1 to unlock AI help for this field
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>

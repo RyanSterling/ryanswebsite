@@ -30,10 +30,12 @@ export default function BreakthroughSalesPage() {
 
         {/* VSL Video */}
         <div className="aspect-video bg-black rounded-xl overflow-hidden">
-          {/* TODO: Replace with your VSL embed */}
-          <div className="w-full h-full flex items-center justify-center text-gray-500">
-            VSL Video Embed
-          </div>
+          <iframe
+            src="https://player.vimeo.com/video/1214096214?badge=0&autopause=0&player_id=0&app_id=58479"
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+            allowFullScreen
+          />
         </div>
       </section>
 

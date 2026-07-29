@@ -22,7 +22,6 @@ import GeneratorUI from './GeneratorUI'
 
 const COURSE_SLUG = 'breakthrough-content-strategy'
 const STORAGE_KEY = 'breakthrough-form-data'
-const GENERATIONS_KEY = 'breakthrough-generations'
 const MAX_GENERATIONS = 3
 
 // Test data for development
@@ -98,13 +97,14 @@ export default function BreakthroughContentViewer() {
   // Form state
   const [formData, setFormData] = useState<BreakthroughFormData>(createEmptyFormData())
   const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
+  const [creditsLoading, setCreditsLoading] = useState(true)
   const [savedIdeas, setSavedIdeas] = useState<GeneratedIdea[]>([])
 
   const apiUrl = import.meta.env.DEV
     ? 'http://localhost:8787'
     : 'https://ryan-website-api.rsterling20.workers.dev'
 
-  // Load saved form data
+  // Load saved form data from localStorage
   useEffect(() => {
     if (user) {
       const savedData = localStorage.getItem(`${STORAGE_KEY}-${user.id}`)
@@ -114,10 +114,6 @@ export default function BreakthroughContentViewer() {
         } catch (e) {
           console.error('Error parsing saved form data:', e)
         }
-      }
-      const savedGenerations = localStorage.getItem(`${GENERATIONS_KEY}-${user.id}`)
-      if (savedGenerations) {
-        setGenerationsRemaining(parseInt(savedGenerations, 10))
       }
     }
   }, [user])
@@ -129,12 +125,25 @@ export default function BreakthroughContentViewer() {
     }
   }, [formData, user])
 
-  // Save generations on change
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(`${GENERATIONS_KEY}-${user.id}`, generationsRemaining.toString())
+  // Fetch generation credits from server
+  const fetchCredits = async (courseIdToFetch: string) => {
+    if (!user) return
+
+    try {
+      const response = await fetch(
+        `${apiUrl}/generation-credits/${courseIdToFetch}?userId=${user.id}`
+      )
+      if (response.ok) {
+        const { remaining } = await response.json()
+        setGenerationsRemaining(remaining)
+        console.log(`Loaded ${remaining} credits remaining from server`)
+      }
+    } catch (err) {
+      console.error('Error fetching generation credits:', err)
+    } finally {
+      setCreditsLoading(false)
     }
-  }, [generationsRemaining, user])
+  }
 
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {
@@ -171,6 +180,9 @@ export default function BreakthroughContentViewer() {
       }
 
       setHasAccess(true)
+
+      // Fetch generation credits from server
+      await fetchCredits(courseData.id)
 
       // Load saved generation ideas
       try {
@@ -209,12 +221,6 @@ export default function BreakthroughContentViewer() {
     fetchCourseAndCheckAccess()
   }, [user, isLoaded, navigate])
 
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return ''
-    const mins = Math.floor(seconds / 60)
-    return `${mins} min`
-  }
-
   const getLessonCompletionStatus = (index: number): boolean => {
     switch (index) {
       case 0:
@@ -242,10 +248,9 @@ export default function BreakthroughContentViewer() {
     navigate(`/courses/${COURSE_SLUG}/learn/${lesson.id}`)
   }
 
-  const handleUseGeneration = () => {
-    if (generationsRemaining > 0) {
-      setGenerationsRemaining(generationsRemaining - 1)
-    }
+  // Called by GeneratorUI when generation completes with new credit count from server
+  const handleCreditsUpdate = (newCreditsRemaining: number) => {
+    setGenerationsRemaining(newCreditsRemaining)
   }
 
   const handleLoadTestData = () => {
@@ -270,7 +275,7 @@ export default function BreakthroughContentViewer() {
         <GeneratorUI
           formData={formData}
           generationsRemaining={generationsRemaining}
-          onUseGeneration={handleUseGeneration}
+          onCreditsUpdate={handleCreditsUpdate}
           allComplete={allComplete}
           onLoadTestData={handleLoadTestData}
           userId={user?.id}
@@ -375,13 +380,13 @@ export default function BreakthroughContentViewer() {
       )}
 
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar - Lesson List */}
+        {/* Sidebar - Lesson List (Fixed on desktop) */}
         <div
           className={`
-            fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-brand-card border-r border-gray-800
-            transform transition-transform duration-300 ease-in-out lg:transform-none
+            fixed inset-y-0 left-0 z-50 w-80 bg-brand-card border-r border-gray-800
+            transform transition-transform duration-300 ease-in-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-            lg:min-h-screen overflow-y-auto
+            overflow-y-auto
           `}
         >
           <div className="p-6 border-b border-gray-800 flex items-center justify-between">
@@ -498,11 +503,6 @@ export default function BreakthroughContentViewer() {
                     >
                       {lesson.title}
                     </div>
-                    {lesson.duration_seconds && (
-                      <div className="text-gray-500 text-xs mt-1">
-                        {formatDuration(lesson.duration_seconds)}
-                      </div>
-                    )}
                   </div>
                 </button>
               )
@@ -510,8 +510,8 @@ export default function BreakthroughContentViewer() {
           </nav>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-4 md:p-8">
+        {/* Main Content - offset for fixed sidebar on desktop */}
+        <div className="flex-1 p-4 md:p-8 lg:ml-80">
           {currentLesson ? (
             <div className="max-w-4xl mx-auto">
               <h1 className="font-soehne text-2xl md:text-3xl text-white mb-6">

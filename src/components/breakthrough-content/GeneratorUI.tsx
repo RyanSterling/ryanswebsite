@@ -14,7 +14,7 @@ import IdeaBrainstormDrawer from './IdeaBrainstormDrawer'
 interface Props {
   formData: BreakthroughFormData
   generationsRemaining: number
-  onUseGeneration: () => void
+  onCreditsUpdate: (remaining: number) => void
   allComplete: boolean
   onLoadTestData?: () => void
   userId?: string
@@ -26,7 +26,7 @@ interface Props {
 export default function GeneratorUI({
   formData,
   generationsRemaining,
-  onUseGeneration,
+  onCreditsUpdate,
   allComplete,
   onLoadTestData,
   userId,
@@ -75,17 +75,32 @@ export default function GeneratorUI({
     console.log('[Breakthrough] Starting SSE generation...')
 
     try {
-      // Use fetch with SSE streaming
+      // Use fetch with SSE streaming - include userId and courseId for server-side credit tracking
       const response = await fetch(`${apiUrl}/generate-ideas-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          userId,
+          courseId,
+        }),
       })
 
       if (!response.ok) {
-        const error = await response.text()
-        console.error('Generation failed:', error)
-        setJobError('Generation failed. Please try again.')
+        const errorText = await response.text()
+        console.error('Generation failed:', response.status, errorText)
+
+        // Handle specific error cases
+        if (response.status === 403) {
+          setJobError('No generation credits remaining.')
+        } else {
+          try {
+            const errorJson = JSON.parse(errorText)
+            setJobError(errorJson.error || 'Generation failed. Please try again.')
+          } catch {
+            setJobError('Generation failed. Please try again.')
+          }
+        }
         setIsGenerating(false)
         return
       }
@@ -99,7 +114,6 @@ export default function GeneratorUI({
 
       const decoder = new TextDecoder()
       let buffer = ''
-      let generationCounted = false
 
       console.log('[Breakthrough] SSE stream connected, reading events...')
 
@@ -131,13 +145,7 @@ export default function GeneratorUI({
               setGeneratedIdeas(event.allIdeas)
               setCompletedBatches(event.batch)
               setTotalBatches(event.totalBatches)
-
-              // Count generation when batch 1 completes
-              if (event.batch === 1 && !generationCounted) {
-                generationCounted = true
-                onUseGeneration()
-                console.log('[Breakthrough] Generation counted after batch 1')
-              }
+              // Credit is NOT counted here - only after ALL batches complete successfully on the server
             } else if (event.type === 'complete') {
               console.log(`[Breakthrough] All batches complete! ${event.allIdeas.length} ideas`)
               setGeneratedIdeas(event.allIdeas)
@@ -145,48 +153,21 @@ export default function GeneratorUI({
               setJobStatus('complete')
               setIsGenerating(false)
 
-              // Save to Supabase
-              if (userId && courseId) {
-                fetch(`${apiUrl}/save-generation`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    userId,
-                    courseId,
-                    ideas: event.allIdeas,
-                  }),
-                }).then(res => {
-                  if (res.ok) {
-                    console.log('[Breakthrough] Ideas saved to Supabase')
-                  } else {
-                    console.error('[Breakthrough] Failed to save ideas to Supabase')
-                  }
-                }).catch(err => {
-                  console.error('[Breakthrough] Error saving ideas:', err)
-                })
+              // Update credits from server response (generation was saved server-side)
+              if (typeof event.creditsRemaining === 'number') {
+                onCreditsUpdate(event.creditsRemaining)
+                console.log(`[Breakthrough] Credits remaining: ${event.creditsRemaining}`)
               }
             } else if (event.type === 'error') {
               console.error('[Breakthrough] Generation error:', event.error)
               if (event.allIdeas && event.allIdeas.length > 0) {
-                // Partial success - save what we have
+                // Partial success - show ideas but DON'T save or consume credit
+                // User can try again since generation didn't fully complete
                 setGeneratedIdeas(event.allIdeas)
                 setJobStatus('partial_complete')
-                setJobError(`Generated ${event.allIdeas.length} ideas. Batch ${event.batch} failed: ${event.error}`)
-
-                // Save partial results to Supabase
-                if (userId && courseId) {
-                  fetch(`${apiUrl}/save-generation`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      userId,
-                      courseId,
-                      ideas: event.allIdeas,
-                    }),
-                  }).catch(err => console.error('[Breakthrough] Error saving partial ideas:', err))
-                }
+                setJobError(`Generated ${event.allIdeas.length} ideas but generation incomplete. No credit used - you can try again.`)
               } else {
-                setJobError(event.error || 'Generation failed')
+                setJobError(event.error || 'Generation failed. No credit used - you can try again.')
               }
               setIsGenerating(false)
             }
