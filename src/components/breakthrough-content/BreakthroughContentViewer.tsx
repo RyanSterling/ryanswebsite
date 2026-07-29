@@ -97,7 +97,6 @@ export default function BreakthroughContentViewer() {
   // Form state
   const [formData, setFormData] = useState<BreakthroughFormData>(createEmptyFormData())
   const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
-  const [creditsLoading, setCreditsLoading] = useState(true)
   const [savedIdeas, setSavedIdeas] = useState<GeneratedIdea[]>([])
 
   const apiUrl = import.meta.env.DEV
@@ -140,8 +139,6 @@ export default function BreakthroughContentViewer() {
       }
     } catch (err) {
       console.error('Error fetching generation credits:', err)
-    } finally {
-      setCreditsLoading(false)
     }
   }
 
