@@ -18,7 +18,7 @@ export default function BreakthroughSalesPage() {
       {/* Hero: Headline + Subhead + VSL */}
       <section className="max-w-4xl mx-auto px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center mb-10">
-          <h1 className="font-soehne text-4xl md:text-5xl lg:text-6xl text-white mb-6 leading-tight">
+          <h1 className="font-soehne text-3xl md:text-5xl text-white mb-6 leading-tight">
             Finally get views on your content, even if you've been posting for months with nothing to show for it.
           </h1>
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto">
@@ -29,7 +29,7 @@ export default function BreakthroughSalesPage() {
         {/* VSL Video */}
         <div className="aspect-video bg-black rounded-xl overflow-hidden">
           <iframe
-            src="https://player.vimeo.com/video/1214096214?badge=0&autopause=0&player_id=0&app_id=58479"
+            src="https://player.vimeo.com/video/1214096214?badge=0&autopause=0&autoplay=1&muted=1&texttrack=en&player_id=0&app_id=58479"
             className="w-full h-full"
             allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
             allowFullScreen
