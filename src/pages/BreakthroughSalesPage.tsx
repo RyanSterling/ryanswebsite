@@ -37,74 +37,73 @@ export default function BreakthroughSalesPage() {
         </div>
       </section>
 
-      {/* Reframe: This is a tool, not a course */}
+      {/* What You Get */}
       <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800">
         <div className="text-center mb-12">
-          <p className="text-brand-orange uppercase tracking-wider text-sm font-medium mb-4">
-            This isn't a course
-          </p>
           <h2 className="font-soehne text-3xl md:text-4xl text-white mb-6">
-            It's a content strategy machine
+            Here's what you get
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            You don't watch and hope. You input your unique data, and the system generates ideas that could only work for you.
-          </p>
         </div>
 
-        {/* The Process */}
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-brand-card rounded-xl p-6">
-            <div className="text-brand-orange text-sm font-medium mb-2">Your Input</div>
-            <h3 className="text-white text-xl font-soehne mb-3">5 Strategic Exercises</h3>
-            <ul className="space-y-3 text-gray-400">
-              <li className="flex items-start gap-3">
-                <span className="text-brand-orange mt-1">→</span>
-                <span>Define your niche and core problem you solve</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-orange mt-1">→</span>
-                <span>Map your audience's desire ladder (what they really want)</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-orange mt-1">→</span>
-                <span>Uncover what you'll say that competitors won't or can't</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-orange mt-1">→</span>
-                <span>Identify questions at every awareness stage</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-orange mt-1">→</span>
-                <span>Analyze market saturation and find your gap</span>
-              </li>
-            </ul>
+        <div className="space-y-8 max-w-2xl mx-auto">
+          {/* Item 1 */}
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center">
+              <span className="text-brand-orange font-medium">1</span>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-2">
+                The real reason your content isn't getting views
+              </h3>
+              <p className="text-gray-400">
+                It's not your hooks. It's not the algorithm. It's the topics you're choosing. You'll understand exactly why strangers scroll past your content—and what to do instead.
+              </p>
+            </div>
           </div>
 
-          <div className="bg-brand-card rounded-xl p-6">
-            <div className="text-green-400 text-sm font-medium mb-2">Your Output</div>
-            <h3 className="text-white text-xl font-soehne mb-3">50 Personalized Ideas</h3>
-            <ul className="space-y-3 text-gray-400">
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Ideas engineered from your unique positioning data</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Each idea scored for urgency, staying power, and scope</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>4 hook variations per idea (teacher, contrarian, etc.)</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Matched to your audience's awareness level</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>A custom prompt to generate more ideas forever</span>
-              </li>
-            </ul>
+          {/* Item 2 */}
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center">
+              <span className="text-brand-orange font-medium">2</span>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-2">
+                A clear picture of what your audience actually wants
+              </h3>
+              <p className="text-gray-400">
+                Not what you think they want. Not what you want to talk about. What they're actively searching for right now—at every stage from curious to ready to buy.
+              </p>
+            </div>
+          </div>
+
+          {/* Item 3 */}
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center">
+              <span className="text-brand-orange font-medium">3</span>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-2">
+                50 content ideas built from your answers
+              </h3>
+              <p className="text-gray-400">
+                Not generic prompts. Ideas generated from your niche, your audience, and your unique angle. Each one scored so you know which to post first.
+              </p>
+            </div>
+          </div>
+
+          {/* Item 4 */}
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center">
+              <span className="text-brand-orange font-medium">4</span>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-2">
+                A custom prompt to generate more ideas whenever you want
+              </h3>
+              <p className="text-gray-400">
+                Take it to ChatGPT or Claude. Get fresh ideas that fit your positioning—forever. No more staring at a blank screen wondering what to post.
+              </p>
+            </div>
           </div>
         </div>
       </section>
