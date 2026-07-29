@@ -19,12 +19,10 @@ export default function BreakthroughSalesPage() {
       <section className="max-w-4xl mx-auto px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center mb-10">
           <h1 className="font-soehne text-4xl md:text-5xl lg:text-6xl text-white mb-6 leading-tight">
-            {/* TODO: Your headline */}
-            Stop Guessing What to Post
+            Finally get views on your content, even if you've been posting for months with nothing to show for it.
           </h1>
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto">
-            {/* TODO: Your subheadline */}
-            Get 50 content ideas engineered for your specific niche, audience, and positioning—in one session.
+            The algorithm shows your content to strangers when your topics have broad appeal. Most creators pick topics only their existing audience cares about—then wonder why growth is flat.
           </p>
         </div>
 
@@ -111,26 +109,6 @@ export default function BreakthroughSalesPage() {
         </div>
       </section>
 
-      {/* Why short videos are a feature */}
-      <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800">
-        <div className="bg-brand-card rounded-xl p-8 md:p-12">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-gray-500 text-sm uppercase tracking-wider mb-4">
-              You might notice
-            </p>
-            <h2 className="font-soehne text-2xl md:text-3xl text-white mb-6">
-              The videos are short. That's the point.
-            </h2>
-            <p className="text-gray-400 text-lg mb-6">
-              Each lesson is 2-3 minutes because I'm not filling time—I'm giving you exactly what you need to complete that exercise. Then you do the work, and your answers become the fuel.
-            </p>
-            <p className="text-gray-400 text-lg">
-              The value isn't in watching me talk. It's in what comes out when you feed the machine your data.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Price + CTA */}
       <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800">
         <div className="text-center">
@@ -178,7 +156,7 @@ export default function BreakthroughSalesPage() {
               How long does this take to complete?
             </h3>
             <p className="text-gray-400">
-              Most people finish in a single focused session—about 60-90 minutes. The videos are short, but the exercises require real thinking about your niche and audience.
+              Most people finish in a single focused session—about 60-90 minutes. The exercises require real thinking about your niche and audience.
             </p>
           </div>
           <div className="bg-brand-card rounded-xl p-6">
@@ -203,16 +181,16 @@ export default function BreakthroughSalesPage() {
       {/* Final CTA */}
       <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800 text-center">
         <h2 className="font-soehne text-3xl text-white mb-4">
-          Stop staring at a blank content calendar
+          Learn why your content isn't getting views—and fix it.
         </h2>
         <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
-          Get ideas that actually fit your voice, your audience, and your positioning.
+          Understand exactly why your content isn't reaching anyone, and walk away with a strategy that will.
         </p>
         <button
           onClick={handleBuy}
           className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity"
         >
-          Get 50 Ideas for $27
+          Get Instant Access — $27
         </button>
       </section>
     </main>
