@@ -515,36 +515,44 @@ export default function BreakthroughContentViewer() {
                 {currentLesson.title}
               </h1>
 
-              {/* Video Embed */}
-              <div className="aspect-video bg-black rounded-xl overflow-hidden mb-8">
-                {currentLesson.video_url.includes('vimeo.com') ? (
-                  <iframe
-                    src={currentLesson.video_url.replace(
-                      'vimeo.com/',
-                      'player.vimeo.com/video/'
-                    )}
-                    className="w-full h-full"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : currentLesson.video_url.includes('youtube.com') ||
-                  currentLesson.video_url.includes('youtu.be') ? (
-                  <iframe
-                    src={currentLesson.video_url
-                      .replace('watch?v=', 'embed/')
-                      .replace('youtu.be/', 'youtube.com/embed/')}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <video
-                    src={currentLesson.video_url}
-                    controls
-                    className="w-full h-full"
-                  />
-                )}
-              </div>
+              {/* Video Embed - hide for generator lesson */}
+              {isGeneratorLesson ? (
+                <div className="bg-brand-card rounded-xl p-6 mb-8">
+                  <p className="text-gray-300">
+                    Based on everything you've entered in the previous lessons, the generator will create 50 content ideas tailored to your niche, audience, and positioning. Each idea includes multiple hook variations and is scored for urgency, staying power, and reach.
+                  </p>
+                </div>
+              ) : (
+                <div className="aspect-video bg-black rounded-xl overflow-hidden mb-8">
+                  {currentLesson.video_url.includes('vimeo.com') ? (
+                    <iframe
+                      src={currentLesson.video_url.replace(
+                        'vimeo.com/',
+                        'player.vimeo.com/video/'
+                      )}
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : currentLesson.video_url.includes('youtube.com') ||
+                    currentLesson.video_url.includes('youtu.be') ? (
+                    <iframe
+                      src={currentLesson.video_url
+                        .replace('watch?v=', 'embed/')
+                        .replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={currentLesson.video_url}
+                      controls
+                      className="w-full h-full"
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Lesson Form */}
               <div className="mb-8">{renderLessonForm()}</div>
