@@ -108,6 +108,111 @@ export default function BreakthroughSalesPage() {
         </div>
       </section>
 
+      {/* Lessons */}
+      <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800">
+        <div className="text-center mb-12">
+          <h2 className="font-soehne text-3xl md:text-4xl text-white mb-4">
+            What's inside
+          </h2>
+          <p className="text-gray-400 text-lg">
+            7 lessons. Each one builds on the last.
+          </p>
+        </div>
+
+        <div className="space-y-4 max-w-2xl mx-auto">
+          {/* Lesson 1 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">1</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Start Here</h3>
+                <p className="text-gray-500 text-sm">How to use this tool and what to expect</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 2 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">2</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Define Your Niche</h3>
+                <p className="text-gray-500 text-sm">Get clear on who you help and what problem you solve</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 3 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">3</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Map Your Audience</h3>
+                <p className="text-gray-500 text-sm">Understand what your audience actually wants—not what you assume</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 4 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">4</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Uncover Your Edge</h3>
+                <p className="text-gray-500 text-sm">Find what you can say that competitors won't or can't</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 5 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">5</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Map Awareness Stages</h3>
+                <p className="text-gray-500 text-sm">Know exactly what your audience is searching for at each stage</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 6 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">6</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Find Your Gap</h3>
+                <p className="text-gray-500 text-sm">Identify what's overdone in your niche so you can avoid it</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lesson 7 */}
+          <div className="bg-brand-card rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-orange text-sm font-medium">7</span>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Generate Ideas</h3>
+                <p className="text-gray-500 text-sm">Get 50 personalized content ideas based on everything you entered</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Price + CTA */}
       <section className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-800">
         <div className="text-center">
