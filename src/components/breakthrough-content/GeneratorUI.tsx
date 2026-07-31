@@ -149,6 +149,10 @@ export default function GeneratorUI({
 
           try {
             const event = JSON.parse(jsonStr)
+
+            // Ignore heartbeat pings (just keep connection alive)
+            if (event.type === 'ping') continue
+
             console.log(`[Breakthrough] SSE event:`, event.type, event.batch || '')
 
             if (event.type === 'progress') {

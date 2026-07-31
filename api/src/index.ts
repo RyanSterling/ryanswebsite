@@ -2142,6 +2142,15 @@ app.post('/generate-ideas-stream', async (c) => {
 
           console.log(`SSE: Starting ${awarenessLevel} batch (${targetCount} ideas)`)
 
+          // Start heartbeat to keep connection alive during long batch generation
+          const heartbeatInterval = setInterval(() => {
+            try {
+              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: 'ping' })}\n\n`))
+            } catch {
+              // Connection may have closed, ignore
+            }
+          }, 10000) // Send ping every 10 seconds
+
           try {
             const batchIdeas = await generateBatch(
               formData,
@@ -2150,6 +2159,8 @@ app.post('/generate-ideas-stream', async (c) => {
               allIdeas,
               c.env.ANTHROPIC_API_KEY
             )
+
+            clearInterval(heartbeatInterval)
 
             allIdeas = [...allIdeas, ...batchIdeas]
 
@@ -2165,6 +2176,7 @@ app.post('/generate-ideas-stream', async (c) => {
             console.log(`SSE: ${awarenessLevel} batch complete (${batchIdeas.length} ideas), ${allIdeas.length} total`)
 
           } catch (error) {
+            clearInterval(heartbeatInterval)
             console.error(`SSE: ${awarenessLevel} batch failed:`, error)
             sendEvent({
               type: 'error',
