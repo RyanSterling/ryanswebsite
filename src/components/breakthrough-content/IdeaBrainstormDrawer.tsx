@@ -15,9 +15,6 @@ export default function IdeaBrainstormDrawer({ idea, formData, isOpen, onClose }
 
   const { lesson1, lesson2, lesson3 } = formData
 
-  // Find relevant can't-tell insight (just pick first one for now, could be smarter)
-  const relevantInsight = lesson3.cant_tell_1
-
   const buildPrompt = () => {
     return `## MY NICHE
 ${lesson1.niche}
@@ -25,8 +22,32 @@ ${lesson1.niche}
 ## MY AUDIENCE
 ${lesson2.audience_description}
 
-## THE INSIGHT THEY DON'T KNOW YET
-${relevantInsight}
+## WHAT THEY REALLY WANT (DESIRE LADDERS)
+
+**Desire 1:** ${lesson2.desire_1.want}
+→ So they can: ${lesson2.desire_1.so_i_can_1}
+→ So they can: ${lesson2.desire_1.so_i_can_2}
+→ **Emotional core:** ${lesson2.desire_1.so_i_can_3}
+
+**Desire 2:** ${lesson2.desire_2.want}
+→ So they can: ${lesson2.desire_2.so_i_can_1}
+→ So they can: ${lesson2.desire_2.so_i_can_2}
+→ **Emotional core:** ${lesson2.desire_2.so_i_can_3}
+
+**Desire 3:** ${lesson2.desire_3.want}
+→ So they can: ${lesson2.desire_3.so_i_can_1}
+→ So they can: ${lesson2.desire_3.so_i_can_2}
+→ **Emotional core:** ${lesson2.desire_3.so_i_can_3}
+
+## WHAT THEY THINK BUT WON'T ADMIT
+- ${lesson3.wont_tell_1}
+- ${lesson3.wont_tell_2}
+- ${lesson3.wont_tell_3}
+
+## WHAT THEY DON'T KNOW ABOUT THEIR SITUATION
+- ${lesson3.cant_tell_1}
+- ${lesson3.cant_tell_2}
+- ${lesson3.cant_tell_3}
 
 ## THE IDEA
 **Title:** ${idea.idea}
@@ -34,6 +55,8 @@ ${relevantInsight}
 **Why This Works:** ${idea.room_rationale}
 
 **Awareness Level:** ${idea.awareness_level}
+
+**Resolution Preview:** ${idea.resolution_preview || 'Not specified'}
 
 ## MY CONTEXT & THOUGHTS
 ${userContext || '(Add your personal angle, recent examples, or why this matters to you above)'}

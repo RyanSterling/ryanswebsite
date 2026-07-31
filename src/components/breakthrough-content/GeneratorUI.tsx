@@ -246,37 +246,6 @@ export default function GeneratorUI({
     URL.revokeObjectURL(link.href)
   }
 
-  type HookType = 'experimenter' | 'teacher' | 'investigator' | 'contrarian'
-
-  const hookLabels: Record<HookType, string> = {
-    experimenter: 'Experimenter',
-    teacher: 'Teacher',
-    investigator: 'Investigator',
-    contrarian: 'Contrarian',
-  }
-
-  const copyIdeaToClipboard = (idea: GeneratedIdea, hookType: HookType) => {
-    const hookMap: Record<HookType, string> = {
-      experimenter: idea.hook_experimenter,
-      teacher: idea.hook_teacher,
-      investigator: idea.hook_investigator,
-      contrarian: idea.hook_contrarian,
-    }
-    const hook = hookMap[hookType]
-
-    // Include resolution preview in the copy
-    const copyText = `Idea: ${idea.idea}
-
-Resolution: ${idea.resolution_preview || 'N/A'}
-
-Hook (${hookLabels[hookType]}): ${hook}
-
----
-[Prompt B would be included here for expansion in your own LLM]`
-
-    navigator.clipboard.writeText(copyText)
-  }
-
   return (
     <div className="space-y-6">
       {/* Input Review */}
@@ -549,15 +518,6 @@ Hook (${hookLabels[hookType]}): ${hook}
                           <p className="text-gray-400 text-xs mb-1">Experimenter</p>
                           <p className="text-white text-sm">{idea.hook_experimenter}</p>
                         </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'experimenter')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
                       </div>
 
                       {/* Teacher Hook */}
@@ -569,15 +529,6 @@ Hook (${hookLabels[hookType]}): ${hook}
                           <p className="text-gray-400 text-xs mb-1">Teacher</p>
                           <p className="text-white text-sm">{idea.hook_teacher}</p>
                         </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'teacher')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
                       </div>
 
                       {/* Investigator Hook */}
@@ -589,15 +540,6 @@ Hook (${hookLabels[hookType]}): ${hook}
                           <p className="text-gray-400 text-xs mb-1">Investigator</p>
                           <p className="text-white text-sm">{idea.hook_investigator}</p>
                         </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'investigator')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
                       </div>
 
                       {/* Contrarian Hook */}
@@ -609,14 +551,7 @@ Hook (${hookLabels[hookType]}): ${hook}
                           <p className="text-gray-400 text-xs mb-1">Contrarian</p>
                           <p className="text-white text-sm">{idea.hook_contrarian}</p>
                         </div>
-                        <button
-                          onClick={() => copyIdeaToClipboard(idea, 'contrarian')}
-                          className="text-gray-400 hover:text-white p-1"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
+                      </div>
                         </button>
                       </div>
                     </div>
