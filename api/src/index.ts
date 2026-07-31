@@ -1309,10 +1309,15 @@ Generate 25 ideas now. Return ONLY valid JSON.`
 // ============================================
 
 // Awareness-level batch configuration
+// Split into smaller batches (max 9 ideas) to prevent timeout
+// Same total (50 ideas), same awareness distribution, but more reliable
 const AWARENESS_BATCHES = [
-  { level: 'unaware', count: 14 },
-  { level: 'problem_aware', count: 18 },
-  { level: 'solution_aware', count: 12 },
+  { level: 'unaware', count: 7 },
+  { level: 'unaware', count: 7 },
+  { level: 'problem_aware', count: 9 },
+  { level: 'problem_aware', count: 9 },
+  { level: 'solution_aware', count: 6 },
+  { level: 'solution_aware', count: 6 },
   { level: 'product_aware', count: 6 },
 ] as const
 
@@ -1600,7 +1605,7 @@ const RETRY_CONFIG = {
   maxAttempts: 3,
   baseDelayMs: 2000, // 2 seconds
   maxDelayMs: 30000, // 30 seconds max
-  timeoutMs: 120000, // 2 minute timeout per attempt
+  timeoutMs: 300000, // 5 minute timeout per attempt - complex prompts with deduplication context need time
 }
 
 // Helper to sleep with exponential backoff
