@@ -1338,10 +1338,22 @@ ${lesson4.unaware_questions}
 
 Anchor ideas to UNIVERSAL EXPERIENCES that this audience has (scope 4-5). The topic is universally relatable; the explanation connects to THIS creator's expertise.
 
-Emotional cores to tap into:
+## EMOTIONAL ANCHORS — EVERY IDEA MUST CONNECT TO AT LEAST ONE
+
+**Hidden frustrations they won't admit:**
+- "${lesson3.wont_tell_1}"
+- "${lesson3.wont_tell_2}"
+- "${lesson3.wont_tell_3}"
+
+**Emotional cores driving their behavior:**
 - "${lesson2.desire_1.so_i_can_3}"
 - "${lesson2.desire_2.so_i_can_3}"
 - "${lesson2.desire_3.so_i_can_3}"
+
+CRITICAL: Generic facts about the topic are NOT enough. Each idea must speak to WHY this specific audience cares — their shame, their frustration, their deeper motivation.
+
+Example of what NOT to do: "Why you feel hungrier on days you barely moved" — generic physiology that could work for any fitness account
+Example of what TO do: "Why you feel like a failure when you miss the gym even though you know rest matters" — speaks to the emotional shame
 
 ALL ${targetCount} ideas in this batch MUST be awareness_level: "unaware".`
 
@@ -1377,10 +1389,22 @@ These people are comparing approaches and evaluating methods. They know the prob
 Questions they're asking:
 ${lesson4.solution_aware_questions}
 
+## EMOTIONAL ANCHORS — EVERY IDEA MUST CONNECT TO AT LEAST ONE
+
+**The skepticism they've earned (what they won't admit):**
+- "${lesson3.wont_tell_1}"
+- "${lesson3.wont_tell_2}"
+- "${lesson3.wont_tell_3}"
+
+**What they don't know is sabotaging their choices:**
+- "${lesson3.cant_tell_1}"
+- "${lesson3.cant_tell_2}"
+- "${lesson3.cant_tell_3}"
+
 Create ideas that:
 - Compare approaches: "Why X works better than Y for bodies like yours"
-- Evaluate methods: "The difference between [common approach] and what actually works post-surgery"
-- Help them choose: "How to know if [approach] will work for your specific limitations"
+- Validate their frustration with generic advice
+- Help them choose based on their SPECIFIC situation
 
 Reference THIS creator's unique positioning:
 - What they teach: ${lesson1.what_you_teach}
@@ -1398,10 +1422,22 @@ These people are deciding whether THIS CREATOR is for them. They're considering 
 Questions they're asking about this creator specifically:
 ${lesson4.product_aware_questions}
 
+## EMOTIONAL ANCHORS — EVERY IDEA MUST CONNECT TO AT LEAST ONE
+
+**The skepticism and baggage they're bringing (what they won't admit):**
+- "${lesson3.wont_tell_1}"
+- "${lesson3.wont_tell_2}"
+- "${lesson3.wont_tell_3}"
+
+**Their deeper motivations (why this matters):**
+- "${lesson2.desire_1.so_i_can_3}"
+- "${lesson2.desire_2.so_i_can_3}"
+- "${lesson2.desire_3.so_i_can_3}"
+
 Create ideas that:
-- Address objections: "Why my approach is different from generic [niche] content"
-- Show proof of authority: Content that demonstrates THIS creator's unique positioning and experience
-- Build trust: Behind-the-scenes, methodology explanations, "why I do it this way"
+- Address the hidden objections they won't say out loud
+- Show this creator UNDERSTANDS their frustration with past failures
+- Prove authority through empathy, not just credentials
 
 Emphasize what makes this creator UNIQUE in the space:
 - What they do: ${lesson1.what_you_do}
@@ -1427,14 +1463,15 @@ function buildBasePrompt(formData: BreakthroughFormData): { systemPrompt: string
 
   const { lesson1, lesson2, lesson3, lesson4, lesson5 } = formData
 
-  const systemPrompt = `You are a content strategist who generates viral-worthy content ideas for creators. You understand that content fails not because of bad hooks or editing, but because creators pick topics that only appeal to their existing followers.
+  const systemPrompt = `You are a content strategist who generates emotionally resonant content ideas that reach strangers. You understand that most content fails because it's generic — it could work for any account in the niche.
 
-Your job is to generate content ideas that reach STRANGERS, not just followers. Every idea must pass "the room size test" — would someone who has never heard of this creator still stop scrolling?
+Your job is to generate content ideas that make THIS SPECIFIC AUDIENCE feel seen. Every idea must tap into their hidden fears, unspoken frustrations, or deep emotional motivations.
 
 CRITICAL RULES:
-1. Generate exactly 25 ideas per batch. No more, no less.
-2. Stay in niche. Every idea must clearly serve THIS specific audience — not generic wellness or psychology.
+1. Generate exactly ${formData.lesson5.sophistication_stage === 5 ? 'ideas that a SKEPTICAL, oversaturated audience hasn\'t seen before. No tips, no obvious advice.' : 'ideas that are fresh and specific.'}
+2. Every idea must connect to the EMOTIONAL PAIN or DESIRE of the audience — not just interesting facts about the topic.
 3. The idea title should work as a hook on its own. Hooks should BUILD on the idea, not water it down.
+4. ${formData.lesson5.sophistication_stage >= 4 ? 'This audience has heard it all. Generic advice will scroll past. Go deeper.' : 'Stay specific to this audience.'}
 
 Return valid JSON only. No markdown, no explanation, just the JSON object.`
 
@@ -1459,10 +1496,25 @@ If an idea could work equally well for:
 - A generic wellness page
 - A therapy practice
 - A meditation teacher
+- ANY OTHER ACCOUNT in this niche
 
 ...then it's TOO BROAD or OUT OF NICHE. Skip it.
 
 The TOPIC can be universal (everyone experiences it), but the ANGLE must clearly serve THIS specific audience. "Why you wake up at 3am" is universal; "Why you wake up at 3am when you have chronic symptoms" serves this niche.
+
+## ANTI-GENERIC FILTER — CRITICAL
+
+Do NOT generate content that:
+- Explains physiological facts without emotional connection ("Why you feel X when Y happens")
+- Could be posted by any account in this niche and still make sense
+- Teaches concepts without addressing the PAIN of not knowing them
+- Sounds like a textbook or educational video
+
+DO generate content that:
+- Names specific emotional experiences this audience has
+- Validates frustrations they've never heard articulated
+- Speaks to the SHAME, EMBARRASSMENT, or HIDDEN STRUGGLES they carry
+- Makes them feel understood, not just informed
 
 ## DESIRE LADDERS
 
@@ -1515,7 +1567,27 @@ The TOPIC can be universal (everyone experiences it), but the ANGLE must clearly
 ${lesson5.competitor_angles}
 
 **Market Stage:** ${lesson5.sophistication_stage}/5
-Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}
+${lesson5.sophistication_stage === 5 ? `
+⚠️ STAGE 5 MARKET — CRITICAL INSTRUCTION ⚠️
+
+This audience is HIGHLY SKEPTICAL. They've:
+- Heard every tip, trick, and hack
+- Seen the same "Why you..." hooks hundreds of times
+- Become numb to generic advice
+
+DO NOT generate content that:
+- Explains basic concepts they already know
+- Sounds like it could come from any account in this niche
+- Delivers "tips" or "hacks" or "reasons why"
+- Uses educational framing ("here's what's happening in your body")
+
+INSTEAD generate content that:
+- Names experiences they've NEVER heard articulated
+- Challenges beliefs they didn't know they had
+- Shows transformation stories and "life on the other side"
+- Speaks to the EMOTIONAL EXHAUSTION of trying everything
+- Validates the frustration of "doing everything right and still failing"
+` : `Prescription: ${stagePrescriptions[lesson5.sophistication_stage]}`}
 
 ## HOOK FORMATS
 
