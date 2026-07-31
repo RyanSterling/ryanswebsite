@@ -421,7 +421,9 @@ export default function GeneratorUI({
                 </p>
               )}
               {jobStatus === 'complete' && (
-                <p className="text-green-400 text-sm mt-1">All {generatedIdeas.length} ideas ready!</p>
+                <p className="text-green-400 text-sm mt-1">
+                  {generatedIdeas.length >= 50 ? 'All 50 ideas ready!' : `${generatedIdeas.length} ideas ready`}
+                </p>
               )}
               {jobStatus === 'partial_complete' && (
                 <p className="text-amber-400 text-sm mt-1">
