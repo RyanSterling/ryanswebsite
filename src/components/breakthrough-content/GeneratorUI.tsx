@@ -39,7 +39,6 @@ export default function GeneratorUI({
   const [expandedIdea, setExpandedIdea] = useState<number | null>(null)
   const [brainstormIdea, setBrainstormIdea] = useState<GeneratedIdea | null>(null)
   const [completedBatches, setCompletedBatches] = useState(0)
-  const [totalBatches, setTotalBatches] = useState(2)
   const [jobStatus, setJobStatus] = useState<'in_progress' | 'partial_complete' | 'complete' | null>(null)
   const [jobError, setJobError] = useState<string | null>(null)
   const apiUrl = import.meta.env.DEV
@@ -154,11 +153,9 @@ export default function GeneratorUI({
 
             if (event.type === 'progress') {
               setCompletedBatches(event.batch - 1) // Currently working on this batch
-              setTotalBatches(event.totalBatches)
             } else if (event.type === 'batch_complete') {
               setGeneratedIdeas(event.allIdeas)
               setCompletedBatches(event.batch)
-              setTotalBatches(event.totalBatches)
               // Credit is NOT counted here - only after ALL batches complete successfully on the server
             } else if (event.type === 'complete') {
               console.log(`[Breakthrough] All batches complete! ${event.allIdeas.length} ideas`)
