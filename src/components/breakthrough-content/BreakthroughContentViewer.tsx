@@ -515,13 +515,25 @@ export default function BreakthroughContentViewer() {
                 {currentLesson.title}
               </h1>
 
-              {/* Video Embed - hide for generator lesson */}
+              {/* Video Embed */}
               {isGeneratorLesson ? (
-                <div className="bg-brand-card rounded-xl p-6 mb-8">
-                  <p className="text-gray-300">
-                    Based on everything you've entered in the previous lessons, the generator will create 50 content ideas tailored to your niche, audience, and positioning. Each idea includes multiple hook variations and is scored for urgency, staying power, and reach.
-                  </p>
-                </div>
+                <>
+                  {/* Video placeholder - replace with actual video URL when ready */}
+                  <div className="aspect-video bg-brand-card rounded-xl overflow-hidden mb-8 flex items-center justify-center border-2 border-dashed border-gray-700">
+                    <div className="text-center p-8">
+                      <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-gray-500 text-lg font-medium">Video Coming Soon</p>
+                      <p className="text-gray-600 text-sm mt-2">How to use the generator + best practices</p>
+                    </div>
+                  </div>
+                  <div className="bg-brand-card rounded-xl p-6 mb-8">
+                    <p className="text-gray-300">
+                      Based on everything you've entered in the previous lessons, the generator will create 50 content ideas tailored to your niche, audience, and positioning. Each idea includes multiple hook variations and is scored for urgency, staying power, and reach.
+                    </p>
+                  </div>
+                </>
               ) : (
                 <div className="aspect-video bg-black rounded-xl overflow-hidden mb-8">
                   {currentLesson.video_url.includes('vimeo.com') ? (
