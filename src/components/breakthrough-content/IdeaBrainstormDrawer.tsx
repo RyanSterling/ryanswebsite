@@ -24,17 +24,17 @@ ${lesson2.audience_description}
 
 ## WHAT THEY REALLY WANT (DESIRE LADDERS)
 
-**Desire 1:** ${lesson2.desire_1.want}
+**Desire 1:** ${lesson2.desire_1.desire_text}
 → So they can: ${lesson2.desire_1.so_i_can_1}
 → So they can: ${lesson2.desire_1.so_i_can_2}
 → **Emotional core:** ${lesson2.desire_1.so_i_can_3}
 
-**Desire 2:** ${lesson2.desire_2.want}
+**Desire 2:** ${lesson2.desire_2.desire_text}
 → So they can: ${lesson2.desire_2.so_i_can_1}
 → So they can: ${lesson2.desire_2.so_i_can_2}
 → **Emotional core:** ${lesson2.desire_2.so_i_can_3}
 
-**Desire 3:** ${lesson2.desire_3.want}
+**Desire 3:** ${lesson2.desire_3.desire_text}
 → So they can: ${lesson2.desire_3.so_i_can_1}
 → So they can: ${lesson2.desire_3.so_i_can_2}
 → **Emotional core:** ${lesson2.desire_3.so_i_can_3}
