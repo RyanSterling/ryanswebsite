@@ -552,8 +552,6 @@ export default function GeneratorUI({
                           <p className="text-white text-sm">{idea.hook_contrarian}</p>
                         </div>
                       </div>
-                        </button>
-                      </div>
                     </div>
                   </div>
                 )}
