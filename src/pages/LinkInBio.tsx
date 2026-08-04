@@ -10,15 +10,9 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
-    title: 'Roast My Profile',
-    description: 'Submit your IG for a chance to get roasted in a public reel',
-    to: '/roast',
+    title: '1:1 Content Coaching',
+    to: '/coaching',
     featured: true,
-  },
-  {
-    title: 'Personal Growth Audit',
-    description: "I'll personally review your content and tell you exactly what to fix",
-    to: '/profile-audit',
   },
   {
     title: 'Free Growth Audit',
