@@ -14,19 +14,19 @@ export default function AuditPromoCard() {
         {/* Content */}
         <div className="flex-1">
           <h2 className="text-white font-semibold text-xl mb-2 text-center md:text-left">
-            Want Me To Personally Review Your Content?
+            Want Feedback On Every Post You Make?
           </h2>
           <p className="text-gray-400 mb-4 text-center md:text-left">
-            I'll watch your reels, react in real-time, and tell you exactly what to fix to get more views, followers, and sales.
+            Send me your content on WhatsApp after you post. I'll send you a voice note breaking down what's working, what's not, and how to improve your next post.
           </p>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <Link
-              to="/profile-audit"
+              to="/coaching"
               className="inline-block bg-brand-orange text-white font-medium text-lg px-6 py-3 rounded-xl hover:opacity-90 transition-opacity text-center"
             >
-              Get My Personal Review
+              Apply for 1:1 Coaching
             </Link>
-            <span className="text-2xl font-bold text-white text-center md:text-left">$97</span>
+            <span className="text-2xl font-bold text-white text-center md:text-left">$500/mo</span>
           </div>
         </div>
       </div>
