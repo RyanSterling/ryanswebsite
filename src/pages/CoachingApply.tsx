@@ -47,6 +47,28 @@ export default function CoachingApply() {
           <p className="text-gray-400 text-lg">
             $500/month
           </p>
+
+          {/* Scarcity indicator */}
+          <div className="mt-6 inline-block">
+            <div className="bg-brand-card border border-gray-800 rounded-xl px-5 py-4">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                {[1, 2, 3, 4, 5].map((spot) => (
+                  <div
+                    key={spot}
+                    className={`w-3 h-3 rounded-full ${
+                      spot <= 3 ? 'bg-gray-600' : 'bg-brand-orange'
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-white text-sm font-medium">
+                2 spots left at this price
+              </p>
+              <p className="text-gray-500 text-xs mt-1">
+                Price increases to $1,000/mo when filled
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* What you get */}
