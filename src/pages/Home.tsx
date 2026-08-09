@@ -16,6 +16,8 @@ export default function Home() {
       name: formData.get('name'),
       email: formData.get('email'),
       instagram: formData.get('instagram'),
+      audience: formData.get('audience'),
+      postingFrequency: formData.get('postingFrequency'),
       message: formData.get('message'),
       source: 'coaching-application',
     }
@@ -135,6 +137,39 @@ export default function Home() {
               placeholder="@yourusername"
               className="w-full px-4 py-3 rounded-lg bg-brand-card text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-gray-800"
             />
+          </div>
+
+          <div>
+            <label htmlFor="audience" className="block text-white text-sm mb-2">
+              Who do you create content for, and what problem does it solve for them? <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="audience"
+              name="audience"
+              required
+              rows={3}
+              placeholder="e.g. I help busy professionals learn to cook healthy meals in under 20 minutes"
+              className="w-full px-4 py-3 rounded-lg bg-brand-card text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-gray-800 resize-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="postingFrequency" className="block text-white text-sm mb-2">
+              How often are you currently posting? <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="postingFrequency"
+              name="postingFrequency"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-brand-card text-white focus:outline-none focus:ring-2 focus:ring-orange-500 border border-gray-800 appearance-none"
+            >
+              <option value="" disabled selected className="text-gray-500">Select frequency</option>
+              <option value="daily">Once a day or more</option>
+              <option value="few-times-week">A few times a week</option>
+              <option value="once-week">About once a week</option>
+              <option value="less-than-weekly">Less than once a week</option>
+              <option value="not-posting">Not currently posting</option>
+            </select>
           </div>
 
           <div>
