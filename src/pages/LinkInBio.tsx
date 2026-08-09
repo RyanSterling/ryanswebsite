@@ -11,7 +11,7 @@ interface LinkItem {
 const links: LinkItem[] = [
   {
     title: '1:1 Content Coaching',
-    to: '/coaching',
+    to: '/',
     featured: true,
   },
   {
@@ -116,7 +116,7 @@ export default function LinkInBio() {
           </svg>
         </a>
         <a
-          href="https://youtube.com/@ryansterling"
+          href="https://www.youtube.com/@ryansterlingmedia"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition-colors"
@@ -138,7 +138,7 @@ export default function LinkInBio() {
           </svg>
         </a>
         <a
-          href="https://tiktok.com/@ryansterling"
+          href="https://www.tiktok.com/@ryansterling_"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-400 hover:text-white transition-colors"

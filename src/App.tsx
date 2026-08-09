@@ -11,7 +11,6 @@ import PromptPage from './pages/PromptPage'
 import PromptOptIn from './pages/PromptOptIn'
 import LinkInBio from './pages/LinkInBio'
 import RoastMyProfile from './pages/RoastMyProfile'
-import CoachingApply from './pages/CoachingApply'
 
 // Course pages
 import Courses from './pages/Courses'
@@ -42,7 +41,6 @@ function App() {
       <Route path="/prompts/:slug" element={<PromptPage />} />
       <Route path="/get/:slug" element={<PromptOptIn />} />
       <Route path="/roast" element={<RoastMyProfile />} />
-      <Route path="/coaching" element={<CoachingApply />} />
 
       {/* Auth */}
       <Route path="/sign-in/*" element={<SignIn />} />
