@@ -19,7 +19,7 @@ export default function Home() {
       audience: formData.get('audience'),
       postingFrequency: formData.get('postingFrequency'),
       message: formData.get('message'),
-      source: 'coaching-application',
+      source: 'coaching-waitlist',
     }
 
     try {
@@ -46,30 +46,9 @@ export default function Home() {
           <h1 className="font-soehne text-3xl md:text-4xl text-white mb-4">
             1:1 Content Coaching
           </h1>
-          <p className="text-gray-400 text-lg">
-            $500/month
-          </p>
-
-          {/* Scarcity indicator */}
-          <div className="mt-6 inline-block">
-            <div className="bg-brand-card border border-gray-800 rounded-xl px-5 py-4">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                {[1, 2, 3, 4, 5].map((spot) => (
-                  <div
-                    key={spot}
-                    className={`w-3 h-3 rounded-full ${
-                      spot <= 3 ? 'bg-gray-600' : 'bg-brand-orange'
-                    }`}
-                  />
-                ))}
-              </div>
-              <p className="text-white text-sm font-medium">
-                2 spots left at this price
-              </p>
-              <p className="text-gray-500 text-xs mt-1">
-                Price increases to $1,000/mo when filled
-              </p>
-            </div>
+          <div className="inline-flex items-center gap-2 bg-brand-card border border-gray-800 rounded-full px-4 py-2">
+            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+            <span className="text-gray-400 text-sm">Currently full</span>
           </div>
         </div>
 
@@ -195,12 +174,12 @@ export default function Home() {
             disabled={isSubmitting}
             className="w-full bg-brand-orange text-white font-semibold text-lg py-4 rounded-2xl hover:bg-brand-orange/90 transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Submitting...' : 'Apply Now'}
+            {isSubmitting ? 'Submitting...' : 'Join Waitlist'}
           </button>
         </form>
 
         <p className="text-gray-500 text-sm text-center mt-6">
-          I'll review your application and reach out within 24 hours.
+          I'll reach out when a spot opens up.
         </p>
       </div>
     </main>
