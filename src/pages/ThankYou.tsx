@@ -22,12 +22,14 @@ export default function ThankYou() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="font-soehne text-4xl md:text-5xl text-white mb-4">Thank You!</h1>
-        <p className="text-gray-400 text-lg">Your message has been received. I'll get back to you soon.</p>
+        <h1 className="font-soehne text-4xl md:text-5xl text-white mb-4">You're on the list</h1>
+        <p className="text-gray-400 text-lg max-w-md mx-auto">
+          Thanks for your interest. If a spot opens up and I think we'd be a good fit to work together, I'll be in touch.
+        </p>
       </div>
 
-      <Link to="/" className="inline-block text-brand-orange hover:underline">
-        ← Back to Home
+      <Link to="/link-in-bio" className="inline-block text-brand-orange hover:underline">
+        ← Back
       </Link>
     </main>
   )

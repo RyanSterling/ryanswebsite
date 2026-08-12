@@ -46,9 +46,18 @@ export default function Home() {
           <h1 className="font-soehne text-3xl md:text-4xl text-white mb-4">
             1:1 Content Coaching
           </h1>
-          <div className="inline-flex items-center gap-2 bg-brand-card border border-gray-800 rounded-full px-4 py-2">
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
-            <span className="text-gray-400 text-sm">Currently full</span>
+          <p className="text-2xl text-white font-semibold mb-6">
+            $1,000<span className="text-gray-400 text-lg font-normal">/month</span>
+          </p>
+
+          {/* Waitlist notice */}
+          <div className="bg-brand-card border border-gray-800 rounded-xl p-5">
+            <p className="text-white font-medium mb-2">
+              I'm not accepting new clients right now.
+            </p>
+            <p className="text-gray-400 text-sm">
+              Join the waitlist below and I'll reach out when a spot opens up.
+            </p>
           </div>
         </div>
 
@@ -178,9 +187,6 @@ export default function Home() {
           </button>
         </form>
 
-        <p className="text-gray-500 text-sm text-center mt-6">
-          I'll reach out when a spot opens up.
-        </p>
       </div>
     </main>
   )
