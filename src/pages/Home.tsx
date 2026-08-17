@@ -1,6 +1,9 @@
 import { FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth, UserButton } from '@clerk/react'
 
 export default function Home() {
+  const { isSignedIn } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,7 +42,27 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#111] flex flex-col items-center px-6 py-12 md:py-16">
+    <main className="min-h-screen bg-[#111]">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto">
+        <Link to="/breakthrough" className="text-gray-400 hover:text-white text-sm transition-colors">
+          Free Course
+        </Link>
+        {isSignedIn ? (
+          <div className="flex items-center gap-4">
+            <Link to="/dashboard" className="text-gray-400 hover:text-white text-sm transition-colors">
+              My Courses
+            </Link>
+            <UserButton />
+          </div>
+        ) : (
+          <Link to="/sign-in" className="text-gray-400 hover:text-white text-sm transition-colors">
+            Sign In
+          </Link>
+        )}
+      </nav>
+
+      <div className="flex flex-col items-center px-6 py-8 md:py-12">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-10">
@@ -187,6 +210,7 @@ export default function Home() {
           </button>
         </form>
 
+      </div>
       </div>
     </main>
   )
