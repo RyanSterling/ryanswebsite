@@ -50,6 +50,27 @@ export default function BreakthroughContentViewer() {
     }
   }, [user])
 
+  // Send email to ConvertKit via n8n webhook (once per user)
+  useEffect(() => {
+    if (user?.primaryEmailAddress?.emailAddress) {
+      const webhookKey = `convertkit-sent-${COURSE_SLUG}-${user.id}`
+      if (!localStorage.getItem(webhookKey)) {
+        fetch('https://n8n.srv1369832.hstgr.cloud/webhook/b6203534-82d2-45f4-bcd2-8d6da195d09b', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          mode: 'no-cors',
+          body: JSON.stringify({
+            email: user.primaryEmailAddress.emailAddress,
+            firstName: user.firstName || '',
+            course: COURSE_SLUG,
+            source: 'course-viewer',
+          }),
+        }).catch(console.error)
+        localStorage.setItem(webhookKey, 'true')
+      }
+    }
+  }, [user])
+
   // Save form data on change
   useEffect(() => {
     if (user) {
