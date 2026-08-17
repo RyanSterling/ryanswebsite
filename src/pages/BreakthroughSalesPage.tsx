@@ -6,11 +6,14 @@ export default function BreakthroughSalesPage() {
   const { isSignedIn } = useAuth()
 
   const handleGetAccess = () => {
+    const courseUrl = '/courses/breakthrough-content-strategy/learn'
     if (!isSignedIn) {
-      navigate('/sign-up?redirect=/courses/breakthrough-content-strategy/learn')
+      // Store redirect for after OAuth sign-in
+      localStorage.setItem('pendingRedirect', courseUrl)
+      navigate(`/sign-up?redirect=${encodeURIComponent(courseUrl)}`)
       return
     }
-    navigate('/courses/breakthrough-content-strategy/learn')
+    navigate(courseUrl)
   }
 
   return (

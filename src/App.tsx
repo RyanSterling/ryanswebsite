@@ -1,4 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, useNavigate } from 'react-router-dom'
+import { useAuth } from '@clerk/react'
 import Home from './pages/Home'
 import Challenge from './pages/Challenge'
 import ChallengeSuccess from './pages/ChallengeSuccess'
@@ -27,6 +29,20 @@ import { BreakthroughContentViewer } from './components/breakthrough-content'
 import BreakthroughSalesPage from './pages/BreakthroughSalesPage'
 
 function App() {
+  const navigate = useNavigate()
+  const { isSignedIn, isLoaded } = useAuth()
+
+  // Handle pending redirects after OAuth sign-in
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      const pendingRedirect = localStorage.getItem('pendingRedirect')
+      if (pendingRedirect) {
+        localStorage.removeItem('pendingRedirect')
+        navigate(pendingRedirect)
+      }
+    }
+  }, [isLoaded, isSignedIn, navigate])
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
