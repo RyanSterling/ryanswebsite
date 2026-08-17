@@ -12,7 +12,7 @@ export default function SignIn() {
         routing="path"
         path="/sign-in"
         signUpUrl={`/sign-up?redirect=${encodeURIComponent(redirect)}`}
-        fallbackRedirectUrl={redirect}
+        forceRedirectUrl={redirect}
         appearance={{
           baseTheme: dark,
           variables: {
