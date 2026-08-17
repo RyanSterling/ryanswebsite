@@ -11,7 +11,7 @@ export default function SignIn() {
       <ClerkSignIn
         routing="path"
         path="/sign-in"
-        signUpUrl="/sign-up"
+        signUpUrl={`/sign-up?redirect=${encodeURIComponent(redirect)}`}
         fallbackRedirectUrl={redirect}
         appearance={{
           baseTheme: dark,
