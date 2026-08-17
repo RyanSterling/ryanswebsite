@@ -3,42 +3,21 @@ import { Link } from 'react-router-dom'
 import { useUser, UserButton } from '@clerk/react'
 import { supabase, Course } from '../lib/supabase'
 
-interface PurchasedCourse extends Course {
-  purchased_at: string
-}
-
 export default function Dashboard() {
   const { user } = useUser()
-  const [courses, setCourses] = useState<PurchasedCourse[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchPurchasedCourses() {
+    async function fetchCourses() {
       if (!user) return
 
-      // Get purchases for this user
-      const { data: purchases, error: purchaseError } = await supabase
-        .from('purchases')
-        .select('course_id, created_at')
-        .eq('user_id', user.id)
-
-      if (purchaseError) {
-        console.error('Error fetching purchases:', purchaseError)
-        setLoading(false)
-        return
-      }
-
-      if (!purchases || purchases.length === 0) {
-        setLoading(false)
-        return
-      }
-
-      // Get course details for each purchase
-      const courseIds = purchases.map((p) => p.course_id)
+      // Fetch all published courses (free access for authenticated users)
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*')
-        .in('id', courseIds)
+        .eq('published', true)
+        .order('created_at', { ascending: false })
 
       if (coursesError) {
         console.error('Error fetching courses:', coursesError)
@@ -46,20 +25,11 @@ export default function Dashboard() {
         return
       }
 
-      // Combine course data with purchase date
-      const purchasedCourses = (coursesData || []).map((course) => {
-        const purchase = purchases.find((p) => p.course_id === course.id)
-        return {
-          ...course,
-          purchased_at: purchase?.created_at || '',
-        }
-      })
-
-      setCourses(purchasedCourses)
+      setCourses(coursesData || [])
       setLoading(false)
     }
 
-    fetchPurchasedCourses()
+    fetchCourses()
   }, [user])
 
   if (loading) {
@@ -95,14 +65,8 @@ export default function Dashboard() {
         {courses.length === 0 ? (
           <div className="bg-brand-card rounded-xl p-12 text-center">
             <p className="text-gray-400 mb-6">
-              You haven't purchased any courses yet.
+              No courses available yet.
             </p>
-            <Link
-              to="/courses"
-              className="inline-block bg-brand-orange text-white font-medium px-8 py-3 rounded-[19px] hover:opacity-90 transition-opacity"
-            >
-              Browse Courses
-            </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -120,7 +84,7 @@ export default function Dashboard() {
                       className="w-full h-48 object-cover"
                     />
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white font-medium">Continue</span>
+                      <span className="text-white font-medium">Start</span>
                     </div>
                   </div>
                 ) : (
@@ -133,8 +97,7 @@ export default function Dashboard() {
                     {course.title}
                   </h2>
                   <p className="text-gray-500 text-sm">
-                    Purchased{' '}
-                    {new Date(course.purchased_at).toLocaleDateString()}
+                    {course.description}
                   </p>
                 </div>
               </Link>

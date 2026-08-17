@@ -6,12 +6,11 @@ import { supabase, Course, LessonPreview } from '../lib/supabase'
 export default function CourseLanding() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { isSignedIn, userId } = useAuth()
+  const { isSignedIn } = useAuth()
 
   const [course, setCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<LessonPreview[]>([])
   const [loading, setLoading] = useState(true)
-  const [alreadyPurchased, setAlreadyPurchased] = useState(false)
 
   useEffect(() => {
     async function fetchCourse() {
@@ -44,40 +43,13 @@ export default function CourseLanding() {
     fetchCourse()
   }, [slug])
 
-  // Check if user already purchased this course
-  useEffect(() => {
-    async function checkPurchase() {
-      if (!isSignedIn || !userId || !course) return
-
-      const { data } = await supabase
-        .from('purchases')
-        .select('id')
-        .eq('course_id', course.id)
-        .eq('user_id', userId)
-        .limit(1)
-
-      if (data && data.length > 0) {
-        setAlreadyPurchased(true)
-      }
-    }
-
-    checkPurchase()
-  }, [isSignedIn, userId, course])
-
-  const handleBuy = () => {
+  const handleStartCourse = () => {
     if (!isSignedIn) {
-      // Redirect to sign up, then back to checkout
-      navigate(`/sign-up?redirect=/checkout/${slug}`)
+      // Redirect to sign up, then to course
+      navigate(`/sign-up?redirect=/courses/${slug}/learn`)
       return
     }
-    navigate(`/checkout/${slug}`)
-  }
-
-  const formatPrice = (cents: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(cents / 100)
+    navigate(`/courses/${slug}/learn`)
   }
 
   const formatDuration = (seconds: number | null) => {
@@ -126,27 +98,17 @@ export default function CourseLanding() {
           </div>
         )}
 
-        {/* Price & CTA */}
+        {/* CTA */}
         <div className="bg-brand-card rounded-xl p-8 mb-12 text-center">
-          <div className="text-4xl font-soehne text-white mb-4">
-            {formatPrice(course.price_cents)}
+          <div className="text-2xl font-soehne text-white mb-4">
+            Free Course
           </div>
-
-          {alreadyPurchased ? (
-            <button
-              onClick={() => navigate(`/courses/${slug}/learn`)}
-              className="w-full max-w-md bg-green-600 text-white font-medium text-lg py-4 rounded-[19px] hover:opacity-90 transition-opacity"
-            >
-              Go to Course
-            </button>
-          ) : (
-            <button
-              onClick={handleBuy}
-              className="w-full max-w-md bg-brand-orange text-white font-medium text-lg py-4 rounded-[19px] hover:opacity-90 transition-opacity"
-            >
-              Get Instant Access
-            </button>
-          )}
+          <button
+            onClick={handleStartCourse}
+            className="w-full max-w-md bg-brand-orange text-white font-medium text-lg py-4 rounded-[19px] hover:opacity-90 transition-opacity"
+          >
+            Start Free Course
+          </button>
         </div>
 
         {/* Curriculum */}

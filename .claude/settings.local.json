@@ -45,7 +45,17 @@
       "Bash(node -e \"\nconst path = require\\(''path''\\);\nconst fs = require\\(''fs''\\);\nconst importPath = ''./src/components/flop-proof/index.ts'';\nif \\(fs.existsSync\\(importPath\\)\\) {\n  console.log\\(''Index file exists at:'', path.resolve\\(importPath\\)\\);\n  console.log\\(''Contents:'', fs.readFileSync\\(importPath, ''utf8''\\)\\);\n} else {\n  console.log\\(''Index file NOT found''\\);\n}\n\")",
       "Bash(pkill:*)",
       "Bash(npx wrangler:*)",
-      "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website && npx tsc:*)"
+      "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website && npx tsc:*)",
+      "Bash(wrangler deploy:*)",
+      "Bash(wrangler whoami)",
+      "Bash(grep:*)",
+      "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website/api && npm run typecheck:*)",
+      "Bash(xargs ls:*)",
+      "Bash(echo:*)",
+      "WebFetch(domain:yellowrosefitness.com)",
+      "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website && npx netlify deploy:*)",
+      "WebFetch(domain:aliabdaal.com)",
+      "Bash(npx netlify deploy:*)"
     ]
   }
 }

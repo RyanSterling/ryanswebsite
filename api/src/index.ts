@@ -1305,20 +1305,12 @@ Generate 25 ideas now. Return ONLY valid JSON.`
 })
 
 // ============================================
-// FLOP-PROOF BACKGROUND GENERATION (50 ideas)
+// BREAKTHROUGH CONTENT GENERATION (25 ideas)
 // ============================================
 
-// Awareness-level batch configuration
-// Split into smaller batches (max 9 ideas) to prevent timeout
-// Same total (50 ideas), same awareness distribution, but more reliable
+// Single batch of 25 ideas focused on problem-aware stage (highest reach)
 const AWARENESS_BATCHES = [
-  { level: 'unaware', count: 7 },
-  { level: 'unaware', count: 7 },
-  { level: 'problem_aware', count: 9 },
-  { level: 'problem_aware', count: 9 },
-  { level: 'solution_aware', count: 6 },
-  { level: 'solution_aware', count: 6 },
-  { level: 'product_aware', count: 6 },
+  { level: 'problem_aware', count: 25 },
 ] as const
 
 const TOTAL_BATCHES = AWARENESS_BATCHES.length
@@ -2075,7 +2067,7 @@ interface GenerateStreamRequest extends BreakthroughFormData {
 }
 
 // Generation credit limit per user per course
-const MAX_GENERATIONS_PER_COURSE = 3
+const MAX_GENERATIONS_PER_COURSE = 1
 
 app.post('/generate-ideas-stream', async (c) => {
   const requestData = await c.req.json<GenerateStreamRequest>()

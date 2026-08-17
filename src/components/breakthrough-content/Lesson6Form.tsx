@@ -105,7 +105,7 @@ Stay within my niche. The final piece should feel like "this creator GETS me" no
       <div className="bg-brand-card rounded-2xl p-6 md:p-8">
         <h3 className="font-soehne text-xl text-white mb-4">Unlimited AI Brainstorming</h3>
         <p className="text-gray-300 mb-4">
-          Your 50 generated ideas are a starting point. Use this page to brainstorm more whenever you want — for free, using any AI tool you have access to (ChatGPT, Claude, etc).
+          Use this page to brainstorm content ideas whenever you want — for free, using any AI tool you have access to (ChatGPT, Claude, etc). Your positioning data from the previous lessons is automatically included.
         </p>
         <p className="text-gray-400 text-sm">
           Add your rough ideas, observations, or topics below. Then copy everything and paste it into your AI of choice.

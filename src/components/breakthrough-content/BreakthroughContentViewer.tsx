@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useUser } from '@clerk/react'
-import { supabase, Course, Lesson, GeneratedIdea } from '../../lib/supabase'
+import { supabase, Course, Lesson } from '../../lib/supabase'
 import {
   BreakthroughFormData,
   createEmptyFormData,
@@ -18,70 +18,9 @@ import Lesson3Form from './Lesson3Form'
 import Lesson4Form from './Lesson4Form'
 import Lesson5Form from './Lesson5Form'
 import Lesson6Form from './Lesson6Form'
-import GeneratorUI from './GeneratorUI'
 
 const COURSE_SLUG = 'breakthrough-content-strategy'
 const STORAGE_KEY = 'breakthrough-form-data'
-const MAX_GENERATIONS = 3
-
-// Test data for development
-// Profile: Woman with ostomy, pelvic cancer history, CKD - fitness creator with severe medical history
-// Audience fork: Option A (women with permanent body alterations from cancer/organ removal) with B (ostomy community) as authority base
-const TEST_DATA: BreakthroughFormData = {
-  lesson1: {
-    niche: 'How women whose bodies were permanently altered by cancer treatment decide what their life still gets to include',
-    core_problem: "They've been handed a body that no longer works the way it did—ostomy, organ removals, CKD—and every available model is either full grief or full triumph. Nobody shows the negotiation in between.",
-    what_you_do: 'Help women with permanently altered bodies decide what to spend a limited body on',
-    what_you_teach: "How to lift weights and build muscle with an ostomy bag visible through your gym clothes. How to train around organ removals, CKD fatigue, and pelvic floor limitations. The physique is the receipt—proof that someone with your level of medical severity is still in the gym, still building, still choosing what her body gets to do.",
-  },
-  lesson2: {
-    audience_description: "Women who've had organs removed, live with an ostomy, are managing CKD, or are post-pelvic-cancer treatment. Not the broader 'chronic illness' crowd with manageable conditions—specifically women whose bodies were permanently restructured by medical intervention. They're past diagnosis, past acute treatment, and now living in the 'what now' phase nobody prepared them for.",
-    desire_1: {
-      desire_text: 'Reclaim normalcy and make decisions about my life that aren\'t defined by my condition',
-      so_i_can_1: 'Stop letting my altered body be the first filter on every single choice',
-      so_i_can_2: 'Have things to look forward to again instead of just managing what\'s left',
-      so_i_can_3: 'Feel like myself again instead of being "the one who had cancer" in every room',
-      urgency: 5, repeats: 5, who_cares: 'almost_everyone',
-    },
-    desire_2: {
-      desire_text: 'Feel less alone and seen by someone who actually gets the severity',
-      so_i_can_1: 'Stop performing strength for people who think I should just be grateful to be alive',
-      so_i_can_2: 'Have one space where I don\'t have to explain what an ostomy is or why I\'m tired',
-      so_i_can_3: 'See proof that someone with my level of medical reality is still building a life worth wanting',
-      urgency: 5, repeats: 5, who_cares: 'almost_everyone',
-    },
-    desire_3: {
-      desire_text: 'Get back in the gym and build muscle even with my limitations',
-      so_i_can_1: 'Feel ownership over something in a body that\'s felt like it belongs to doctors for years',
-      so_i_can_2: 'Have one input I control—the workout, the lift, the rep—when so many outputs are out of my hands',
-      so_i_can_3: 'See what my restructured body can actually do instead of only tracking what it can\'t',
-      urgency: 4, repeats: 4, who_cares: 'some_strangers_too',
-    },
-  },
-  lesson3: {
-    will_tell_1: "It's exhausting explaining my stoma to people at the gym who stare or ask what's under my shirt",
-    will_tell_2: 'Some days I hit the gym feeling strong and some days the CKD fatigue wins before I even warm up',
-    will_tell_3: "I just want to lift and train without every workout being a statement about my medical history",
-    wont_tell_1: "I'm tired of being someone's inspiration for working out with a bag—I didn't choose this and I don't want to be brave, I just want to be strong",
-    wont_tell_2: "I don't know who I am if I stop training. The gym is the only place where I feel like more than a patient.",
-    wont_tell_3: "Sometimes I resent my body mid-lift and I don't know how to push a body I'm still angry at",
-    cant_tell_1: "The stoma bag visible through your gym shirt is your authority—not despite it, because of it. The physique is the receipt for what severity can still build.",
-    cant_tell_2: "The gap between what you can lift and what you think you should be able to lift is the actual injury—and it's fixable independently of your diagnosis",
-    cant_tell_3: "Small wins in the gym aren't consolation prizes—a 10-minute workout with an ostomy is not less than an hour workout without one",
-  },
-  lesson4: {
-    unaware_questions: 'Can I even go back to the gym after ostomy surgery? Is it safe to lift heavy with a stoma? Why do I feel guilty for wanting to work out when I should just be grateful to be alive?',
-    problem_aware_questions: 'How do other people with ostomies or organ removals actually train? Why is all the fitness content either for able-bodied people or "gentle movement for chronic illness"? Where are the people lifting heavy with a bag?',
-    solution_aware_questions: 'Can I actually build muscle with CKD fatigue and a stoma? How do I modify lifts around pelvic floor limitations? What does a real workout program look like for someone with my level of restructuring?',
-    product_aware_questions: 'Does she actually train with a visible ostomy or is this another able-bodied fitness person with a "health journey"? Will her gym approach work for someone with my specific restrictions (CKD, pelvic floor, fatigue)? Can I actually build a physique that looks like hers with my limitations?',
-  },
-  lesson5: {
-    saturated_topics: '"Gentle movement for chronic illness", "Listen to your body", "Chronic illness warrior", "Healing is possible if you just...", "Spoonie life". Also saturated in fitness: "No excuses", before/after transformation content, "Anyone can do it" motivation',
-    saturated_formats: '"Day in my life with [condition]" without decisions, hospital vlogs, awareness month content, medication routines, "What I eat to manage symptoms", generic workout tutorials that don\'t address stoma/organ removal',
-    competitor_angles: 'Chronic-illness-emotional: @chronicallycandid, @spoonielife (stage 2, grief/validation focus). Able-bodied fitness: @kaikifit, @whitneyysimmons (stage 1, no medical context). Visible-stoma-fitness: nearly empty category—@beyondthestoma is her asset. Gap: nobody showing heavy lifting + ostomy bag + competition physique.',
-    sophistication_stage: 4,
-  },
-}
 
 export default function BreakthroughContentViewer() {
   const navigate = useNavigate()
@@ -96,12 +35,6 @@ export default function BreakthroughContentViewer() {
 
   // Form state
   const [formData, setFormData] = useState<BreakthroughFormData>(createEmptyFormData())
-  const [generationsRemaining, setGenerationsRemaining] = useState(MAX_GENERATIONS)
-  const [savedIdeas, setSavedIdeas] = useState<GeneratedIdea[]>([])
-
-  const apiUrl = import.meta.env.DEV
-    ? 'http://localhost:8787'
-    : 'https://ryan-website-api.rsterling20.workers.dev'
 
   // Load saved form data from localStorage
   useEffect(() => {
@@ -123,24 +56,6 @@ export default function BreakthroughContentViewer() {
       localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(formData))
     }
   }, [formData, user])
-
-  // Fetch generation credits from server
-  const fetchCredits = async (courseIdToFetch: string) => {
-    if (!user) return
-
-    try {
-      const response = await fetch(
-        `${apiUrl}/generation-credits/${courseIdToFetch}?userId=${user.id}`
-      )
-      if (response.ok) {
-        const { remaining } = await response.json()
-        setGenerationsRemaining(remaining)
-        console.log(`Loaded ${remaining} credits remaining from server`)
-      }
-    } catch (err) {
-      console.error('Error fetching generation credits:', err)
-    }
-  }
 
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {
@@ -164,39 +79,8 @@ export default function BreakthroughContentViewer() {
 
       setCourse(courseData)
 
-      const { data: purchaseData } = await supabase
-        .from('purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('course_id', courseData.id)
-        .limit(1)
-
-      if (!purchaseData || purchaseData.length === 0) {
-        navigate(`/courses/${COURSE_SLUG}`)
-        return
-      }
-
+      // Free course - all authenticated users have access
       setHasAccess(true)
-
-      // Fetch generation credits from server
-      await fetchCredits(courseData.id)
-
-      // Load saved generation ideas
-      try {
-        const genResponse = await fetch(
-          `${apiUrl}/generations/${courseData.id}?userId=${user.id}`
-        )
-        if (genResponse.ok) {
-          const { generations } = await genResponse.json()
-          if (generations && generations.length > 0) {
-            // Load most recent generation
-            setSavedIdeas(generations[0].ideas)
-            console.log(`Loaded ${generations[0].ideas.length} saved ideas`)
-          }
-        }
-      } catch (err) {
-        console.error('Error loading saved ideas:', err)
-      }
 
       const { data: lessonData } = await supabase
         .from('lessons')
@@ -204,7 +88,8 @@ export default function BreakthroughContentViewer() {
         .eq('course_id', courseData.id)
         .order('order_index')
 
-      const lessonsArray = lessonData || []
+      // Filter out the old "Generate Ideas" lesson (index 7) - no longer needed
+      const lessonsArray = (lessonData || []).filter((_, index) => index !== 7)
       setLessons(lessonsArray)
 
       // Redirect to first lesson if no lessonId in URL
@@ -238,20 +123,10 @@ export default function BreakthroughContentViewer() {
   // Derive current lesson from URL
   const currentLesson = lessonId ? lessons.find(l => l.id === lessonId) : null
   const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
-  const isGeneratorLesson = currentLessonIndex === 7 // 8th lesson (0-indexed, after Start Here)
   const allComplete = isAllComplete(formData)
 
   const goToLesson = (lesson: Lesson) => {
     navigate(`/courses/${COURSE_SLUG}/learn/${lesson.id}`)
-  }
-
-  // Called by GeneratorUI when generation completes with new credit count from server
-  const handleCreditsUpdate = (newCreditsRemaining: number) => {
-    setGenerationsRemaining(newCreditsRemaining)
-  }
-
-  const handleLoadTestData = () => {
-    setFormData(TEST_DATA)
   }
 
   if (loading || !isLoaded) {
@@ -267,21 +142,6 @@ export default function BreakthroughContentViewer() {
   }
 
   const renderLessonForm = () => {
-    if (isGeneratorLesson) {
-      return (
-        <GeneratorUI
-          formData={formData}
-          generationsRemaining={generationsRemaining}
-          onCreditsUpdate={handleCreditsUpdate}
-          allComplete={allComplete}
-          onLoadTestData={handleLoadTestData}
-          userId={user?.id}
-          courseId={course?.id}
-          savedIdeas={savedIdeas}
-        />
-      )
-    }
-
     switch (currentLessonIndex) {
       case 0:
         // Start Here - just video, no form
@@ -423,32 +283,11 @@ export default function BreakthroughContentViewer() {
             </div>
           </div>
 
-          {/* Generation Counter */}
-          <div className="px-6 py-4 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm">Generations</span>
-              <div className="flex items-center gap-1">
-                {[...Array(MAX_GENERATIONS)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full ${
-                      i < generationsRemaining ? 'bg-brand-orange' : 'bg-gray-700'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-            <p className="text-gray-500 text-xs mt-1">
-              {generationsRemaining} of {MAX_GENERATIONS} remaining
-            </p>
-          </div>
-
           <nav className="divide-y divide-gray-800">
             {lessons.map((lesson, index) => {
-              // Index 0 is "Start Here" (no form), indices 1-5 have forms
+              // Index 0 is "Start Here" (no form), indices 1-5 have forms, index 6 is brainstorm
               const isComplete = (index > 0 && index < 6) ? getLessonCompletionStatus(index - 1) : false
               const isBrainstorm = index === 6
-              const isGenerator = index === 7
 
               return (
                 <button
@@ -462,17 +301,9 @@ export default function BreakthroughContentViewer() {
                   }`}
                 >
                   <span className="flex-shrink-0 mt-0.5">
-                    {isGenerator ? (
+                    {isBrainstorm ? (
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                         allComplete ? 'bg-brand-orange' : 'bg-gray-700'
-                      }`}>
-                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      </div>
-                    ) : isBrainstorm ? (
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        allComplete ? 'bg-purple-500' : 'bg-gray-700'
                       }`}>
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -516,55 +347,35 @@ export default function BreakthroughContentViewer() {
               </h1>
 
               {/* Video Embed */}
-              {isGeneratorLesson ? (
-                <>
-                  {/* Video placeholder - replace with actual video URL when ready */}
-                  <div className="aspect-video bg-brand-card rounded-xl overflow-hidden mb-8 flex items-center justify-center border-2 border-dashed border-gray-700">
-                    <div className="text-center p-8">
-                      <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-gray-500 text-lg font-medium">Video Coming Soon</p>
-                      <p className="text-gray-600 text-sm mt-2">How to use the generator + best practices</p>
-                    </div>
-                  </div>
-                  <div className="bg-brand-card rounded-xl p-6 mb-8">
-                    <p className="text-gray-300">
-                      Based on everything you've entered in the previous lessons, the generator will create 50 content ideas tailored to your niche, audience, and positioning. Each idea includes multiple hook variations and is scored for urgency, staying power, and reach.
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <div className="aspect-video bg-black rounded-xl overflow-hidden mb-8">
-                  {currentLesson.video_url.includes('vimeo.com') ? (
-                    <iframe
-                      src={currentLesson.video_url.replace(
-                        'vimeo.com/',
-                        'player.vimeo.com/video/'
-                      )}
-                      className="w-full h-full"
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : currentLesson.video_url.includes('youtube.com') ||
-                    currentLesson.video_url.includes('youtu.be') ? (
-                    <iframe
-                      src={currentLesson.video_url
-                        .replace('watch?v=', 'embed/')
-                        .replace('youtu.be/', 'youtube.com/embed/')}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={currentLesson.video_url}
-                      controls
-                      className="w-full h-full"
-                    />
-                  )}
-                </div>
-              )}
+              <div className="aspect-video bg-black rounded-xl overflow-hidden mb-8">
+                {currentLesson.video_url.includes('vimeo.com') ? (
+                  <iframe
+                    src={currentLesson.video_url.replace(
+                      'vimeo.com/',
+                      'player.vimeo.com/video/'
+                    )}
+                    className="w-full h-full"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : currentLesson.video_url.includes('youtube.com') ||
+                  currentLesson.video_url.includes('youtu.be') ? (
+                  <iframe
+                    src={currentLesson.video_url
+                      .replace('watch?v=', 'embed/')
+                      .replace('youtu.be/', 'youtube.com/embed/')}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={currentLesson.video_url}
+                    controls
+                    className="w-full h-full"
+                  />
+                )}
+              </div>
 
               {/* Lesson Form */}
               <div className="mb-8">{renderLessonForm()}</div>

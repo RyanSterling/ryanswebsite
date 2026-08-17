@@ -38,20 +38,7 @@ export default function CourseViewer() {
 
       setCourse(courseData)
 
-      // Check if user has purchased this course
-      const { data: purchaseData } = await supabase
-        .from('purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('course_id', courseData.id)
-        .limit(1)
-
-      if (!purchaseData || purchaseData.length === 0) {
-        // No access, redirect to landing page
-        navigate(`/courses/${slug}`)
-        return
-      }
-
+      // Free course - all authenticated users have access
       setHasAccess(true)
 
       // Fetch lessons

@@ -40,17 +40,6 @@ export default function ProfileAudit() {
               </svg>
             </span>
             <div>
-              <h3 className="text-white font-semibold mb-1">Hook rewrites you can use immediately</h3>
-              <p className="text-gray-400">Specific hooks for YOUR niche that create curiosity and stop the scroll</p>
-            </div>
-          </div>
-          <div className="bg-brand-card rounded-2xl p-6 flex items-start gap-4">
-            <span className="text-brand-orange mt-1 flex-shrink-0">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </span>
-            <div>
               <h3 className="text-white font-semibold mb-1">Bio and profile feedback</h3>
               <p className="text-gray-400">Make sure visitors know exactly what you do and why they should follow — in under 5 seconds</p>
             </div>
