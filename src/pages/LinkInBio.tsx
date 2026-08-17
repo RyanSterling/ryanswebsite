@@ -10,15 +10,21 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
-    title: 'Free Content Strategy Course',
-    description: 'Learn how to pick topics that actually get views',
-    to: '/breakthrough',
+    title: '1:1 Content Coaching',
+    to: '/',
     featured: true,
   },
   {
-    title: '1:1 Content Coaching',
-    to: '/',
+    title: 'Free Growth Audit',
+    description: 'Get an instant AI-powered analysis of your content',
+    to: '/assessment',
   },
+  // Add more links here as needed:
+  // {
+  //   title: 'Course Name',
+  //   description: 'Course description',
+  //   to: '/courses/slug',
+  // },
 ]
 
 export default function LinkInBio() {
