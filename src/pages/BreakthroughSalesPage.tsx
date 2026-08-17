@@ -22,13 +22,13 @@ export default function BreakthroughSalesPage() {
       <section className="max-w-4xl mx-auto px-6 pt-12 md:pt-16 pb-8">
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
-            <h2 className="font-soehne font-bold text-3xl md:text-5xl text-white whitespace-nowrap relative z-10">
-              Breakthrough<span className="inline-block w-3 md:w-4"></span>Content Strategy
+            <h2 className="font-soehne font-bold text-xl sm:text-3xl md:text-5xl text-white whitespace-nowrap relative z-10">
+              Breakthrough<span className="inline-block w-2 sm:w-3 md:w-4"></span>Content Strategy
             </h2>
             <img
               src="/bolt.svg"
               alt=""
-              className="absolute w-16 h-16 md:w-24 md:h-24 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"
+              className="absolute w-10 h-10 sm:w-16 sm:h-16 md:w-24 md:h-24 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"
             />
           </div>
           <div className="flex items-center gap-2 text-gray-400">
