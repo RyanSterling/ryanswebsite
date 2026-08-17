@@ -4,6 +4,13 @@
 
 @font-face {
   font-family: 'Soehne';
+  src: url('/fonts/Test Söhne/test-soehne-leicht.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Soehne';
   src: url('/fonts/Test Söhne/test-soehne-extrafett.woff2') format('woff2');
   font-weight: 800;
   font-style: normal;
