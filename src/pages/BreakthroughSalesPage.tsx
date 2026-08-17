@@ -19,7 +19,7 @@ export default function BreakthroughSalesPage() {
       <section className="max-w-4xl mx-auto px-6 pt-12 md:pt-16 pb-8">
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
-            <h2 className="font-soehne font-light text-3xl md:text-5xl text-white whitespace-nowrap relative z-10">
+            <h2 className="font-soehne font-bold text-3xl md:text-5xl text-white whitespace-nowrap relative z-10">
               Breakthrough<span className="inline-block w-3 md:w-4"></span>Content Strategy
             </h2>
             <img
@@ -43,7 +43,7 @@ export default function BreakthroughSalesPage() {
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-6 pt-8 pb-12">
         <div className="text-center mb-10">
-          <h1 className="font-soehne font-light text-3xl md:text-5xl text-white mb-6 leading-tight">
+          <h1 className="font-soehne font-bold text-3xl md:text-5xl text-white mb-6 leading-tight">
             Get More Views, Grow Your Followers, And Finally Know What Content To Make
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
@@ -75,7 +75,7 @@ export default function BreakthroughSalesPage() {
       {/* The Problem */}
       <section className="max-w-3xl mx-auto px-6 py-12">
         <div className="bg-brand-card rounded-2xl p-8 md:p-10">
-          <h2 className="font-soehne font-light text-2xl text-white mb-6">
+          <h2 className="font-soehne font-bold text-2xl text-white mb-6">
             Most creators are picking topics wrong.
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-4">
@@ -92,7 +92,7 @@ export default function BreakthroughSalesPage() {
 
       {/* What You'll Learn */}
       <section className="max-w-3xl mx-auto px-6 py-12">
-        <h2 className="font-soehne font-light text-2xl md:text-3xl text-white mb-2">
+        <h2 className="font-soehne font-bold text-2xl md:text-3xl text-white mb-2">
           5 exercises. One custom AI prompt.
         </h2>
         <p className="text-gray-400 mb-8">
