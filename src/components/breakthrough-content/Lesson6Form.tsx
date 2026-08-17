@@ -80,15 +80,30 @@ ${brainDump || '(Brain dump everything you know about ONE content idea above)'}
 
 ## YOUR TASK
 
-I've brain dumped everything I know about ONE content idea above. Using my creator profile and audience data, help me develop this idea into a piece of content.
+I've brain dumped everything I know about ONE content idea above. Using my creator profile and audience data, help me develop this idea into content that reaches NEW people — not just my existing followers.
 
-1. Refine the core angle — what's the sharpest version of this idea?
-2. Explain why THIS audience would care (not just anyone — MY people)
-3. Write 3-4 hook options I could use to open the video
-4. Suggest a structure or flow for the content
-5. Flag anything that might drift into the saturated topics/formats I listed
+**Step 1: Assess the TAM (Total Addressable Market)**
+Rate this idea's reach potential from 1-5:
+- 1 = Only appeals to people already deep in my niche (e.g., "deadlift form")
+- 5 = Appeals to anyone with the broader desire, even if they don't know my niche exists (e.g., "how to get a bigger butt")
 
-Stay within my niche. The final piece should feel like "this creator GETS me" not "this could be from anyone."
+**Step 2: Suggest a Broader Angle (if needed)**
+If this idea is a 1-2, suggest how to reframe it to reach a wider audience while still leading back to my expertise. The goal: topics that strangers care about, not insider content for people who already follow me.
+
+**Step 3: Match to Awareness Level**
+Based on the QUESTIONS BY AWARENESS LEVEL section above, identify which audience segment this content targets:
+- Unaware (don't know they have a problem)
+- Problem Aware (know the problem, don't know solutions exist)
+- Solution Aware (comparing approaches)
+- Product Aware (evaluating me specifically)
+
+**Step 4: Develop the Content**
+1. Refine the core angle — what's the sharpest, most shareable version?
+2. Write 3-4 hook options that would make a STRANGER stop scrolling
+3. Suggest a structure that delivers value while hinting at my unique approach
+4. Flag anything that drifts into the saturated topics/formats I listed
+
+The final piece should bring new people INTO my world, not just resonate with people already there.
 `
   }
 
