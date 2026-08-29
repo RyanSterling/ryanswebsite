@@ -7,8 +7,6 @@ import ChallengeSuccess from './pages/ChallengeSuccess'
 import Assessment from './pages/Assessment'
 import ResultsPage from './pages/ResultsPage'
 import ThankYou from './pages/ThankYou'
-import ProfileAudit from './pages/ProfileAudit'
-import AuditThankYou from './pages/AuditThankYou'
 import PromptPage from './pages/PromptPage'
 import PromptOptIn from './pages/PromptOptIn'
 import LinkInBio from './pages/LinkInBio'
@@ -52,8 +50,6 @@ function App() {
       <Route path="/assessment" element={<Assessment />} />
       <Route path="/results/:id" element={<ResultsPage />} />
       <Route path="/thank-you" element={<ThankYou />} />
-      <Route path="/profile-audit" element={<ProfileAudit />} />
-      <Route path="/audit-thank-you" element={<AuditThankYou />} />
       <Route path="/prompts/:slug" element={<PromptPage />} />
       <Route path="/get/:slug" element={<PromptOptIn />} />
       <Route path="/roast" element={<RoastMyProfile />} />

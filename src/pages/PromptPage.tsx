@@ -167,21 +167,6 @@ export default function PromptPage() {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-brand-card to-transparent rounded-b-2xl pointer-events-none"></div>
       </section>
 
-      {/* Upsell CTA */}
-      <section className="bg-brand-card rounded-2xl p-8 text-center border border-gray-800">
-        <h2 className="font-soehne text-2xl font-semibold text-white mb-3">
-          Want me to review your content personally?
-        </h2>
-        <p className="text-gray-400 mb-6 max-w-lg mx-auto">
-          I'll watch your reels, react in real-time, and tell you exactly what to fix.
-        </p>
-        <Link
-          to="/profile-audit"
-          className="inline-block bg-brand-orange text-white font-semibold text-lg px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
-        >
-          Get a Personal Audit — $97
-        </Link>
-      </section>
     </main>
   )
 }
