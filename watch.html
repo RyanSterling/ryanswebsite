@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <title>Watch on YouTube</title>
+    <style>
+        /* ============================================================
+           CONFIGURATION — edit these values
+           ============================================================ */
+        :root {
+            --VIDEO_ID: "9SI0bM763pY";
+            --THUMBNAIL: url("assets/YT Thumbnails/thumbnail-growing on social media isn't hard.jpg");
+        }
+        /* ============================================================ */
+
+        /* Design tokens from site */
+        :root {
+            --bg: #111;
+            --card-bg: #1D1D1D;
+            --accent: #FF5125;
+            --ink: #111;
+            --text: #fff;
+            --text-muted: #9ca3af;
+            --border: #333;
+            --shadow-card: 9px 9px 0 0 var(--accent);
+            --shadow-btn: 5px 5px 0 0 var(--ink);
+        }
+
+        @font-face {
+            font-family: 'Soehne';
+            src: url('/fonts/Test Söhne/test-soehne-buch.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Soehne';
+            src: url('/fonts/Test Söhne/test-soehne-kraftig.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Soehne';
+            src: url('/fonts/Test Söhne/test-soehne-halbfett.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Soehne';
+            src: url('/fonts/Test Söhne/test-soehne-dreiviertelfett.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Soehne', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Eyebrow */
+        .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        /* Headline */
+        .headline {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        @media (min-width: 400px) {
+            .headline {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* Thumbnail card */
+        .thumbnail-card {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+        }
+
+        .thumbnail-card:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .thumbnail-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Play badge */
+        .play-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 72px;
+            height: 72px;
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .play-badge {
+                transition: none;
+            }
+        }
+
+        .thumbnail-card:hover .play-badge,
+        .thumbnail-card:focus-visible .play-badge {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .thumbnail-card:hover .play-badge,
+            .thumbnail-card:focus-visible .play-badge {
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .play-badge svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+            margin-left: 4px; /* optical centering for play triangle */
+        }
+
+        /* Button */
+        .watch-btn {
+            display: block;
+            width: 100%;
+            padding: 16px 24px;
+            font-family: inherit;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--accent);
+            border: 2px solid var(--ink);
+            box-shadow: var(--shadow-btn);
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .watch-btn {
+                transition: none;
+            }
+        }
+
+        .watch-btn:hover {
+            opacity: 0.95;
+        }
+
+        .watch-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0 0 0 0 var(--ink);
+        }
+
+        .watch-btn:focus-visible {
+            outline: 3px solid var(--text);
+            outline-offset: 3px;
+        }
+
+        /* Hint message (for in-app browser fallback) */
+        .hint {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            text-align: center;
+            font-size: 0.9375rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .hint.visible {
+            display: block;
+        }
+
+        .hint strong {
+            color: var(--text);
+        }
+
+        .hint-icon {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 12px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .footer a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .footer a:hover {
+            color: var(--text);
+        }
+
+        .footer a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <p class="eyebrow">New Video</p>
+        <h1 class="headline">Tap to watch in the YouTube app</h1>
+
+        <a
+            id="thumbnail"
+            class="thumbnail-card"
+            href="https://www.youtube.com/watch?v=9SI0bM763pY"
+            role="button"
+            aria-label="Play video on YouTube"
+        >
+            <img
+                class="thumbnail-img"
+                src="assets/YT Thumbnails/thumbnail-growing on social media isn't hard.jpg"
+                alt="Video thumbnail"
+                loading="eager"
+            >
+            <span class="play-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </span>
+        </a>
+
+        <a
+            id="watchBtn"
+            class="watch-btn"
+            href="https://www.youtube.com/watch?v=9SI0bM763pY"
+        >
+            Watch on YouTube
+        </a>
+
+        <div id="hint" class="hint">
+            <span class="hint-icon" aria-hidden="true">&#8942;</span>
+            <strong>Open in your browser</strong><br>
+            Tap the <strong>&#x22EF;</strong> menu in the corner, then choose <strong>"Open in browser"</strong> to watch logged in.
+        </div>
+
+        <footer class="footer">
+            <a href="/">ryansterling.com</a>
+        </footer>
+    </main>
+
+    <script>
+        /* ============================================================
+           CONFIGURATION — edit these values
+           ============================================================ */
+        const VIDEO_ID  = "9SI0bM763pY";
+        const THUMBNAIL = "assets/YT Thumbnails/thumbnail-growing on social media isn't hard.jpg";
+        /* ============================================================ */
+
+        (function() {
+            'use strict';
+
+            const ua = navigator.userAgent || '';
+            const isAndroid = /Android/i.test(ua);
+            const isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isInAppBrowser = /Instagram|FBAN|FBAV|FB_IAB/i.test(ua);
+            const isDesktop = !isAndroid && !isIOS;
+
+            const youtubeWeb = `https://www.youtube.com/watch?v=${VIDEO_ID}`;
+            const youtubeIntent = `intent://www.youtube.com/watch?v=${VIDEO_ID}#Intent;package=com.google.android.youtube;scheme=https;end`;
+            const youtubeScheme = `youtube://watch?v=${VIDEO_ID}`;
+
+            const thumbnail = document.getElementById('thumbnail');
+            const watchBtn = document.getElementById('watchBtn');
+            const hint = document.getElementById('hint');
+
+            // Update href attributes with configured VIDEO_ID
+            thumbnail.href = youtubeWeb;
+            watchBtn.href = youtubeWeb;
+
+            // Update thumbnail image with configured THUMBNAIL
+            const thumbImg = thumbnail.querySelector('.thumbnail-img');
+            if (thumbImg) {
+                thumbImg.src = THUMBNAIL;
+            }
+
+            // Show hint immediately if iOS + in-app browser (JS enabled)
+            if (isIOS && isInAppBrowser) {
+                hint.classList.add('visible');
+            }
+
+            function openYouTube(e) {
+                e.preventDefault();
+
+                if (isDesktop) {
+                    // Desktop: straight to web
+                    window.location.href = youtubeWeb;
+                    return;
+                }
+
+                if (isAndroid) {
+                    // Android: use intent
+                    window.location.href = youtubeIntent;
+                    return;
+                }
+
+                if (isIOS) {
+                    // iOS: try app scheme, with fallback logic
+                    let timer = null;
+                    let didLeave = false;
+
+                    function cleanup() {
+                        if (timer) {
+                            clearTimeout(timer);
+                            timer = null;
+                        }
+                        document.removeEventListener('visibilitychange', onVisibilityChange);
+                        window.removeEventListener('pagehide', onPageHide);
+                    }
+
+                    function onVisibilityChange() {
+                        if (document.hidden) {
+                            didLeave = true;
+                            cleanup();
+                        }
+                    }
+
+                    function onPageHide() {
+                        didLeave = true;
+                        cleanup();
+                    }
+
+                    document.addEventListener('visibilitychange', onVisibilityChange);
+                    window.addEventListener('pagehide', onPageHide);
+
+                    // Try the youtube:// scheme
+                    window.location.href = youtubeScheme;
+
+                    // Set fallback timer
+                    timer = setTimeout(function() {
+                        cleanup();
+                        if (didLeave) return;
+
+                        if (isInAppBrowser) {
+                            // In-app browser: show hint instead of redirecting
+                            hint.classList.add('visible');
+                        } else {
+                            // Regular Safari: fallback to web
+                            window.location.href = youtubeWeb;
+                        }
+                    }, 1100);
+                }
+            }
+
+            thumbnail.addEventListener('click', openYouTube);
+            watchBtn.addEventListener('click', openYouTube);
+        })();
+    </script>
+
+    <noscript>
+        <style>
+            /* Show hint for iOS in-app browsers when JS is disabled */
+            .hint { display: block !important; }
+        </style>
+    </noscript>
+</body>
+</html>
