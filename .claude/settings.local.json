@@ -55,7 +55,9 @@
       "WebFetch(domain:yellowrosefitness.com)",
       "Bash(cd /Users/ryansterling/Desktop/Code\\\\ Projects/Ryan\\\\ Website && npx netlify deploy:*)",
       "WebFetch(domain:aliabdaal.com)",
-      "Bash(npx netlify deploy:*)"
+      "Bash(npx netlify deploy:*)",
+      "WebFetch(domain:clerk.com)",
+      "WebFetch(domain:developers.kit.com)"
     ]
   }
 }
