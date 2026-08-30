@@ -24,7 +24,6 @@
             --text: #fff;
             --text-muted: #9ca3af;
             --border: #333;
-            --shadow-card: 9px 9px 0 0 var(--accent);
             --shadow-btn: 5px 5px 0 0 var(--ink);
         }
 
@@ -107,7 +106,6 @@
             aspect-ratio: 16 / 9;
             background: var(--card-bg);
             border: 2px solid var(--border);
-            box-shadow: var(--shadow-card);
             overflow: hidden;
             cursor: pointer;
             display: block;
@@ -207,32 +205,6 @@
             outline-offset: 3px;
         }
 
-        /* Hint message (for in-app browser fallback) */
-        .hint {
-            display: none;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 16px 20px;
-            text-align: center;
-            font-size: 0.9375rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-        }
-
-        .hint.visible {
-            display: block;
-        }
-
-        .hint strong {
-            color: var(--text);
-        }
-
-        .hint-icon {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            display: block;
-        }
-
         /* Footer */
         .footer {
             margin-top: 12px;
@@ -289,12 +261,6 @@
             Watch on YouTube
         </a>
 
-        <div id="hint" class="hint">
-            <span class="hint-icon" aria-hidden="true">&#8942;</span>
-            <strong>Open in your browser</strong><br>
-            Tap the <strong>&#x22EF;</strong> menu in the corner, then choose <strong>"Open in browser"</strong> to watch logged in.
-        </div>
-
         <footer class="footer">
             <a href="/">ryansterling.com</a>
         </footer>
@@ -324,7 +290,6 @@
 
             const thumbnail = document.getElementById('thumbnail');
             const watchBtn = document.getElementById('watchBtn');
-            const hint = document.getElementById('hint');
 
             // Update href attributes with configured VIDEO_ID
             thumbnail.href = youtubeWeb;
@@ -334,11 +299,6 @@
             const thumbImg = thumbnail.querySelector('.thumbnail-img');
             if (thumbImg) {
                 thumbImg.src = THUMBNAIL;
-            }
-
-            // Show hint immediately if iOS + in-app browser (JS enabled)
-            if (isIOS && isInAppBrowser) {
-                hint.classList.add('visible');
             }
 
             function openYouTube(e) {
@@ -393,13 +353,8 @@
                         cleanup();
                         if (didLeave) return;
 
-                        if (isInAppBrowser) {
-                            // In-app browser: show hint instead of redirecting
-                            hint.classList.add('visible');
-                        } else {
-                            // Regular Safari: fallback to web
-                            window.location.href = youtubeWeb;
-                        }
+                        // Fallback to web if app didn't open
+                        window.location.href = youtubeWeb;
                     }, 1100);
                 }
             }
@@ -409,11 +364,5 @@
         })();
     </script>
 
-    <noscript>
-        <style>
-            /* Show hint for iOS in-app browsers when JS is disabled */
-            .hint { display: block !important; }
-        </style>
-    </noscript>
 </body>
 </html>
