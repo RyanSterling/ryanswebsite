@@ -14,20 +14,54 @@ export default function ProfileAudit() {
           Profile Audit
         </h1>
         <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto">
-          I'll review your content and tell you exactly what to fix.
+          I study your content, pinpoint what's working and what isn't, and walk you through it in a video you can actually learn from.
         </p>
       </section>
 
-      {/* Simple Description */}
+      {/* What's Included */}
       <section className="mb-12">
-        <div className="bg-brand-card rounded-2xl p-6 md:p-8">
-          <p className="text-gray-300 text-lg leading-relaxed">
-            Send me your profile. I'll watch your content, review your bio, and record a personalized video
-            breaking down what's working, what's not, and what I'd do differently.
-          </p>
-          <p className="text-gray-400 mt-4">
-            You can implement my suggestions and send me a few more posts for follow-up feedback if you want.
-          </p>
+        <h2 className="text-white font-semibold text-xl mb-6">What's included</h2>
+        <div className="space-y-4">
+          <div className="flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <p className="text-gray-300">A full review of your recent content — what's landing and what's falling flat</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <p className="text-gray-300">Hook, pacing, and retention notes on your top and worst performing posts</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <p className="text-gray-300">Bio and profile feedback — do people know what you do in under 5 seconds?</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <p className="text-gray-300">A recorded video walkthrough of your page, yours to keep</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <span className="text-brand-orange mt-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <p className="text-gray-300">Follow-up feedback after you implement — send me a few new posts and I'll tell you if you're on track</p>
+          </div>
         </div>
       </section>
 
