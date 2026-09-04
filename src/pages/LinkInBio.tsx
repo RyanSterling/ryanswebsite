@@ -16,8 +16,8 @@ const links: LinkItem[] = [
     featured: true,
   },
   {
-    title: 'Profile Audit — $297',
-    description: 'Video breakdown of what\'s working and what\'s holding you back',
+    title: 'Content Audit',
+    description: 'I review your content and show you exactly what to change — $297',
     to: '/profile-audit',
   },
   {
