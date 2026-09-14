@@ -44,7 +44,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
           type="text"
           value={data.desire_text}
           onChange={(e) => updateField('desire_text', e.target.value)}
-          placeholder="They want to"
+          placeholder="I want to"
           className="w-full px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
         />
 
@@ -55,7 +55,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
             type="text"
             value={data.so_i_can_1}
             onChange={(e) => updateField('so_i_can_1', e.target.value)}
-            placeholder="So they can"
+            placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
@@ -67,7 +67,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
             type="text"
             value={data.so_i_can_2}
             onChange={(e) => updateField('so_i_can_2', e.target.value)}
-            placeholder="So they can"
+            placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
@@ -79,7 +79,7 @@ export default function DesireLadder({ label, data, onChange }: Props) {
             type="text"
             value={data.so_i_can_3}
             onChange={(e) => updateField('so_i_can_3', e.target.value)}
-            placeholder="So they can"
+            placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500/30"
           />
         </div>
