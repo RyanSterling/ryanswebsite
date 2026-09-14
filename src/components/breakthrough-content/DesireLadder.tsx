@@ -18,7 +18,21 @@ function IndentArrow({ className = '' }: { className?: string }) {
 
 export default function DesireLadder({ label, data, onChange }: Props) {
   const updateField = <K extends keyof DesireLadderType>(field: K, value: DesireLadderType[K]) => {
-    onChange({ ...data, [field]: value })
+    const updated = { ...data, [field]: value }
+
+    // Cascade-clear downstream fields when upstream is emptied
+    if (field === 'desire_text' && (value as string).trim() === '') {
+      updated.so_i_can_1 = ''
+      updated.so_i_can_2 = ''
+      updated.so_i_can_3 = ''
+    } else if (field === 'so_i_can_1' && (value as string).trim() === '') {
+      updated.so_i_can_2 = ''
+      updated.so_i_can_3 = ''
+    } else if (field === 'so_i_can_2' && (value as string).trim() === '') {
+      updated.so_i_can_3 = ''
+    }
+
+    onChange(updated)
   }
 
   const isComplete = isDesireLadderComplete(data)
