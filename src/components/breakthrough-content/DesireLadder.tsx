@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react'
 import { DesireLadder as DesireLadderType, isDesireLadderComplete, WHO_CARES_OPTIONS } from './types'
 import HelpDrawer from './HelpDrawer'
 
@@ -5,6 +6,39 @@ interface Props {
   label: string
   data: DesireLadderType
   onChange: (data: DesireLadderType) => void
+}
+
+function AutoResizeTextarea({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: {
+  value: string
+  onChange: (value: string) => void
+  placeholder: string
+  className: string
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      textarea.style.height = `${textarea.scrollHeight}px`
+    }
+  }, [value])
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={1}
+      className={`${className} resize-none overflow-hidden`}
+    />
+  )
 }
 
 function IndentArrow({ className = '' }: { className?: string }) {
@@ -54,45 +88,41 @@ export default function DesireLadder({ label, data, onChange }: Props) {
 
       <div className="space-y-2">
         {/* Rung 1 - no indent */}
-        <input
-          type="text"
+        <AutoResizeTextarea
           value={data.desire_text}
-          onChange={(e) => updateField('desire_text', e.target.value)}
+          onChange={(val) => updateField('desire_text', val)}
           placeholder="I want to"
           className="w-full px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
         />
 
         {/* Rung 2 - first indent */}
-        <div className={`flex items-center gap-2 pl-4 transition-all duration-200 ${showRung1 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <IndentArrow className="text-gray-600" />
-          <input
-            type="text"
+        <div className={`flex items-start gap-2 pl-4 transition-all duration-200 ${showRung1 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-gray-600 mt-2" />
+          <AutoResizeTextarea
             value={data.so_i_can_1}
-            onChange={(e) => updateField('so_i_can_1', e.target.value)}
+            onChange={(val) => updateField('so_i_can_1', val)}
             placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
 
         {/* Rung 3 - second indent */}
-        <div className={`flex items-center gap-2 pl-12 transition-all duration-200 ${showRung2 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <IndentArrow className="text-gray-600" />
-          <input
-            type="text"
+        <div className={`flex items-start gap-2 pl-12 transition-all duration-200 ${showRung2 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-gray-600 mt-2" />
+          <AutoResizeTextarea
             value={data.so_i_can_2}
-            onChange={(e) => updateField('so_i_can_2', e.target.value)}
+            onChange={(val) => updateField('so_i_can_2', val)}
             placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-orange"
           />
         </div>
 
         {/* Rung 4 - third indent (the emotional core) */}
-        <div className={`flex items-center gap-2 pl-20 transition-all duration-200 ${showRung3 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-          <IndentArrow className="text-green-500" />
-          <input
-            type="text"
+        <div className={`flex items-start gap-2 pl-20 transition-all duration-200 ${showRung3 ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+          <IndentArrow className="text-green-500 mt-2" />
+          <AutoResizeTextarea
             value={data.so_i_can_3}
-            onChange={(e) => updateField('so_i_can_3', e.target.value)}
+            onChange={(val) => updateField('so_i_can_3', val)}
             placeholder="So I can"
             className="flex-1 px-3 py-2 rounded-lg bg-brand-dark text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500/30"
           />
