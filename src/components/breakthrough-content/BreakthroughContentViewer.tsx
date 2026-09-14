@@ -19,7 +19,7 @@ import Lesson4Form from './Lesson4Form'
 import Lesson5Form from './Lesson5Form'
 import Lesson6Form from './Lesson6Form'
 
-const COURSE_SLUG = 'breakthrough-content-strategy'
+const COURSE_SLUG = 'the-content-fix'
 const STORAGE_KEY = 'breakthrough-form-data'
 
 export default function BreakthroughContentViewer() {

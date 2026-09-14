@@ -1,4 +1,4 @@
-// Breakthrough Content Strategy - Form Data Types
+// The Content Fix - Form Data Types
 
 // Lesson 1: Creator Profile
 export interface CreatorProfile {

@@ -1038,7 +1038,7 @@ async function sendToN8N(payload: {
 }
 
 // ============================================
-// BREAKTHROUGH CONTENT STRATEGY GENERATOR
+// THE CONTENT FIX GENERATOR
 // ============================================
 
 interface BreakthroughFormData {

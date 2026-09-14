@@ -77,7 +77,7 @@ function App() {
         }
       />
       <Route
-        path="/courses/breakthrough-content-strategy/learn/:lessonId?"
+        path="/courses/the-content-fix/learn/:lessonId?"
         element={
           <ProtectedRoute>
             <BreakthroughContentViewer />

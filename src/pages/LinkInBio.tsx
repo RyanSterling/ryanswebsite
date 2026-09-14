@@ -10,7 +10,7 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
-    title: 'Free Content Strategy Course',
+    title: 'The Content Fix (Free Course)',
     description: 'Learn how to pick topics that actually get views',
     to: '/breakthrough',
     featured: true,

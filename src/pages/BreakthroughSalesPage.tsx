@@ -6,7 +6,7 @@ export default function BreakthroughSalesPage() {
   const { isSignedIn } = useAuth()
 
   const handleGetAccess = () => {
-    const courseUrl = '/courses/breakthrough-content-strategy/learn'
+    const courseUrl = '/courses/the-content-fix/learn'
     if (!isSignedIn) {
       // Store redirect for after OAuth sign-in
       localStorage.setItem('pendingRedirect', courseUrl)
@@ -23,7 +23,7 @@ export default function BreakthroughSalesPage() {
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
             <h2 className="font-soehne font-bold text-xl sm:text-3xl md:text-5xl text-white whitespace-nowrap relative z-10">
-              Breakthrough<span className="inline-block w-2 sm:w-3 md:w-4"></span>Content Strategy
+              The Content Fix
             </h2>
             <img
               src="/bolt.svg"

@@ -1,4 +1,4 @@
-# Breakthrough Content Strategy — Master Spec
+# The Content Fix — Master Spec
 
 > **Status:** 50-idea generator deployed with Lesson 6 brainstorm page and AI prompt builder
 > **Last updated:** 2026-07-27 (Reduced to 50 ideas, added streaming, Lesson 6, and "Create AI Prompt" drawer)
@@ -24,7 +24,7 @@ This is the single source of truth for the build. It is a **living document** �
 
 | | |
 |---|---|
-| **Name** | Breakthrough Content Strategy |
+| **Name** | The Content Fix |
 | **Price** | $29 |
 | **Type** | Front-end course with a generator tool built into the final lesson |
 | **Platform** | Ryan's own custom-coded course delivery site |
