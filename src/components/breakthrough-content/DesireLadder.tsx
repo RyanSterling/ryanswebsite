@@ -21,12 +21,16 @@ function AutoResizeTextarea({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
+  const adjustHeight = () => {
     const textarea = textareaRef.current
     if (textarea) {
-      textarea.style.height = 'auto'
-      textarea.style.height = `${textarea.scrollHeight}px`
+      textarea.style.height = '0'
+      textarea.style.height = `${textarea.scrollHeight + 2}px`
     }
+  }
+
+  useEffect(() => {
+    adjustHeight()
   }, [value])
 
   return (
@@ -34,9 +38,10 @@ function AutoResizeTextarea({
       ref={textareaRef}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onInput={adjustHeight}
       placeholder={placeholder}
       rows={1}
-      className={`${className} resize-none overflow-hidden`}
+      className={`${className} resize-none overflow-hidden leading-normal`}
     />
   )
 }
