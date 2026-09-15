@@ -65,6 +65,7 @@ function App() {
       {/* Courses - Public */}
       <Route path="/courses" element={<Courses />} />
       <Route path="/breakthrough" element={<BreakthroughSalesPage />} />
+      <Route path="/the-content-fix" element={<BreakthroughSalesPage />} />
       <Route path="/courses/:slug" element={<CourseLanding />} />
 
       {/* Courses - Protected */}
