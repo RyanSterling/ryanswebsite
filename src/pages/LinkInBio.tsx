@@ -17,11 +17,6 @@ const links: LinkItem[] = [
     badge: 'Free Course',
   },
   {
-    title: 'Content Audit',
-    description: 'I review your content and show you exactly what to change — $297',
-    to: '/profile-audit',
-  },
-  {
     title: '1:1 Content Coaching',
     to: '/',
   },
