@@ -18,6 +18,7 @@ const links: LinkItem[] = [
   },
   {
     title: '1:1 Content Coaching',
+    description: '$2000/mo',
     to: '/',
   },
 ]
