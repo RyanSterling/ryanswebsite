@@ -70,7 +70,7 @@ export default function Home() {
             1:1 Content Coaching
           </h1>
           <p className="text-2xl text-white font-semibold mb-6">
-            $1,000<span className="text-gray-400 text-lg font-normal">/month</span>
+            $2,000<span className="text-gray-400 text-lg font-normal">/month</span>
           </p>
 
           {/* Waitlist notice */}
