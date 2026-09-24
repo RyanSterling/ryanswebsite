@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useUser } from '@clerk/react'
 import { supabase, Course, Lesson } from '../../lib/supabase'
@@ -21,6 +21,8 @@ import Lesson6Form from './Lesson6Form'
 
 const COURSE_SLUG = 'the-content-fix'
 const STORAGE_KEY = 'breakthrough-form-data'
+const API_URL = import.meta.env.VITE_API_URL || 'https://ryan-website-api.rsterling20.workers.dev'
+const DEBOUNCE_MS = 2500
 
 export default function BreakthroughContentViewer() {
   const navigate = useNavigate()
@@ -36,19 +38,92 @@ export default function BreakthroughContentViewer() {
   // Form state
   const [formData, setFormData] = useState<BreakthroughFormData>(createEmptyFormData())
 
-  // Load saved form data from localStorage
+  // Refs for database sync
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSavedRef = useRef<string>('')
+  const isInitialLoadRef = useRef(true)
+
+  // Save to database (called with debounce)
+  const saveToDatabase = useCallback(async (data: BreakthroughFormData, userId: string) => {
+    const dataString = JSON.stringify(data)
+
+    // Skip if data hasn't changed since last save
+    if (dataString === lastSavedRef.current) {
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/course-progress/${COURSE_SLUG}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          formData: data,
+        }),
+      })
+
+      if (response.ok) {
+        lastSavedRef.current = dataString
+      } else {
+        console.error('Failed to save to database:', response.status)
+      }
+    } catch (error) {
+      console.error('Network error saving to database:', error)
+    }
+  }, [])
+
+  // Load form data: localStorage first (fast), then DB (authoritative)
   useEffect(() => {
-    if (user) {
-      const savedData = localStorage.getItem(`${STORAGE_KEY}-${user.id}`)
-      if (savedData) {
-        try {
-          setFormData(JSON.parse(savedData))
-        } catch (e) {
-          console.error('Error parsing saved form data:', e)
-        }
+    if (!user) return
+
+    // Step 1: Load from localStorage immediately (existing behavior)
+    const savedData = localStorage.getItem(`${STORAGE_KEY}-${user.id}`)
+    let localData: BreakthroughFormData | null = null
+
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData) as BreakthroughFormData
+        localData = parsed
+        setFormData(parsed)
+      } catch (e) {
+        console.error('Error parsing saved form data:', e)
       }
     }
-  }, [user])
+
+    // Step 2: Fetch from database
+    const fetchFromDb = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/course-progress/${COURSE_SLUG}?userId=${encodeURIComponent(user.id)}`
+        )
+
+        if (!response.ok) {
+          console.error('Failed to fetch from database:', response.status)
+          isInitialLoadRef.current = false
+          return
+        }
+
+        const { formData: dbData } = await response.json()
+
+        if (dbData && !localData) {
+          // DB has data, localStorage empty - use DB data
+          setFormData(dbData)
+          localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(dbData))
+          lastSavedRef.current = JSON.stringify(dbData)
+        } else if (localData) {
+          // localStorage has data - prefer it (may have unsaved changes) and sync to DB
+          // This handles both: migration of existing users AND recovery of unsaved edits
+          await saveToDatabase(localData, user.id)
+        }
+      } catch (error) {
+        console.error('Error fetching from database:', error)
+      } finally {
+        isInitialLoadRef.current = false
+      }
+    }
+
+    fetchFromDb()
+  }, [user, saveToDatabase])
 
   // Send email to ConvertKit via n8n webhook (once per user)
   useEffect(() => {
@@ -71,12 +146,55 @@ export default function BreakthroughContentViewer() {
     }
   }, [user])
 
-  // Save form data on change
+  // Save form data: localStorage immediately, DB debounced
   useEffect(() => {
-    if (user) {
-      localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(formData))
+    if (!user) return
+
+    // Skip during initial load (don't save what we just loaded)
+    if (isInitialLoadRef.current) return
+
+    // Save to localStorage immediately (existing behavior)
+    localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(formData))
+
+    // Debounce database save
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
     }
-  }, [formData, user])
+
+    debounceTimerRef.current = setTimeout(() => {
+      saveToDatabase(formData, user.id)
+    }, DEBOUNCE_MS)
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [formData, user, saveToDatabase])
+
+  // Flush pending save on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current && user) {
+        clearTimeout(debounceTimerRef.current)
+        // Fire immediate save on unmount
+        const currentData = localStorage.getItem(`${STORAGE_KEY}-${user.id}`)
+        if (currentData && currentData !== lastSavedRef.current) {
+          // Use sendBeacon for reliability during page unload
+          if (navigator.sendBeacon) {
+            const payload = JSON.stringify({
+              userId: user.id,
+              formData: JSON.parse(currentData),
+            })
+            navigator.sendBeacon(
+              `${API_URL}/course-progress/${COURSE_SLUG}`,
+              new Blob([payload], { type: 'application/json' })
+            )
+          }
+        }
+      }
+    }
+  }, [user])
 
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {

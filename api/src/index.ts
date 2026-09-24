@@ -2528,4 +2528,104 @@ app.post('/roast-submission', async (c) => {
   return c.json({ success: true })
 })
 
+// ============================================
+// COURSE FORM DATA PERSISTENCE
+// ============================================
+
+// Get form data for a user/course
+app.get('/course-progress/:courseSlug', async (c) => {
+  const courseSlug = c.req.param('courseSlug')
+  const userId = c.req.query('userId')
+
+  if (!userId) {
+    return c.json({ error: 'Missing userId' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  const { data, error } = await supabase
+    .from('course_form_data')
+    .select('form_data, updated_at')
+    .eq('user_id', userId)
+    .eq('course_slug', courseSlug)
+    .single()
+
+  if (error && error.code !== 'PGRST116') {
+    // PGRST116 = no rows found (expected for new users)
+    console.error('Failed to fetch course form data:', error)
+    return c.json({ error: 'Failed to fetch form data' }, 500)
+  }
+
+  // Return null if no data exists (new user)
+  return c.json({
+    formData: data?.form_data || null,
+    updatedAt: data?.updated_at || null,
+  })
+})
+
+// Save/update form data for a user/course (upsert)
+// Accepts both PUT and POST (POST needed for sendBeacon on page unload)
+app.put('/course-progress/:courseSlug', async (c) => {
+  const courseSlug = c.req.param('courseSlug')
+  const body = await c.req.json<{ userId: string; formData: unknown }>()
+  const { userId, formData } = body
+
+  if (!userId || !formData) {
+    return c.json({ error: 'Missing required fields' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  // Upsert: insert if new, update if exists
+  const { error } = await supabase
+    .from('course_form_data')
+    .upsert(
+      {
+        user_id: userId,
+        course_slug: courseSlug,
+        form_data: formData,
+      },
+      { onConflict: 'user_id,course_slug' }
+    )
+
+  if (error) {
+    console.error('Failed to save course form data:', error)
+    return c.json({ error: 'Failed to save form data' }, 500)
+  }
+
+  console.log(`Saved form data for user ${userId}, course ${courseSlug}`)
+  return c.json({ success: true })
+})
+
+// POST handler for sendBeacon (page unload) - same logic as PUT
+app.post('/course-progress/:courseSlug', async (c) => {
+  const courseSlug = c.req.param('courseSlug')
+  const body = await c.req.json<{ userId: string; formData: unknown }>()
+  const { userId, formData } = body
+
+  if (!userId || !formData) {
+    return c.json({ error: 'Missing required fields' }, 400)
+  }
+
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_KEY)
+
+  const { error } = await supabase
+    .from('course_form_data')
+    .upsert(
+      {
+        user_id: userId,
+        course_slug: courseSlug,
+        form_data: formData,
+      },
+      { onConflict: 'user_id,course_slug' }
+    )
+
+  if (error) {
+    console.error('Failed to save course form data:', error)
+    return c.json({ error: 'Failed to save form data' }, 500)
+  }
+
+  return c.json({ success: true })
+})
+
 export default app
