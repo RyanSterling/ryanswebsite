@@ -105,14 +105,13 @@ export default function BreakthroughContentViewer() {
 
         const { formData: dbData } = await response.json()
 
-        if (dbData && !localData) {
-          // DB has data, localStorage empty - use DB data
+        if (dbData) {
+          // DB has data - it's the authoritative source, use it
           setFormData(dbData)
           localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(dbData))
           lastSavedRef.current = JSON.stringify(dbData)
         } else if (localData) {
-          // localStorage has data - prefer it (may have unsaved changes) and sync to DB
-          // This handles both: migration of existing users AND recovery of unsaved edits
+          // DB is empty but localStorage has data - migrate to DB (existing user)
           await saveToDatabase(localData, user.id)
         }
       } catch (error) {
