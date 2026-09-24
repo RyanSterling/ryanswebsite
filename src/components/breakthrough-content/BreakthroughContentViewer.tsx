@@ -24,6 +24,31 @@ const STORAGE_KEY = 'breakthrough-form-data'
 const API_URL = import.meta.env.VITE_API_URL || 'https://ryan-website-api.rsterling20.workers.dev'
 const DEBOUNCE_MS = 2500
 
+// Check if form data has any actual content (not just empty strings)
+function hasActualContent(data: BreakthroughFormData): boolean {
+  // Check lesson 1
+  if (data.lesson1.niche || data.lesson1.core_problem || data.lesson1.what_you_do || data.lesson1.what_you_teach) {
+    return true
+  }
+  // Check lesson 2
+  if (data.lesson2.audience_description || data.lesson2.desire_1.desire_text || data.lesson2.desire_2.desire_text || data.lesson2.desire_3.desire_text) {
+    return true
+  }
+  // Check lesson 3
+  if (data.lesson3.will_tell_1 || data.lesson3.wont_tell_1 || data.lesson3.cant_tell_1) {
+    return true
+  }
+  // Check lesson 4
+  if (data.lesson4.unaware_questions || data.lesson4.problem_aware_questions) {
+    return true
+  }
+  // Check lesson 5
+  if (data.lesson5.saturated_topics || data.lesson5.saturated_formats || data.lesson5.competitor_angles) {
+    return true
+  }
+  return false
+}
+
 export default function BreakthroughContentViewer() {
   const navigate = useNavigate()
   const { lessonId } = useParams<{ lessonId?: string }>()
@@ -105,15 +130,19 @@ export default function BreakthroughContentViewer() {
 
         const { formData: dbData } = await response.json()
 
-        if (dbData) {
-          // DB has data - it's the authoritative source, use it
+        const dbHasContent = dbData && hasActualContent(dbData)
+        const localHasContent = localData && hasActualContent(localData)
+
+        if (dbHasContent) {
+          // DB has real content - it's the authoritative source, use it
           setFormData(dbData)
           localStorage.setItem(`${STORAGE_KEY}-${user.id}`, JSON.stringify(dbData))
           lastSavedRef.current = JSON.stringify(dbData)
-        } else if (localData) {
-          // DB is empty but localStorage has data - migrate to DB (existing user)
+        } else if (localHasContent && localData) {
+          // DB is empty but localStorage has real content - migrate to DB (existing user)
           await saveToDatabase(localData, user.id)
         }
+        // If both are empty, do nothing - user starts fresh
       } catch (error) {
         console.error('Error fetching from database:', error)
       } finally {
