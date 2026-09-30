@@ -1,7 +1,10 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 
-const N8N_WEBHOOK_URL = 'https://n8n.srv1369832.hstgr.cloud/webhook/ccf6e619-d233-4159-8ea2-9d12acdf505c'
+const WEBHOOK_URLS: Record<string, string> = {
+  'mass-desire-topic-shifter-v3': 'https://n8n.srv1369832.hstgr.cloud/webhook/ccf6e619-d233-4159-8ea2-9d12acdf505c',
+  'brain-dump-to-script': 'https://n8n.srv1369832.hstgr.cloud/webhook/8428ffde-2aeb-4a54-b894-796d0041f118',
+}
 
 export default function PromptOptIn() {
   const { slug } = useParams<{ slug: string }>()
@@ -38,7 +41,14 @@ export default function PromptOptIn() {
     setError(false)
 
     try {
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      const webhookUrl = slug ? WEBHOOK_URLS[slug] : undefined
+      if (!webhookUrl) {
+        setError(true)
+        setSubmitting(false)
+        return
+      }
+
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
