@@ -14,6 +14,7 @@ export interface Course {
   price_cents: number
   stripe_price_id: string | null
   thumbnail_url: string | null
+  template_url: string | null
   published: boolean
   created_at: string
 }

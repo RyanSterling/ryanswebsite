@@ -38,8 +38,26 @@ export default function CourseViewer() {
 
       setCourse(courseData)
 
-      // Free course - all authenticated users have access
-      setHasAccess(true)
+      // Check if course is free (price_cents === 0 or null) or user has purchased
+      if (!courseData.price_cents || courseData.price_cents === 0) {
+        setHasAccess(true)
+      } else {
+        // Paid course - check for purchase
+        const { data: purchaseData } = await supabase
+          .from('purchases')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('course_id', courseData.id)
+          .limit(1)
+
+        if (purchaseData && purchaseData.length > 0) {
+          setHasAccess(true)
+        } else {
+          // No purchase found, redirect to sales page or checkout
+          navigate(`/courses/${slug}`)
+          return
+        }
+      }
 
       // Fetch lessons
       const { data: lessonData } = await supabase
@@ -218,6 +236,24 @@ export default function CourseViewer() {
                   />
                 )}
               </div>
+
+              {/* Template Download */}
+              {course.template_url && (
+                <div className="bg-brand-card rounded-xl p-6 mb-6">
+                  <h3 className="text-white font-medium mb-3">Resources</h3>
+                  <a
+                    href={course.template_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-brand-orange hover:opacity-80 transition-opacity"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Get the Notion Template
+                  </a>
+                </div>
+              )}
 
               {/* Lesson Description */}
               {currentLesson.description && (
