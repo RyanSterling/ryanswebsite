@@ -81,6 +81,7 @@ export default function Checkout() {
           price_cents: course.price_cents,
           course_title: course.title,
           origin_url: window.location.origin,
+          stripe_price_id: course.stripe_price_id,
         }),
       })
 

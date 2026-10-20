@@ -2255,6 +2255,7 @@ interface CheckoutRequest {
   price_cents: number
   course_title: string
   origin_url: string
+  stripe_price_id?: string  // If provided, use this instead of price_data
 }
 
 // Create Stripe Checkout Session
@@ -2269,10 +2270,11 @@ app.post('/create-checkout-session', async (c) => {
   const baseUrl = data.origin_url || 'https://ryansterling.com'
 
   try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
+    // Use stripe_price_id if available (enables full promo code support),
+    // otherwise fall back to inline price_data
+    const lineItem = data.stripe_price_id
+      ? { price: data.stripe_price_id, quantity: 1 }
+      : {
           price_data: {
             currency: 'usd',
             product_data: {
@@ -2281,8 +2283,11 @@ app.post('/create-checkout-session', async (c) => {
             unit_amount: data.price_cents,
           },
           quantity: 1,
-        },
-      ],
+        }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [lineItem],
       mode: 'payment',
       allow_promotion_codes: true,
       success_url: `${baseUrl}/dashboard?purchased=${data.course_slug}`,
