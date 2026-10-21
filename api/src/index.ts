@@ -2290,8 +2290,8 @@ app.post('/create-checkout-session', async (c) => {
       line_items: [lineItem],
       mode: 'payment',
       allow_promotion_codes: true,
-      success_url: `${baseUrl}/dashboard?purchased=${data.course_slug}`,
-      cancel_url: `${baseUrl}/courses/${data.course_slug}`,
+      success_url: `${baseUrl}/courses/${data.course_slug}/learn`,
+      cancel_url: `${baseUrl}/${data.course_slug}`,
       customer_email: data.user_email,
       metadata: {
         user_id: data.user_id,
@@ -2303,7 +2303,8 @@ app.post('/create-checkout-session', async (c) => {
     return c.json({ url: session.url })
   } catch (error) {
     console.error('Stripe checkout error:', error)
-    return c.json({ error: 'Failed to create checkout session' }, 500)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return c.json({ error: `Failed to create checkout session: ${errorMessage}` }, 500)
   }
 })
 

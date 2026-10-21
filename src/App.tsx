@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import Home from './pages/Home'
 import Challenge from './pages/Challenge'
@@ -68,6 +68,8 @@ function App() {
       <Route path="/breakthrough" element={<BreakthroughSalesPage />} />
       <Route path="/the-content-fix" element={<BreakthroughSalesPage />} />
       <Route path="/content-compass" element={<ContentCompassSalesPage />} />
+      {/* Redirect /courses/content-compass to sales page */}
+      <Route path="/courses/content-compass" element={<Navigate to="/content-compass" replace />} />
       <Route path="/courses/:slug" element={<CourseLanding />} />
 
       {/* Courses - Protected */}

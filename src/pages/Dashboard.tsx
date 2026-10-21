@@ -12,7 +12,15 @@ export default function Dashboard() {
     async function fetchCourses() {
       if (!user) return
 
-      // Fetch all published courses (free access for authenticated users)
+      // Fetch user's purchased courses
+      const { data: purchases } = await supabase
+        .from('purchases')
+        .select('course_id')
+        .eq('user_id', user.id)
+
+      const purchasedCourseIds = purchases?.map(p => p.course_id) || []
+
+      // Fetch courses: either purchased OR free (price_cents = 0 or null)
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*')
@@ -25,7 +33,14 @@ export default function Dashboard() {
         return
       }
 
-      setCourses(coursesData || [])
+      // Filter to only show courses user has access to
+      const accessibleCourses = (coursesData || []).filter(course =>
+        purchasedCourseIds.includes(course.id) ||
+        !course.price_cents ||
+        course.price_cents === 0
+      )
+
+      setCourses(accessibleCourses)
       setLoading(false)
     }
 
