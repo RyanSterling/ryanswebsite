@@ -1,23 +1,9 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-
-// Preview mode: add ?preview=compass to URL to access before launch
-const PREVIEW_KEY = 'compass'
 
 export default function ContentCompassSalesPage() {
   const navigate = useNavigate()
   const { isSignedIn } = useAuth()
-  const [searchParams] = useSearchParams()
-
-  // Check for preview access - remove this check when ready to launch
-  const isPreview = searchParams.get('preview') === PREVIEW_KEY
-  if (!isPreview) {
-    return (
-      <main className="min-h-screen bg-brand-dark flex items-center justify-center">
-        <div className="text-white text-xl">Coming Soon</div>
-      </main>
-    )
-  }
 
   const handleGetAccess = () => {
     const checkoutUrl = '/checkout/content-compass'
