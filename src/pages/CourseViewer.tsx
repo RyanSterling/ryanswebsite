@@ -53,8 +53,8 @@ export default function CourseViewer() {
         if (purchaseData && purchaseData.length > 0) {
           setHasAccess(true)
         } else {
-          // No purchase found, redirect to sales page or checkout
-          navigate(`/courses/${slug}`)
+          // No purchase found, redirect to sales page
+          navigate(`/${slug}`)
           return
         }
       }

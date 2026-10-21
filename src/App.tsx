@@ -68,8 +68,6 @@ function App() {
       <Route path="/breakthrough" element={<BreakthroughSalesPage />} />
       <Route path="/the-content-fix" element={<BreakthroughSalesPage />} />
       <Route path="/content-compass" element={<ContentCompassSalesPage />} />
-      {/* Redirect /courses/content-compass to sales page */}
-      <Route path="/courses/content-compass" element={<Navigate to="/content-compass" replace />} />
       <Route path="/courses/:slug" element={<CourseLanding />} />
 
       {/* Courses - Protected */}
