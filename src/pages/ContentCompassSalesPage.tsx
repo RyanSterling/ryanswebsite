@@ -44,7 +44,7 @@ export default function ContentCompassSalesPage() {
             Your AI-Powered Junior Content Strategist Inside Notion
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Brain dump your content ideas to AI, and let it document, organize, and prepare them for scripting — all inside a Notion template that works for you.
+            Brain dump your content ideas to AI. It documents them, finds better angles for wider reach, and organizes everything for scripting — all inside a Notion template that works for you.
           </p>
         </div>
 
