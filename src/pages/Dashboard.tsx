@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom'
 import { useUser, UserButton } from '@clerk/react'
 import { supabase, Course } from '../lib/supabase'
 
+interface CourseWithAccess extends Course {
+  hasAccess: boolean
+}
+
 export default function Dashboard() {
   const { user } = useUser()
-  const [courses, setCourses] = useState<Course[]>([])
+  const [courses, setCourses] = useState<CourseWithAccess[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -20,7 +24,7 @@ export default function Dashboard() {
 
       const purchasedCourseIds = purchases?.map(p => p.course_id) || []
 
-      // Fetch courses: either purchased OR free (price_cents = 0 or null)
+      // Fetch ALL published courses
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*')
@@ -33,14 +37,15 @@ export default function Dashboard() {
         return
       }
 
-      // Filter to only show courses user has access to
-      const accessibleCourses = (coursesData || []).filter(course =>
-        purchasedCourseIds.includes(course.id) ||
-        !course.price_cents ||
-        course.price_cents === 0
-      )
+      // Add hasAccess flag to each course
+      const coursesWithAccess = (coursesData || []).map(course => ({
+        ...course,
+        hasAccess: purchasedCourseIds.includes(course.id) ||
+          !course.price_cents ||
+          course.price_cents === 0
+      }))
 
-      setCourses(accessibleCourses)
+      setCourses(coursesWithAccess)
       setLoading(false)
     }
 
@@ -88,7 +93,7 @@ export default function Dashboard() {
             {courses.map((course) => (
               <Link
                 key={course.id}
-                to={`/courses/${course.slug}/learn`}
+                to={course.hasAccess ? `/courses/${course.slug}/learn` : `/${course.slug}`}
                 className="bg-brand-card rounded-xl overflow-hidden hover:ring-2 hover:ring-brand-orange transition-all group"
               >
                 {course.thumbnail_url ? (
@@ -99,7 +104,9 @@ export default function Dashboard() {
                       className="w-full h-48 object-cover"
                     />
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white font-medium">Start</span>
+                      <span className="text-white font-medium">
+                        {course.hasAccess ? 'Continue' : 'Learn More'}
+                      </span>
                     </div>
                   </div>
                 ) : (
@@ -108,9 +115,20 @@ export default function Dashboard() {
                   </div>
                 )}
                 <div className="p-6">
-                  <h2 className="font-soehne text-xl text-white mb-2">
-                    {course.title}
-                  </h2>
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="font-soehne text-xl text-white">
+                      {course.title}
+                    </h2>
+                    {course.hasAccess ? (
+                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                        Owned
+                      </span>
+                    ) : (
+                      <span className="text-xs bg-brand-orange/20 text-brand-orange px-2 py-1 rounded">
+                        ${(course.price_cents / 100).toFixed(0)}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-gray-500 text-sm">
                     {course.description}
                   </p>
