@@ -119,11 +119,7 @@ export default function Dashboard() {
                     <h2 className="font-soehne text-xl text-white">
                       {course.title}
                     </h2>
-                    {course.hasAccess ? (
-                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
-                        Owned
-                      </span>
-                    ) : (
+                    {!course.hasAccess && course.price_cents > 0 && (
                       <span className="text-xs bg-brand-orange/20 text-brand-orange px-2 py-1 rounded">
                         ${(course.price_cents / 100).toFixed(0)}
                       </span>
