@@ -2290,7 +2290,7 @@ app.post('/create-checkout-session', async (c) => {
       line_items: [lineItem],
       mode: 'payment',
       allow_promotion_codes: true,
-      success_url: `${baseUrl}/courses/${data.course_slug}/learn`,
+      success_url: `${baseUrl}/courses/${data.course_slug}/learn?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/${data.course_slug}`,
       customer_email: data.user_email,
       metadata: {
@@ -2398,6 +2398,58 @@ app.post('/webhooks/stripe', async (c) => {
   }
 
   return c.json({ received: true })
+})
+
+// Verify purchase from session_id (backup for webhook)
+app.post('/verify-purchase', async (c) => {
+  const { session_id } = await c.req.json()
+
+  if (!session_id) {
+    return c.json({ error: 'Missing session_id' }, 400)
+  }
+
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20',
+  })
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id)
+
+    if (session.payment_status !== 'paid' && session.status !== 'complete') {
+      return c.json({ error: 'Payment not completed' }, 400)
+    }
+
+    const userId = session.metadata?.user_id
+    const courseId = session.metadata?.course_id
+
+    if (!userId || !courseId) {
+      return c.json({ error: 'Missing metadata' }, 400)
+    }
+
+    const supabase = createClient(
+      c.env.SUPABASE_URL,
+      c.env.SUPABASE_SERVICE_KEY
+    )
+
+    // Insert purchase (ignore if already exists)
+    const { error: insertError } = await supabase
+      .from('purchases')
+      .insert({
+        user_id: userId,
+        course_id: courseId,
+        stripe_payment_id: session.payment_intent as string || session.id,
+      })
+
+    if (insertError && insertError.code !== '23505') {
+      console.error('Failed to insert purchase:', insertError)
+      return c.json({ error: 'Failed to record purchase' }, 500)
+    }
+
+    return c.json({ success: true, userId, courseId })
+  } catch (error) {
+    console.error('Verify purchase error:', error)
+    return c.json({ error: 'Failed to verify session' }, 500)
+  }
 })
 
 // ============================================

@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useUser } from '@clerk/react'
 import { supabase, Course, Lesson } from '../lib/supabase'
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://ryan-website-api.rsterling20.workers.dev'
 
 export default function CourseViewer() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { user, isLoaded } = useUser()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [course, setCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
@@ -21,6 +24,25 @@ export default function CourseViewer() {
       if (!user) {
         navigate(`/courses/${slug}`)
         return
+      }
+
+      // Check for session_id from Stripe redirect - verify purchase first
+      const sessionId = searchParams.get('session_id')
+      if (sessionId) {
+        try {
+          const response = await fetch(`${API_URL}/verify-purchase`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId }),
+          })
+          if (response.ok) {
+            console.log('Purchase verified successfully')
+          }
+        } catch (err) {
+          console.error('Failed to verify purchase:', err)
+        }
+        // Remove session_id from URL
+        setSearchParams({})
       }
 
       // Fetch course
@@ -78,7 +100,7 @@ export default function CourseViewer() {
     }
 
     fetchCourseAndCheckAccess()
-  }, [slug, user, isLoaded, navigate])
+  }, [slug, user, isLoaded, navigate, searchParams, setSearchParams])
 
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return ''
