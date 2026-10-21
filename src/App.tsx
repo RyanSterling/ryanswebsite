@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import Home from './pages/Home'
 import Challenge from './pages/Challenge'
