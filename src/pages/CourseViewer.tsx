@@ -17,6 +17,15 @@ export default function CourseViewer() {
   const [loading, setLoading] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
+
+  // Per-lesson resources (keyed by lesson title for now)
+  const lessonResources: Record<string, { name: string; url: string }[]> = {
+    'Muse Grok Bot Setup': [
+      { name: 'Muse.ai', url: 'https://muse.ai/' },
+      { name: 'Grok Bot (X.ai)', url: 'https://x.ai/bot' },
+    ],
+  }
 
   useEffect(() => {
     async function fetchCourseAndCheckAccess() {
@@ -91,9 +100,10 @@ export default function CourseViewer() {
       const lessonsArray = lessonData || []
       setLessons(lessonsArray)
 
-      // Set first lesson as current
-      if (lessonsArray.length > 0) {
+      // Only set first lesson as current on initial load
+      if (lessonsArray.length > 0 && !initialLoadDone) {
         setCurrentLesson(lessonsArray[0])
+        setInitialLoadDone(true)
       }
 
       setLoading(false)
@@ -259,21 +269,39 @@ export default function CourseViewer() {
                 )}
               </div>
 
-              {/* Template Download */}
-              {course.template_url && (
+              {/* Resources */}
+              {(course.template_url || (currentLesson && lessonResources[currentLesson.title])) && (
                 <div className="bg-brand-card rounded-xl p-6 mb-6">
                   <h3 className="text-white font-medium mb-3">Resources</h3>
-                  <a
-                    href={course.template_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-brand-orange hover:opacity-80 transition-opacity"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Get the Notion Template
-                  </a>
+                  <div className="space-y-2">
+                    {course.template_url && (
+                      <a
+                        href={course.template_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-brand-orange hover:opacity-80 transition-opacity"
+                      >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Get the Notion Template
+                      </a>
+                    )}
+                    {currentLesson && lessonResources[currentLesson.title]?.map((resource, idx) => (
+                      <a
+                        key={idx}
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-brand-orange hover:opacity-80 transition-opacity"
+                      >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {resource.name}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
 
