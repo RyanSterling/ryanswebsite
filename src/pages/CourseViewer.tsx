@@ -21,7 +21,7 @@ export default function CourseViewer() {
 
   // Per-lesson resources (keyed by lesson title for now)
   const lessonResources: Record<string, { name: string; url: string }[]> = {
-    'Muse Grok Bot Setup': [
+    'Muse/GrokBot Setup': [
       { name: 'Muse.ai', url: 'https://muse.ai/' },
       { name: 'Grok Bot (X.ai)', url: 'https://x.ai/bot' },
     ],
