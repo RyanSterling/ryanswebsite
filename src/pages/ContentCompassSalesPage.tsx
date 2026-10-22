@@ -40,6 +40,11 @@ export default function ContentCompassSalesPage() {
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-6 pt-8 pb-12">
         <div className="text-center mb-10">
+          <img
+            src="/assets/content compass hero image.png"
+            alt="The Content Compass"
+            className="w-full max-w-2xl mx-auto mb-8 rounded-xl"
+          />
           <h1 className="font-soehne font-bold text-3xl md:text-5xl text-gray-900 mb-6 leading-tight">
             Your AI-Powered Junior Content Strategist Inside Notion
           </h1>
