@@ -82,6 +82,58 @@ export default function ContentCompassSalesPage() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section className="max-w-3xl mx-auto px-6 py-12">
+        <h2 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-2">
+          How it works
+        </h2>
+        <p className="text-gray-600 mb-8">
+          Four simple steps to never lose a content idea again.
+        </p>
+
+        <div className="space-y-6">
+          <div className="flex gap-4 items-start">
+            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
+              1
+            </div>
+            <div>
+              <p className="text-gray-900 font-medium">Connect Notion to your AI</p>
+              <p className="text-gray-600 text-sm">One-time setup. Link your Notion workspace to your AI assistant so everything syncs automatically.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 items-start">
+            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
+              2
+            </div>
+            <div>
+              <p className="text-gray-900 font-medium">Load your AI with the included prompts</p>
+              <p className="text-gray-600 text-sm">Copy-paste ready. No prompt engineering required — just use the ones that come with the template.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 items-start">
+            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
+              3
+            </div>
+            <div>
+              <p className="text-gray-900 font-medium">Teach your AI who you create for</p>
+              <p className="text-gray-600 text-sm">Complete your audience profile so the AI understands your niche, your voice, and exactly who you're trying to reach.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 items-start">
+            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
+              4
+            </div>
+            <div>
+              <p className="text-gray-900 font-medium">Voice your ideas, get better angles back</p>
+              <p className="text-gray-600 text-sm">Speak your raw thoughts. Your AI documents them, finds angles that reach more people, and saves everything to Notion — ready for you to script.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* What's Included */}
       <section className="max-w-3xl mx-auto px-6 py-12">
         <h2 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-2">
