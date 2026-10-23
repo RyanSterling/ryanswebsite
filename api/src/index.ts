@@ -2371,28 +2371,31 @@ app.post('/webhooks/stripe', async (c) => {
 
     console.log('Purchase recorded:', { userId, courseId, paymentId })
 
-    // Tag user in ConvertKit for email sequence (V3 API)
+    // Send to n8n webhook for ConvertKit tagging
     const customerEmail = session.customer_email
-    if (customerEmail && c.env.CONVERTKIT_API_SECRET && c.env.CONVERTKIT_COURSE_TAG_ID) {
+    const courseSlug = session.metadata?.course_slug
+    if (customerEmail) {
       try {
-        const ckResponse = await fetch(
-          `https://api.convertkit.com/v3/tags/${c.env.CONVERTKIT_COURSE_TAG_ID}/subscribe`,
+        const n8nResponse = await fetch(
+          'https://n8n.srv1369832.hstgr.cloud/webhook/0f8763c3-7d30-4073-b047-215082f979dd',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              api_secret: c.env.CONVERTKIT_API_SECRET,
               email: customerEmail,
+              course_id: courseId,
+              course_slug: courseSlug,
+              user_id: userId,
             }),
           }
         )
-        if (ckResponse.ok) {
-          console.log('Tagged user in ConvertKit:', customerEmail)
+        if (n8nResponse.ok) {
+          console.log('Sent purchase to n8n webhook:', customerEmail)
         } else {
-          console.error('ConvertKit tagging failed:', await ckResponse.text())
+          console.error('n8n webhook failed:', await n8nResponse.text())
         }
-      } catch (ckError) {
-        console.error('ConvertKit API error:', ckError)
+      } catch (n8nError) {
+        console.error('n8n webhook error:', n8nError)
       }
     }
   }
@@ -2443,6 +2446,32 @@ app.post('/verify-purchase', async (c) => {
     if (insertError && insertError.code !== '23505') {
       console.error('Failed to insert purchase:', insertError)
       return c.json({ error: 'Failed to record purchase' }, 500)
+    }
+
+    // Send to n8n webhook for ConvertKit tagging (only if new purchase)
+    if (!insertError) {
+      const customerEmail = session.customer_email
+      const courseSlug = session.metadata?.course_slug
+      if (customerEmail) {
+        try {
+          await fetch(
+            'https://n8n.srv1369832.hstgr.cloud/webhook/0f8763c3-7d30-4073-b047-215082f979dd',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: customerEmail,
+                course_id: courseId,
+                course_slug: courseSlug,
+                user_id: userId,
+              }),
+            }
+          )
+          console.log('Sent purchase to n8n webhook:', customerEmail)
+        } catch (n8nError) {
+          console.error('n8n webhook error:', n8nError)
+        }
+      }
     }
 
     return c.json({ success: true, userId, courseId })

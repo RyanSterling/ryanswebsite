@@ -41,7 +41,7 @@ export default function ContentCompassSalesPage() {
       <section className="max-w-3xl mx-auto px-6 pt-8 pb-12">
         <div className="text-center mb-10">
           <img
-            src="/assets/content compass hero image.png"
+            src="/assets/content-compass-hero.png"
             alt="The Content Compass"
             className="w-full max-w-2xl mx-auto mb-8 rounded-xl"
           />
