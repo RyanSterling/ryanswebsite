@@ -135,7 +135,7 @@ export default function ContentCompassSalesPage() {
             disabled={isProcessing}
             className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {isProcessing ? 'Processing...' : 'Get Access Now'}
+            Get Access Now
           </button>
         </div>
       </section>
