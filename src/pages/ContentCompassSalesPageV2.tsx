@@ -90,9 +90,9 @@ export default function ContentCompassSalesPageV2() {
   }
 
   return (
-    <main className="snap-y snap-mandatory h-screen overflow-y-scroll" style={{ backgroundColor: '#EBEBF1' }}>
+    <main style={{ backgroundColor: '#EBEBF1' }}>
       {/* Hero Section */}
-      <section className="snap-start min-h-screen flex flex-col items-center justify-center px-6 py-12">
+      <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,7 +162,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* Step 1 */}
-      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -178,10 +178,10 @@ export default function ContentCompassSalesPageV2() {
                 src="/assets/content-compass-steps/step-1/voice dictation.svg"
                 alt="Voice dictation"
                 className="w-full max-w-sm mx-auto mb-6"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.5 }}
+                transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
               />
 
               {/* AI Icons */}
@@ -197,10 +197,10 @@ export default function ContentCompassSalesPageV2() {
                     src={`/assets/content-compass-steps/step-1/${icon.src}`}
                     alt="AI assistant"
                     className="w-16 h-16"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0, rotate: -10 }}
+                    whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: icon.delay, duration: 0.4 }}
+                    transition={{ delay: icon.delay, duration: 0.5, type: "spring", stiffness: 200 }}
                   />
                 ))}
               </div>
@@ -216,7 +216,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* Step 2 */}
-      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -229,10 +229,10 @@ export default function ContentCompassSalesPageV2() {
             {/* ChatGPT Interface */}
             <motion.div
               className="mb-8"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
             >
               <img
                 src="/assets/content-compass-steps/step-2/ChatGPT5 - Rich Layout.svg"
@@ -251,7 +251,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* Step 3 */}
-      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -319,7 +319,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* The Problem */}
-      <section className="snap-start min-h-screen flex items-center justify-center">
+      <section className="min-h-screen flex items-center justify-center">
         <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -345,7 +345,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* What's Included */}
-      <section className="snap-start min-h-screen flex items-center justify-center">
+      <section className="min-h-screen flex items-center justify-center">
         <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -392,7 +392,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* Final CTA */}
-      <section className="snap-start min-h-screen flex items-center justify-center">
+      <section className="min-h-screen flex items-center justify-center">
         <div className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

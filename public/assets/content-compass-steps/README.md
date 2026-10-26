@@ -18,12 +18,18 @@ Export your Figma assets as individual SVGs to animate them independently.
 
 ## Step 3 - Saves to Notion
 `/step-3/`
-- `notion-board.svg` - The Notion kanban board background
-- `column-idea.svg` - "Idea" column with card
-- `column-scripted.svg` - "Scripted" column
-- `column-filmed.svg` - "Filmed" column
-- `column-posted.svg` - "Posted" column
-- `notion-icon.svg` - The Notion logo badge
+
+**RECOMMENDED:** Export as ONE SVG with named nested elements:
+- Root SVG: `notion-board-complete.svg`
+- Nested groups with IDs: `#idea-column`, `#scripted-column`, `#filmed-column`, `#posted-column`, `#notion-logo`
+- This allows individual animation of each column/element via CSS or Framer Motion
+
+**Current (individual files):**
+- `idea.svg` - "Idea" column with card
+- `scripted.svg` - "Scripted" column
+- `filmed.svg` - "Filmed" column
+- `posted.svg` - "Posted" column
+- `notion.svg` - The Notion logo badge
 
 ## Animation Strategy
 
