@@ -274,7 +274,7 @@ export default function ContentCompassSalesPage() {
       <section className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
         <div className="mb-4">
           <span className="text-gray-400 line-through text-lg">$97</span>
-          <span className="text-gray-900 font-soehne text-3xl ml-3">$47</span>
+          <span className="text-gray-900 font-soehne text-3xl ml-3">$27</span>
           <span className="text-brand-orange ml-2 text-sm font-medium">Launch Price</span>
         </div>
         <button
