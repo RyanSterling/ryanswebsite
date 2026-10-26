@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, useUser } from '@clerk/react'
+import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://your-api.workers.dev'
@@ -89,45 +90,45 @@ export default function ContentCompassSalesPageV2() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Lockup */}
-      <section className="max-w-4xl mx-auto px-6 pt-12 md:pt-16 pb-8">
-        <div className="flex flex-col items-center">
-          <div className="relative mb-4">
-            <h2 className="font-soehne font-bold text-xl sm:text-3xl md:text-5xl text-gray-900 whitespace-nowrap relative z-10">
+    <main className="bg-white">
+      {/* Hero Section */}
+      <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <div className="mb-8">
+            <h2 className="font-soehne font-bold text-2xl md:text-4xl text-gray-900 mb-4">
               The Content Compass
             </h2>
+            <div className="flex items-center justify-center gap-2 text-gray-500">
+              <span>by</span>
+              <img
+                src="/ryan-avatar.png"
+                alt="Ryan Sterling"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="text-gray-900 font-medium">Ryan Sterling</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-500">
-            <span>by</span>
-            <img
-              src="/ryan-avatar.png"
-              alt="Ryan Sterling"
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span className="text-gray-900 font-medium">Ryan Sterling</span>
-          </div>
-        </div>
-      </section>
 
-      {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-8 pb-12">
-        <div className="text-center mb-10">
           <img
             src="/assets/content-compass-hero.png"
             alt="The Content Compass"
             className="w-full max-w-2xl mx-auto mb-8 rounded-xl"
           />
+
           <h1 className="font-soehne font-bold text-3xl md:text-5xl text-gray-900 mb-6 leading-tight">
             Your AI-Powered Junior Content Strategist Inside Notion
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
             Voice dictate your content ideas to AI. It documents them, finds better angles for wider reach, and organizes everything for scripting — all inside a Notion template that works for you.
           </p>
-        </div>
 
-        {/* CTA */}
-        <div className="text-center">
+          {/* CTA */}
           <div className="mb-4">
             <span className="text-gray-400 line-through text-lg">$97</span>
             <span className="text-gray-900 font-soehne text-3xl ml-3">$27</span>
@@ -140,12 +141,195 @@ export default function ContentCompassSalesPageV2() {
           >
             Get Access Now
           </button>
-        </div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="mt-16"
+          >
+            <p className="text-gray-400 text-sm mb-2">Scroll to see how it works</p>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="text-gray-400"
+            >
+              ↓
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
+
+      {/* How It Works - Scroll Snap Sections */}
+      <div className="snap-y snap-mandatory md:h-auto">
+        {/* Step 1 */}
+        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white to-gray-50">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-md mx-auto text-center"
+          >
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 1</p>
+
+            {/* Voice Dictation Visual */}
+            <div className="mb-8 relative">
+              <motion.img
+                src="/assets/content-compass-steps/step-1/voice dictation.svg"
+                alt="Voice dictation"
+                className="w-full max-w-sm mx-auto mb-6"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              />
+
+              {/* AI Icons */}
+              <div className="flex justify-center gap-3 flex-wrap">
+                {[
+                  { src: 'muse.svg', delay: 0.3 },
+                  { src: 'claude.svg', delay: 0.4 },
+                  { src: 'grokbot.svg', delay: 0.5 },
+                  { src: 'chatGPT.svg', delay: 0.6 },
+                ].map((icon, i) => (
+                  <motion.img
+                    key={i}
+                    src={`/assets/content-compass-steps/step-1/${icon.src}`}
+                    alt="AI assistant"
+                    className="w-16 h-16"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: icon.delay, duration: 0.4 }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
+              Voice Dictate Your Raw Content Idea Into AI
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Document content ideas on the go with your voice so there is enough context to come back later and flesh them out.
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Step 2 */}
+        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-gray-50 to-white">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-md mx-auto text-center"
+          >
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 2</p>
+
+            {/* ChatGPT Interface */}
+            <motion.div
+              className="mb-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <img
+                src="/assets/content-compass-steps/step-2/ChatGPT5 - Rich Layout.svg"
+                alt="AI suggesting angles"
+                className="w-full max-w-sm mx-auto rounded-xl shadow-lg"
+              />
+            </motion.div>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
+              AI Suggests Angles For Wider Reach
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              We give AI context about your audience and what they care about via the audience profile inside Notion, so it can suggest angles that will get more views.
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Step 3 */}
+        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white to-gray-50">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-md mx-auto text-center"
+          >
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 3</p>
+
+            {/* Notion Board */}
+            <div className="mb-8 relative">
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
+                {/* Columns staggered animation */}
+                <div className="flex gap-2 justify-center mb-4">
+                  {[
+                    { src: 'idea.svg', delay: 0.3 },
+                    { src: 'scripted.svg', delay: 0.4 },
+                    { src: 'filmed.svg', delay: 0.5 },
+                    { src: 'posted.svg', delay: 0.6 },
+                  ].map((column, i) => (
+                    <motion.img
+                      key={i}
+                      src={`/assets/content-compass-steps/step-3/${column.src}`}
+                      alt="Notion column"
+                      className="w-1/4"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: column.delay, duration: 0.4 }}
+                    />
+                  ))}
+                </div>
+
+                {/* Notion logo */}
+                <motion.img
+                  src="/assets/content-compass-steps/step-3/notion.svg"
+                  alt="Notion"
+                  className="w-12 h-12 mx-auto"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.7, duration: 0.3 }}
+                />
+              </motion.div>
+            </div>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
+              Everything Saves To Notion Automatically
+            </h3>
+            <p className="text-gray-600 leading-relaxed mb-8">
+              Your idea with AI suggestions is saved to the content planner in the Notion Template provided, without you even opening Notion.
+            </p>
+
+            {/* Closing benefit */}
+            <p className="text-sm text-gray-500 italic">
+              Repeat anytime inspiration hits. Your Notion workspace becomes an endless library of ready-to-script ideas.
+            </p>
+          </motion.div>
+        </section>
+      </div>
 
       {/* The Problem */}
       <section className="max-w-3xl mx-auto px-6 py-12">
-        <div className="bg-gray-50 rounded-2xl p-8 md:p-10 border border-gray-100">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6 }}
+          className="bg-gray-50 rounded-2xl p-8 md:p-10 border border-gray-100"
+        >
           <h2 className="font-soehne font-bold text-2xl text-gray-900 mb-6">
             Stop losing your best content ideas.
           </h2>
@@ -158,136 +342,76 @@ export default function ContentCompassSalesPageV2() {
           <p className="text-gray-700 text-lg leading-relaxed">
             That's exactly what this Notion template does.
           </p>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="max-w-3xl mx-auto px-6 py-12">
-        <h2 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-2">
-          How it works
-        </h2>
-        <p className="text-gray-600 mb-8">
-          Four simple steps to never lose a content idea again.
-        </p>
-
-        <div className="space-y-6">
-          <div className="flex gap-4 items-start">
-            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
-              1
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Connect Notion to your AI</p>
-              <p className="text-gray-600 text-sm">One-time setup. Link your Notion workspace to your AI assistant so everything syncs automatically.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
-              2
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Load your AI with the included prompts</p>
-              <p className="text-gray-600 text-sm">Copy-paste ready. No prompt engineering required — just use the ones that come with the template.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
-              3
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Teach your AI who you create for</p>
-              <p className="text-gray-600 text-sm">Complete your audience profile so the AI understands your niche, your voice, and exactly who you're trying to reach.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center flex-shrink-0 font-medium">
-              4
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Voice your ideas, get better angles back</p>
-              <p className="text-gray-600 text-sm">Speak your raw thoughts. Your AI documents them, finds angles that reach more people, and saves everything to Notion — ready for you to script.</p>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* What's Included */}
       <section className="max-w-3xl mx-auto px-6 py-12">
-        <h2 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-2">
-          What's included
-        </h2>
-        <p className="text-gray-600 mb-8">
-          A complete system for capturing, developing, and organizing your content ideas.
-        </p>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-2">
+            What's included
+          </h2>
+          <p className="text-gray-600 mb-8">
+            A complete system for capturing, developing, and organizing your content ideas.
+          </p>
 
-        <div className="space-y-4">
-          <div className="flex gap-4 items-start">
-            <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Notion Template</p>
-              <p className="text-gray-500 text-sm">Duplicate and use immediately. No setup required.</p>
-            </div>
+          <div className="space-y-4">
+            {[
+              { title: 'Notion Template', desc: 'Duplicate and use immediately. No setup required.' },
+              { title: 'AI Brain Dump Integration', desc: 'Voice or text your ideas to AI that knows your style.' },
+              { title: 'Auto-Documentation', desc: 'Ideas are organized and documented for you automatically.' },
+              { title: 'Video Walkthroughs', desc: 'Step-by-step videos showing you exactly how to use the system.' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="flex gap-4 items-start"
+              >
+                <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0 mt-1">
+                  <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-gray-900 font-medium">{item.title}</p>
+                  <p className="text-gray-500 text-sm">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">AI Brain Dump Integration</p>
-              <p className="text-gray-500 text-sm">Voice or text your ideas to AI that knows your style.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Auto-Documentation</p>
-              <p className="text-gray-500 text-sm">Ideas are organized and documented for you automatically.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-start">
-            <div className="w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-900 font-medium">Video Walkthroughs</p>
-              <p className="text-gray-500 text-sm">Step-by-step videos showing you exactly how to use the system.</p>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* CTA */}
+      {/* Final CTA */}
       <section className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
-        <div className="mb-4">
-          <span className="text-gray-400 line-through text-lg">$97</span>
-          <span className="text-gray-900 font-soehne text-3xl ml-3">$27</span>
-          <span className="text-brand-orange ml-2 text-sm font-medium">Launch Price</span>
-        </div>
-        <button
-          onClick={handleGetAccess}
-          disabled={isProcessing}
-          className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          {isProcessing ? 'Processing...' : 'Get Access Now'}
-        </button>
-        <p className="text-gray-500 text-sm mt-4">Instant access after purchase</p>
+          <div className="mb-4">
+            <span className="text-gray-400 line-through text-lg">$97</span>
+            <span className="text-gray-900 font-soehne text-3xl ml-3">$27</span>
+            <span className="text-brand-orange ml-2 text-sm font-medium">Launch Price</span>
+          </div>
+          <button
+            onClick={handleGetAccess}
+            disabled={isProcessing}
+            className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            Get Access Now
+          </button>
+          <p className="text-gray-500 text-sm mt-4">Instant access after purchase</p>
+        </motion.div>
       </section>
     </main>
   )
