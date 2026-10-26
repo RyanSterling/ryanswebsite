@@ -187,12 +187,6 @@ export default function ContentCompassSalesPageV2() {
             transition={{ duration: 0.6 }}
             className="max-w-md mx-auto text-center"
           >
-            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 1</p>
-
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
-              Voice Dictate Your Raw Content Idea Into AI
-            </h3>
-
             {/* Voice Dictation Visual */}
             <div className="mb-8 relative">
               <motion.div
@@ -270,6 +264,12 @@ export default function ContentCompassSalesPageV2() {
               </div>
             </div>
 
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 1</p>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              Voice Dictate Your Raw Content Idea Into AI
+            </h3>
+
             <p className="text-gray-600 leading-relaxed">
               Document content ideas on the go with your voice so there is enough context to come back later and flesh them out.
             </p>
@@ -285,12 +285,6 @@ export default function ContentCompassSalesPageV2() {
             transition={{ duration: 0.6 }}
             className="max-w-md mx-auto text-center"
           >
-            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 2</p>
-
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
-              AI Suggests Angles For Wider Reach
-            </h3>
-
             {/* ChatGPT Interface */}
             <motion.div
               className="mb-8"
@@ -305,6 +299,12 @@ export default function ContentCompassSalesPageV2() {
                 className="w-full max-w-sm mx-auto rounded-xl shadow-lg"
               />
             </motion.div>
+
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 2</p>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              AI Suggests Angles For Wider Reach
+            </h3>
 
             <p className="text-gray-600 leading-relaxed">
               We give AI context about your audience and what they care about via the audience profile inside Notion, so it can suggest angles that will get more views.
@@ -321,12 +321,6 @@ export default function ContentCompassSalesPageV2() {
             transition={{ duration: 0.6 }}
             className="max-w-md mx-auto text-center"
           >
-            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 3</p>
-
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
-              Everything Saves To Notion Automatically
-            </h3>
-
             {/* Notion Board */}
             <div className="mb-8 relative">
               <motion.div
@@ -397,6 +391,12 @@ export default function ContentCompassSalesPageV2() {
                 }
               `}</style>
             </div>
+
+            <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 3</p>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              Everything Saves To Notion Automatically
+            </h3>
 
             <p className="text-gray-600 leading-relaxed mb-8">
               Your idea with AI suggestions is saved to the content planner in the Notion Template provided, without you even opening Notion.
