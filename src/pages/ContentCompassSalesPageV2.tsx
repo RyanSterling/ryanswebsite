@@ -17,6 +17,8 @@ export default function ContentCompassSalesPageV2() {
   const [step1Svg, setStep1Svg] = useState<string>('')
   const [step2Svg, setStep2Svg] = useState<string>('')
   const [step3Svg, setStep3Svg] = useState<string>('')
+  const [typedText, setTypedText] = useState<string>('')
+  const [isTyping, setIsTyping] = useState<boolean>(false)
 
   // Load SVGs for inline animation
   useEffect(() => {
@@ -38,6 +40,25 @@ export default function ContentCompassSalesPageV2() {
       .then(svg => setStep3Svg(svg))
       .catch(err => console.error('Failed to load step 3 SVG:', err))
   }, [])
+
+  // Typing animation effect
+  useEffect(() => {
+    if (!isTyping) return
+
+    const fullText = "Your idea is too narrow, one of these angles might get your idea more views. Let me know then ill save it to your Notion."
+    let currentIndex = 0
+
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= fullText.length) {
+        setTypedText(fullText.slice(0, currentIndex))
+        currentIndex++
+      } else {
+        clearInterval(typingInterval)
+      }
+    }, 30) // 30ms per character for smooth typing
+
+    return () => clearInterval(typingInterval)
+  }, [isTyping])
 
   const handleGetAccess = async () => {
     if (!isSignedIn) {
@@ -300,13 +321,17 @@ export default function ContentCompassSalesPageV2() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
+                onViewportEnter={() => {
+                  setTimeout(() => setIsTyping(true), 800) // Start typing after SVG animates in
+                }}
               >
                 <div dangerouslySetInnerHTML={{ __html: step2Svg }} />
 
                 {/* Typing text overlay */}
                 <div className="typing-text-overlay">
                   <p className="typing-text">
-                    Your idea is too narrow, one of these angles might get your idea more views. Let me know then ill save it to your Notion.
+                    {typedText}
+                    {isTyping && typedText.length < 110 && <span className="typing-cursor">|</span>}
                   </p>
                 </div>
               </motion.div>
@@ -320,32 +345,30 @@ export default function ContentCompassSalesPageV2() {
 
                 .typing-text-overlay {
                   position: absolute;
-                  top: 43%;
-                  left: 14%;
-                  right: 14%;
+                  top: 46%;
+                  left: 12%;
+                  right: 12%;
                   pointer-events: none;
                 }
 
                 .typing-text {
                   font-family: system-ui, -apple-system, sans-serif;
-                  font-size: 11px;
-                  line-height: 1.5;
+                  font-size: 13px;
+                  line-height: 1.4;
                   color: #0D0D0D;
                   margin: 0;
-                  overflow: hidden;
+                  text-align: left;
                   white-space: pre-wrap;
                   word-wrap: break-word;
-                  animation: typing 3s steps(110) 1s forwards;
-                  max-width: 0;
                 }
 
-                @keyframes typing {
-                  from {
-                    max-width: 0;
-                  }
-                  to {
-                    max-width: 100%;
-                  }
+                .typing-cursor {
+                  animation: blink 1s infinite;
+                }
+
+                @keyframes blink {
+                  0%, 50% { opacity: 1; }
+                  51%, 100% { opacity: 0; }
                 }
               `}</style>
             </div>
