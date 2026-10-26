@@ -295,28 +295,56 @@ export default function ContentCompassSalesPageV2() {
             {/* ChatGPT Interface */}
             <div className="mb-8 relative">
               <motion.div
-                className="w-full max-w-sm mx-auto step2-svg-container"
+                className="w-full max-w-sm mx-auto step2-svg-container relative"
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
-                dangerouslySetInnerHTML={{ __html: step2Svg }}
-              />
+              >
+                <div dangerouslySetInnerHTML={{ __html: step2Svg }} />
+
+                {/* Typing text overlay */}
+                <div className="typing-text-overlay">
+                  <p className="typing-text">
+                    Your idea is too narrow, one of these angles might get your idea more views. Let me know then ill save it to your Notion.
+                  </p>
+                </div>
+              </motion.div>
+
               <style>{`
                 .step2-svg-container svg {
                   width: 100%;
                   height: auto;
+                  display: block;
                 }
 
-                /* Typing animation using clip-path */
-                #typing-text {
-                  animation: typing 2.5s ease-in-out 0.8s forwards;
-                  clip-path: inset(0 100% 0 0);
+                .typing-text-overlay {
+                  position: absolute;
+                  top: 43%;
+                  left: 14%;
+                  right: 14%;
+                  pointer-events: none;
+                }
+
+                .typing-text {
+                  font-family: system-ui, -apple-system, sans-serif;
+                  font-size: 11px;
+                  line-height: 1.5;
+                  color: #0D0D0D;
+                  margin: 0;
+                  overflow: hidden;
+                  white-space: pre-wrap;
+                  word-wrap: break-word;
+                  animation: typing 3s steps(110) 1s forwards;
+                  max-width: 0;
                 }
 
                 @keyframes typing {
+                  from {
+                    max-width: 0;
+                  }
                   to {
-                    clip-path: inset(0 0 0 0);
+                    max-width: 100%;
                   }
                 }
               `}</style>
