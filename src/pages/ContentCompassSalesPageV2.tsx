@@ -220,18 +220,18 @@ export default function ContentCompassSalesPageV2() {
                   animation: fadeIn 0.3s ease-in-out 0.5s forwards;
                 }
 
-                /* Waveform animations - sequential blue fill */
-                #wave-4 { animation: fillBlue 0.1s ease-in-out 0.8s forwards; }
-                #wave-5 { animation: fillBlue 0.1s ease-in-out 0.9s forwards; }
-                #wave-7 { animation: fillBlue 0.1s ease-in-out 1.0s forwards; }
-                #wave-8 { animation: fillBlue 0.1s ease-in-out 1.1s forwards; }
-                #wave-9 { animation: fillBlue 0.1s ease-in-out 1.2s forwards; }
+                /* Waveform animations - sequential blue fill (left to right) */
+                #wave-12 { animation: fillBlue 0.1s ease-in-out 0.8s forwards; }
+                #wave-13 { animation: fillBlue 0.1s ease-in-out 0.9s forwards; }
+                #wave-4 { animation: fillBlue 0.1s ease-in-out 1.0s forwards; }
+                #wave-7 { animation: fillBlue 0.1s ease-in-out 1.1s forwards; }
+                #wave-17 { animation: fillBlue 0.1s ease-in-out 1.2s forwards; }
                 #wave-10 { animation: fillBlue 0.1s ease-in-out 1.3s forwards; }
-                #wave-12 { animation: fillBlue 0.1s ease-in-out 1.4s forwards; }
-                #wave-13 { animation: fillBlue 0.1s ease-in-out 1.5s forwards; }
-                #wave-14 { animation: fillBlue 0.1s ease-in-out 1.6s forwards; }
+                #wave-14 { animation: fillBlue 0.1s ease-in-out 1.4s forwards; }
+                #wave-5 { animation: fillBlue 0.1s ease-in-out 1.5s forwards; }
+                #wave-8 { animation: fillBlue 0.1s ease-in-out 1.6s forwards; }
                 #wave-15 { animation: fillBlue 0.1s ease-in-out 1.7s forwards; }
-                #wave-17 { animation: fillBlue 0.1s ease-in-out 1.8s forwards; }
+                #wave-9 { animation: fillBlue 0.1s ease-in-out 1.8s forwards; }
 
                 @keyframes fadeOut {
                   to { opacity: 0; }
