@@ -15,6 +15,7 @@ export default function ContentCompassSalesPageV2() {
   const { user } = useUser()
   const [isProcessing, setIsProcessing] = useState(false)
   const [step1Svg, setStep1Svg] = useState<string>('')
+  const [step2Svg, setStep2Svg] = useState<string>('')
   const [step3Svg, setStep3Svg] = useState<string>('')
 
   // Load SVGs for inline animation
@@ -24,6 +25,12 @@ export default function ContentCompassSalesPageV2() {
       .then(res => res.text())
       .then(svg => setStep1Svg(svg))
       .catch(err => console.error('Failed to load step 1 SVG:', err))
+
+    // Load step 2 ChatGPT SVG
+    fetch('/assets/content-compass-steps/step-2/ChatGPT5 - Rich Layout.svg')
+      .then(res => res.text())
+      .then(svg => setStep2Svg(svg))
+      .catch(err => console.error('Failed to load step 2 SVG:', err))
 
     // Load step 3 SVG
     fetch('/assets/content-compass-steps/step-3/step 3.svg')
@@ -286,19 +293,34 @@ export default function ContentCompassSalesPageV2() {
             className="max-w-md mx-auto text-center"
           >
             {/* ChatGPT Interface */}
-            <motion.div
-              className="mb-8"
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
-            >
-              <img
-                src="/assets/content-compass-steps/step-2/ChatGPT5 - Rich Layout.svg"
-                alt="AI suggesting angles"
-                className="w-full max-w-sm mx-auto rounded-xl shadow-lg"
+            <div className="mb-8 relative">
+              <motion.div
+                className="w-full max-w-sm mx-auto step2-svg-container"
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
+                dangerouslySetInnerHTML={{ __html: step2Svg }}
               />
-            </motion.div>
+              <style>{`
+                .step2-svg-container svg {
+                  width: 100%;
+                  height: auto;
+                }
+
+                /* Typing animation using clip-path */
+                #typing-text {
+                  animation: typing 2.5s ease-in-out 0.8s forwards;
+                  clip-path: inset(0 100% 0 0);
+                }
+
+                @keyframes typing {
+                  to {
+                    clip-path: inset(0 0 0 0);
+                  }
+                }
+              `}</style>
+            </div>
 
             <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 2</p>
 
