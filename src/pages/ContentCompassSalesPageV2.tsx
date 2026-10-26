@@ -209,24 +209,41 @@ export default function ContentCompassSalesPageV2() {
                   height: auto;
                 }
 
-                /* Play button animation - will need specific element IDs from your SVG */
-                /* Example: #play-button { animation: fadePlayToPause 0.3s ease-in-out 0.5s forwards; } */
+                /* Play/Pause button animations */
+                #play-button {
+                  opacity: 1;
+                  animation: fadeOut 0.3s ease-in-out 0.5s forwards;
+                }
+
+                #pause-button {
+                  opacity: 0;
+                  animation: fadeIn 0.3s ease-in-out 0.5s forwards;
+                }
 
                 /* Waveform animations - sequential blue fill */
-                /* You'll need to provide the IDs for each waveform bar */
-                /* Example for sequential animation of waveform bars:
-                #wave-1 { animation: fillBlue 0.15s ease-in-out 0.6s forwards; }
-                #wave-2 { animation: fillBlue 0.15s ease-in-out 0.75s forwards; }
-                #wave-3 { animation: fillBlue 0.15s ease-in-out 0.9s forwards; }
-                ... and so on
-                */
+                #wave-4 { animation: fillBlue 0.1s ease-in-out 0.8s forwards; }
+                #wave-5 { animation: fillBlue 0.1s ease-in-out 0.9s forwards; }
+                #wave-7 { animation: fillBlue 0.1s ease-in-out 1.0s forwards; }
+                #wave-8 { animation: fillBlue 0.1s ease-in-out 1.1s forwards; }
+                #wave-9 { animation: fillBlue 0.1s ease-in-out 1.2s forwards; }
+                #wave-10 { animation: fillBlue 0.1s ease-in-out 1.3s forwards; }
+                #wave-12 { animation: fillBlue 0.1s ease-in-out 1.4s forwards; }
+                #wave-13 { animation: fillBlue 0.1s ease-in-out 1.5s forwards; }
+                #wave-14 { animation: fillBlue 0.1s ease-in-out 1.6s forwards; }
+                #wave-15 { animation: fillBlue 0.1s ease-in-out 1.7s forwards; }
+                #wave-17 { animation: fillBlue 0.1s ease-in-out 1.8s forwards; }
+
+                @keyframes fadeOut {
+                  to { opacity: 0; }
+                }
+
+                @keyframes fadeIn {
+                  to { opacity: 1; }
+                }
 
                 @keyframes fillBlue {
-                  from {
-                    stroke: #9CA3AF; /* gray */
-                  }
                   to {
-                    stroke: #3B82F6; /* blue */
+                    stroke: #006FEA;
                   }
                 }
               `}</style>
