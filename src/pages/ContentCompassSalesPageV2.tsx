@@ -14,10 +14,18 @@ export default function ContentCompassSalesPageV2() {
   const { isSignedIn } = useAuth()
   const { user } = useUser()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [step1Svg, setStep1Svg] = useState<string>('')
   const [step3Svg, setStep3Svg] = useState<string>('')
 
-  // Load step 3 SVG for inline animation
+  // Load SVGs for inline animation
   useEffect(() => {
+    // Load step 1 voice dictation SVG
+    fetch('/assets/content-compass-steps/step-1/voice dictation.svg')
+      .then(res => res.text())
+      .then(svg => setStep1Svg(svg))
+      .catch(err => console.error('Failed to load step 1 SVG:', err))
+
+    // Load step 3 SVG
     fetch('/assets/content-compass-steps/step-3/step 3.svg')
       .then(res => res.text())
       .then(svg => setStep3Svg(svg))
@@ -181,17 +189,47 @@ export default function ContentCompassSalesPageV2() {
           >
             <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 1</p>
 
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              Voice Dictate Your Raw Content Idea Into AI
+            </h3>
+
             {/* Voice Dictation Visual */}
             <div className="mb-8 relative">
-              <motion.img
-                src="/assets/content-compass-steps/step-1/voice dictation.svg"
-                alt="Voice dictation"
-                className="w-full max-w-sm mx-auto mb-6"
+              <motion.div
+                className="w-full max-w-sm mx-auto mb-6 step1-svg-container"
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                dangerouslySetInnerHTML={{ __html: step1Svg }}
               />
+              <style>{`
+                .step1-svg-container svg {
+                  width: 100%;
+                  height: auto;
+                }
+
+                /* Play button animation - will need specific element IDs from your SVG */
+                /* Example: #play-button { animation: fadePlayToPause 0.3s ease-in-out 0.5s forwards; } */
+
+                /* Waveform animations - sequential blue fill */
+                /* You'll need to provide the IDs for each waveform bar */
+                /* Example for sequential animation of waveform bars:
+                #wave-1 { animation: fillBlue 0.15s ease-in-out 0.6s forwards; }
+                #wave-2 { animation: fillBlue 0.15s ease-in-out 0.75s forwards; }
+                #wave-3 { animation: fillBlue 0.15s ease-in-out 0.9s forwards; }
+                ... and so on
+                */
+
+                @keyframes fillBlue {
+                  from {
+                    stroke: #9CA3AF; /* gray */
+                  }
+                  to {
+                    stroke: #3B82F6; /* blue */
+                  }
+                }
+              `}</style>
 
               {/* AI Icons */}
               <div className="flex justify-center gap-3 flex-wrap">
@@ -215,9 +253,6 @@ export default function ContentCompassSalesPageV2() {
               </div>
             </div>
 
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
-              Voice Dictate Your Raw Content Idea Into AI
-            </h3>
             <p className="text-gray-600 leading-relaxed">
               Document content ideas on the go with your voice so there is enough context to come back later and flesh them out.
             </p>
@@ -235,6 +270,10 @@ export default function ContentCompassSalesPageV2() {
           >
             <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 2</p>
 
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              AI Suggests Angles For Wider Reach
+            </h3>
+
             {/* ChatGPT Interface */}
             <motion.div
               className="mb-8"
@@ -250,9 +289,6 @@ export default function ContentCompassSalesPageV2() {
               />
             </motion.div>
 
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
-              AI Suggests Angles For Wider Reach
-            </h3>
             <p className="text-gray-600 leading-relaxed">
               We give AI context about your audience and what they care about via the audience profile inside Notion, so it can suggest angles that will get more views.
             </p>
@@ -269,6 +305,10 @@ export default function ContentCompassSalesPageV2() {
             className="max-w-md mx-auto text-center"
           >
             <p className="text-gray-400 uppercase tracking-wide text-sm mb-4">Step 3</p>
+
+            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-6">
+              Everything Saves To Notion Automatically
+            </h3>
 
             {/* Notion Board */}
             <div className="mb-8 relative">
@@ -341,9 +381,6 @@ export default function ContentCompassSalesPageV2() {
               `}</style>
             </div>
 
-            <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
-              Everything Saves To Notion Automatically
-            </h3>
             <p className="text-gray-600 leading-relaxed mb-8">
               Your idea with AI suggestions is saved to the content planner in the Notion Template provided, without you even opening Notion.
             </p>
