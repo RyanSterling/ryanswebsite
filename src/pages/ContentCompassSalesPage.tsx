@@ -1,18 +1,88 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@clerk/react'
+import { useAuth, useUser } from '@clerk/react'
+import { supabase } from '../lib/supabase'
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://your-api.workers.dev'
 
 export default function ContentCompassSalesPage() {
   const navigate = useNavigate()
   const { isSignedIn } = useAuth()
+  const { user } = useUser()
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleGetAccess = () => {
-    const checkoutUrl = '/checkout/content-compass'
+  const handleGetAccess = async () => {
     if (!isSignedIn) {
+      const checkoutUrl = '/checkout/content-compass'
       localStorage.setItem('pendingRedirect', checkoutUrl)
       navigate(`/sign-up?redirect=${encodeURIComponent(checkoutUrl)}`)
       return
     }
-    navigate(checkoutUrl)
+
+    if (!user || isProcessing) return
+
+    setIsProcessing(true)
+
+    try {
+      // Fetch course details
+      const { data: course, error: courseError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('slug', 'content-compass')
+        .eq('published', true)
+        .single()
+
+      if (courseError || !course) {
+        console.error('Course not found:', courseError)
+        setIsProcessing(false)
+        return
+      }
+
+      // Check if already purchased
+      const { data: purchaseData } = await supabase
+        .from('purchases')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', course.id)
+        .limit(1)
+
+      if (purchaseData && purchaseData.length > 0) {
+        // Already purchased, redirect to course
+        navigate(`/courses/content-compass/learn`)
+        return
+      }
+
+      // Create Stripe checkout session
+      const response = await fetch(`${API_URL}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          course_id: course.id,
+          course_slug: course.slug,
+          user_id: user.id,
+          user_email: user.primaryEmailAddress?.emailAddress,
+          price_cents: course.price_cents,
+          course_title: course.title,
+          origin_url: window.location.origin,
+          stripe_price_id: course.stripe_price_id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url
+      } else {
+        console.error('Failed to create checkout session:', data.error)
+        setIsProcessing(false)
+      }
+    } catch (err) {
+      console.error('Checkout error:', err)
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -62,9 +132,10 @@ export default function ContentCompassSalesPage() {
           </div>
           <button
             onClick={handleGetAccess}
-            className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity"
+            disabled={isProcessing}
+            className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            Get Access Now
+            {isProcessing ? 'Processing...' : 'Get Access Now'}
           </button>
         </div>
       </section>
@@ -208,9 +279,10 @@ export default function ContentCompassSalesPage() {
         </div>
         <button
           onClick={handleGetAccess}
-          className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity"
+          disabled={isProcessing}
+          className="bg-brand-orange text-white font-medium text-lg py-4 px-12 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          Get Access Now
+          {isProcessing ? 'Processing...' : 'Get Access Now'}
         </button>
         <p className="text-gray-500 text-sm mt-4">Instant access after purchase</p>
       </section>
