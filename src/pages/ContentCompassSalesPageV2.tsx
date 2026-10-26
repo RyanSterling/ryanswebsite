@@ -90,9 +90,9 @@ export default function ContentCompassSalesPageV2() {
   }
 
   return (
-    <main className="bg-white">
+    <main className="snap-y snap-mandatory h-screen overflow-y-scroll" style={{ backgroundColor: '#EBEBF1' }}>
       {/* Hero Section */}
-      <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+      <section className="snap-start min-h-screen flex flex-col items-center justify-center px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,10 +161,8 @@ export default function ContentCompassSalesPageV2() {
         </motion.div>
       </section>
 
-      {/* How It Works - Scroll Snap Sections */}
-      <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
-        {/* Step 1 */}
-        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white to-gray-50">
+      {/* Step 1 */}
+      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -217,8 +215,8 @@ export default function ContentCompassSalesPageV2() {
           </motion.div>
         </section>
 
-        {/* Step 2 */}
-        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-gray-50 to-white">
+      {/* Step 2 */}
+      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -252,8 +250,8 @@ export default function ContentCompassSalesPageV2() {
           </motion.div>
         </section>
 
-        {/* Step 3 */}
-        <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white to-gray-50">
+      {/* Step 3 */}
+      <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -273,7 +271,7 @@ export default function ContentCompassSalesPageV2() {
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
                 {/* Columns staggered animation */}
-                <div className="flex gap-2 justify-center mb-4">
+                <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
                   {[
                     { src: 'idea.svg', delay: 0.3 },
                     { src: 'scripted.svg', delay: 0.4 },
@@ -284,7 +282,7 @@ export default function ContentCompassSalesPageV2() {
                       key={i}
                       src={`/assets/content-compass-steps/step-3/${column.src}`}
                       alt="Notion column"
-                      className="w-1/4"
+                      className="w-full"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
@@ -319,10 +317,10 @@ export default function ContentCompassSalesPageV2() {
             </p>
           </motion.div>
         </section>
-      </div>
 
       {/* The Problem */}
-      <section className="max-w-3xl mx-auto px-6 py-12">
+      <section className="snap-start min-h-screen flex items-center justify-center">
+        <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -343,10 +341,12 @@ export default function ContentCompassSalesPageV2() {
             That's exactly what this Notion template does.
           </p>
         </motion.div>
+        </div>
       </section>
 
       {/* What's Included */}
-      <section className="max-w-3xl mx-auto px-6 py-12">
+      <section className="snap-start min-h-screen flex items-center justify-center">
+        <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -388,10 +388,12 @@ export default function ContentCompassSalesPageV2() {
             ))}
           </div>
         </motion.div>
+        </div>
       </section>
 
       {/* Final CTA */}
-      <section className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
+      <section className="snap-start min-h-screen flex items-center justify-center">
+        <div className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -412,6 +414,7 @@ export default function ContentCompassSalesPageV2() {
           </button>
           <p className="text-gray-500 text-sm mt-4">Instant access after purchase</p>
         </motion.div>
+        </div>
       </section>
     </main>
   )
