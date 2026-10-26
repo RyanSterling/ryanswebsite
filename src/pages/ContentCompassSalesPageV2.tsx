@@ -162,7 +162,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* How It Works - Scroll Snap Sections */}
-      <div className="snap-y snap-mandatory md:h-auto">
+      <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
         {/* Step 1 */}
         <section className="snap-start min-h-screen flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white to-gray-50">
           <motion.div
