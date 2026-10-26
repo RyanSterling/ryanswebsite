@@ -1,7 +1,7 @@
 // EXPERIMENTAL VERSION - testing new layouts and animations
 // Original: ContentCompassSalesPage.tsx
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, useUser } from '@clerk/react'
 import { motion } from 'framer-motion'
@@ -14,6 +14,15 @@ export default function ContentCompassSalesPageV2() {
   const { isSignedIn } = useAuth()
   const { user } = useUser()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [step3Svg, setStep3Svg] = useState<string>('')
+
+  // Load step 3 SVG for inline animation
+  useEffect(() => {
+    fetch('/assets/content-compass-steps/step-3/step 3.svg')
+      .then(res => res.text())
+      .then(svg => setStep3Svg(svg))
+      .catch(err => console.error('Failed to load step 3 SVG:', err))
+  }, [])
 
   const handleGetAccess = async () => {
     if (!isSignedIn) {
@@ -162,7 +171,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* Step 1 */}
-      <section className="min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="flex items-center justify-center px-6 py-16 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -216,7 +225,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* Step 2 */}
-      <section className="min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="flex items-center justify-center px-6 py-16 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -251,7 +260,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* Step 3 */}
-      <section className="min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="flex items-center justify-center px-6 py-16 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -263,15 +272,73 @@ export default function ContentCompassSalesPageV2() {
 
             {/* Notion Board */}
             <div className="mb-8 relative">
-              <motion.img
-                src="/assets/content-compass-steps/step-3/step 3.svg"
-                alt="Notion board"
-                className="w-full max-w-lg mx-auto"
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              <motion.div
+                className="w-full max-w-lg mx-auto step3-svg-container"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                dangerouslySetInnerHTML={{ __html: step3Svg }}
               />
+              <style>{`
+                .step3-svg-container svg {
+                  width: 100%;
+                  height: auto;
+                }
+
+                #idea-column {
+                  animation: slideInLeft 0.6s ease-out 0.4s both;
+                }
+
+                #scripted-column {
+                  animation: slideInRight 0.6s ease-out 0.5s both;
+                }
+
+                #filmed-column {
+                  animation: slideInLeft 0.6s ease-out 0.6s both;
+                }
+
+                #posted-column {
+                  animation: slideInRight 0.6s ease-out 0.7s both;
+                }
+
+                #notion-logo {
+                  animation: scaleIn 0.5s ease-out 0.9s both;
+                }
+
+                @keyframes slideInLeft {
+                  from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+
+                @keyframes slideInRight {
+                  from {
+                    opacity: 0;
+                    transform: translateX(20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+
+                @keyframes scaleIn {
+                  from {
+                    opacity: 0;
+                    transform: scale(0.5);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: scale(1);
+                  }
+                }
+              `}</style>
             </div>
 
             <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
@@ -289,7 +356,7 @@ export default function ContentCompassSalesPageV2() {
         </section>
 
       {/* The Problem */}
-      <section className="min-h-screen flex items-center justify-center">
+      <section className="flex items-center justify-center py-16 md:py-20">
         <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -315,7 +382,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* What's Included */}
-      <section className="min-h-screen flex items-center justify-center">
+      <section className="flex items-center justify-center py-16 md:py-20">
         <div className="max-w-3xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -362,7 +429,7 @@ export default function ContentCompassSalesPageV2() {
       </section>
 
       {/* Final CTA */}
-      <section className="min-h-screen flex items-center justify-center">
+      <section className="flex items-center justify-center py-16 md:py-20">
         <div className="max-w-3xl mx-auto px-6 py-12 pb-24 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
