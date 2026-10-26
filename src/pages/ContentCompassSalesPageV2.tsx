@@ -263,45 +263,15 @@ export default function ContentCompassSalesPageV2() {
 
             {/* Notion Board */}
             <div className="mb-8 relative">
-              <motion.div
-                className="relative"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+              <motion.img
+                src="/assets/content-compass-steps/step-3/step 3.svg"
+                alt="Notion board"
+                className="w-full max-w-lg mx-auto"
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                {/* Columns staggered animation */}
-                <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
-                  {[
-                    { src: 'idea.svg', delay: 0.3 },
-                    { src: 'scripted.svg', delay: 0.4 },
-                    { src: 'filmed.svg', delay: 0.5 },
-                    { src: 'posted.svg', delay: 0.6 },
-                  ].map((column, i) => (
-                    <motion.img
-                      key={i}
-                      src={`/assets/content-compass-steps/step-3/${column.src}`}
-                      alt="Notion column"
-                      className="w-full"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: column.delay, duration: 0.4 }}
-                    />
-                  ))}
-                </div>
-
-                {/* Notion logo */}
-                <motion.img
-                  src="/assets/content-compass-steps/step-3/notion.svg"
-                  alt="Notion"
-                  className="w-12 h-12 mx-auto"
-                  initial={{ opacity: 0, scale: 0 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7, duration: 0.3 }}
-                />
-              </motion.div>
+                transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
+              />
             </div>
 
             <h3 className="font-soehne font-bold text-2xl md:text-3xl text-gray-900 mb-4">
