@@ -113,11 +113,15 @@ export default function Dashboard() {
                   className="bg-brand-card rounded-xl overflow-hidden hover:ring-2 hover:ring-brand-orange transition-all group"
                 >
                   {thumbnailUrl ? (
-                    <div className="relative">
+                    <div className={`relative ${course.slug === 'content-compass' ? 'bg-white' : ''}`}>
                       <img
                         src={thumbnailUrl}
                         alt={course.title}
-                        className="w-full h-48 object-cover"
+                        className={`w-full h-48 ${
+                          course.slug === 'content-compass'
+                            ? 'object-contain p-6'
+                            : 'object-cover'
+                        }`}
                       />
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="text-white font-medium">
