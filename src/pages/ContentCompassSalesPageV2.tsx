@@ -142,11 +142,22 @@ export default function ContentCompassSalesPageV2() {
     return () => clearInterval(counterInterval)
   }, [notionSaving])
 
+  // Handle pending checkout after sign-in
+  useEffect(() => {
+    if (isSignedIn && user) {
+      const pendingCheckout = sessionStorage.getItem('pendingCheckout')
+      if (pendingCheckout === 'content-compass') {
+        sessionStorage.removeItem('pendingCheckout')
+        handleGetAccess()
+      }
+    }
+  }, [isSignedIn, user])
+
   const handleGetAccess = async () => {
     if (!isSignedIn) {
-      const checkoutUrl = '/checkout/content-compass'
-      localStorage.setItem('pendingRedirect', checkoutUrl)
-      navigate(`/sign-up?redirect=${encodeURIComponent(checkoutUrl)}`)
+      // Store that we want to checkout after sign-in
+      sessionStorage.setItem('pendingCheckout', 'content-compass')
+      navigate('/sign-in')
       return
     }
 
