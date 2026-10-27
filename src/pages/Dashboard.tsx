@@ -135,7 +135,7 @@ export default function Dashboard() {
                     </div>
                   )}
                   <div className="p-6">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                       <h2 className="font-soehne text-xl text-white">
                         {course.title}
                       </h2>
@@ -145,9 +145,6 @@ export default function Dashboard() {
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-500 text-sm">
-                      {course.description}
-                    </p>
                   </div>
                 </Link>
               )
