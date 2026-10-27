@@ -27,7 +27,6 @@ import ProtectedRoute from './components/ProtectedRoute'
 // Custom course viewers
 import { BreakthroughContentViewer } from './components/breakthrough-content'
 import BreakthroughSalesPage from './pages/BreakthroughSalesPage'
-import ContentCompassSalesPage from './pages/ContentCompassSalesPage'
 import ContentCompassSalesPageV2 from './pages/ContentCompassSalesPageV2'
 
 function App() {
@@ -68,8 +67,7 @@ function App() {
       <Route path="/courses" element={<Courses />} />
       <Route path="/breakthrough" element={<BreakthroughSalesPage />} />
       <Route path="/the-content-fix" element={<BreakthroughSalesPage />} />
-      <Route path="/content-compass" element={<ContentCompassSalesPage />} />
-      <Route path="/content-compass-v2" element={<ContentCompassSalesPageV2 />} />
+      <Route path="/content-compass" element={<ContentCompassSalesPageV2 />} />
       <Route path="/courses/:slug" element={<CourseLanding />} />
 
       {/* Courses - Protected */}
