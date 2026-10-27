@@ -100,47 +100,54 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
-              <Link
-                key={course.id}
-                to={course.hasAccess ? `/courses/${course.slug}/learn` : `/${course.slug}`}
-                className="bg-brand-card rounded-xl overflow-hidden hover:ring-2 hover:ring-brand-orange transition-all group"
-              >
-                {course.thumbnail_url ? (
-                  <div className="relative">
-                    <img
-                      src={course.thumbnail_url}
-                      alt={course.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white font-medium">
-                        {course.hasAccess ? 'Continue' : 'Learn More'}
-                      </span>
+            {courses.map((course) => {
+              // Use local icon for Content Compass
+              const thumbnailUrl = course.slug === 'content-compass'
+                ? '/assets/Content Compass 3D app icon.png'
+                : course.thumbnail_url
+
+              return (
+                <Link
+                  key={course.id}
+                  to={course.hasAccess ? `/courses/${course.slug}/learn` : `/${course.slug}`}
+                  className="bg-brand-card rounded-xl overflow-hidden hover:ring-2 hover:ring-brand-orange transition-all group"
+                >
+                  {thumbnailUrl ? (
+                    <div className="relative">
+                      <img
+                        src={thumbnailUrl}
+                        alt={course.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-white font-medium">
+                          {course.hasAccess ? 'Continue' : 'Learn More'}
+                        </span>
+                      </div>
                     </div>
+                  ) : (
+                    <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
+                      <span className="text-gray-500 text-4xl">📚</span>
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="font-soehne text-xl text-white">
+                        {course.title}
+                      </h2>
+                      {!course.hasAccess && course.price_cents > 0 && (
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                          ${(course.price_cents / 100).toFixed(0)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      {course.description}
+                    </p>
                   </div>
-                ) : (
-                  <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
-                    <span className="text-gray-500 text-4xl">📚</span>
-                  </div>
-                )}
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="font-soehne text-xl text-white">
-                      {course.title}
-                    </h2>
-                    {!course.hasAccess && course.price_cents > 0 && (
-                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
-                        ${(course.price_cents / 100).toFixed(0)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-500 text-sm">
-                    {course.description}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         )}
       </div>
