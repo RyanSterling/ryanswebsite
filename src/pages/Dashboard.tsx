@@ -38,12 +38,22 @@ export default function Dashboard() {
       }
 
       // Add hasAccess flag to each course
-      const coursesWithAccess = (coursesData || []).map(course => ({
-        ...course,
-        hasAccess: purchasedCourseIds.includes(course.id) ||
-          !course.price_cents ||
-          course.price_cents === 0
-      }))
+      // Filter out "the-content-fix" unless user has purchased it
+      const coursesWithAccess = (coursesData || [])
+        .filter(course => {
+          // For "the-content-fix", only show if user has purchased it
+          if (course.slug === 'the-content-fix') {
+            return purchasedCourseIds.includes(course.id)
+          }
+          // For other courses, show all published courses
+          return true
+        })
+        .map(course => ({
+          ...course,
+          hasAccess: purchasedCourseIds.includes(course.id) ||
+            !course.price_cents ||
+            course.price_cents === 0
+        }))
 
       setCourses(coursesWithAccess)
       setLoading(false)
