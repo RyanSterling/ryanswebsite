@@ -231,15 +231,15 @@ export default function ContentCompassSalesPageV2() {
     <main style={{ backgroundColor: '#EBEBF1' }}>
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-gray-200" style={{ backgroundColor: 'rgba(235, 235, 241, 0.8)' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
           {/* Logo and Brand */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <img
               src="/assets/Front-facing Content Compass icon.png"
               alt="Content Compass"
-              className="w-10 h-10"
+              className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0"
             />
-            <span className="font-soehne font-semibold text-lg text-gray-900">
+            <span className="font-soehne font-semibold text-base md:text-lg text-gray-900 whitespace-nowrap">
               The Content Compass
             </span>
           </div>
@@ -248,7 +248,7 @@ export default function ContentCompassSalesPageV2() {
           <button
             onClick={handleGetAccess}
             disabled={isProcessing}
-            className="bg-brand-orange text-white font-medium text-sm py-2.5 px-6 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="bg-brand-orange text-white font-medium text-sm py-2.5 px-4 md:px-6 rounded-[19px] hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap flex-shrink-0"
           >
             Get Access
           </button>
