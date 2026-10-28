@@ -540,7 +540,7 @@ export default function ContentCompassSalesPageV2() {
             className="max-w-md mx-auto text-center"
           >
             {/* Notion Board */}
-            <div className="mb-6 relative">
+            <div className="mb-6">
               <motion.div
                 className="w-full max-w-lg mx-auto step3-svg-container"
                 initial={{ opacity: 0, y: 30 }}
@@ -550,35 +550,37 @@ export default function ContentCompassSalesPageV2() {
                 dangerouslySetInnerHTML={{ __html: step3Svg }}
               />
 
-              {/* Notion Saving Notification */}
-              <motion.div
-                className="mt-6 flex justify-start min-h-[44px]"
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-                onViewportEnter={() => {
-                  setTimeout(() => setNotionSaving(true), 800)
-                }}
-              >
-                {notionSaving && (
-                  <div className="notion-notification saving">
-                    <div className="notion-icon-fixed" dangerouslySetInnerHTML={{ __html: notionLogoSvg }} />
-                    <span className="notion-text gradient-text">
-                      Using Notion: Saving "Why copying viral..."
-                    </span>
-                    <span className="counter">{savingCounter}s</span>
-                    <div className="chevron-icon" dangerouslySetInnerHTML={{ __html: chevronSvg }} />
-                  </div>
-                )}
-                {notionSaved && (
-                  <div className="notion-notification saved">
-                    <div className="notion-icon-fixed" dangerouslySetInnerHTML={{ __html: notionLogoSvg }} />
-                    <span className="notion-text">Idea saved to Notion</span>
-                    <div className="checkmark-icon" dangerouslySetInnerHTML={{ __html: checkmarkSvg }} />
-                  </div>
-                )}
-              </motion.div>
+              {/* Notion Saving Notification - fixed height, left-aligned, width doesn't affect parent */}
+              <div className="mt-6 h-[44px] flex justify-center">
+                <motion.div
+                  className="w-full max-w-lg"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.4 }}
+                  onViewportEnter={() => {
+                    setTimeout(() => setNotionSaving(true), 800)
+                  }}
+                >
+                  {notionSaving && (
+                    <div className="notion-notification saving">
+                      <div className="notion-icon-fixed" dangerouslySetInnerHTML={{ __html: notionLogoSvg }} />
+                      <span className="notion-text gradient-text">
+                        Using Notion: Saving "Why copying viral..."
+                      </span>
+                      <span className="counter">{savingCounter}s</span>
+                      <div className="chevron-icon" dangerouslySetInnerHTML={{ __html: chevronSvg }} />
+                    </div>
+                  )}
+                  {notionSaved && (
+                    <div className="notion-notification saved">
+                      <div className="notion-icon-fixed" dangerouslySetInnerHTML={{ __html: notionLogoSvg }} />
+                      <span className="notion-text">Idea saved to Notion</span>
+                      <div className="checkmark-icon" dangerouslySetInnerHTML={{ __html: checkmarkSvg }} />
+                    </div>
+                  )}
+                </motion.div>
+              </div>
               <style>{`
                 .step3-svg-container svg {
                   width: 100%;
@@ -593,7 +595,6 @@ export default function ContentCompassSalesPageV2() {
                   background: transparent;
                   padding: 10px 14px;
                   border-radius: 12px;
-                  max-width: fit-content;
                 }
 
                 .notion-icon-fixed {
