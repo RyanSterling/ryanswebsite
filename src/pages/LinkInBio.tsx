@@ -11,10 +11,9 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
-    title: 'The Content Fix',
-    description: 'Learn how to pick topics that actually get views',
-    to: '/breakthrough',
-    badge: 'Free Course',
+    title: 'The Content Compass',
+    description: 'Never satisficing your content strategy again',
+    to: '/content-compass',
   },
   {
     title: '1:1 Content Coaching',
