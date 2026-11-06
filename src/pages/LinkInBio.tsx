@@ -21,6 +21,11 @@ const links: LinkItem[] = [
     description: '$2000/mo',
     to: '/',
   },
+  {
+    title: '1of10 - YouTube Growth Tool',
+    to: 'https://1of10.com/?via=ryan-sterling',
+    external: true,
+  },
 ]
 
 export default function LinkInBio() {
