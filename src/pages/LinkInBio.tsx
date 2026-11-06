@@ -16,11 +16,6 @@ const links: LinkItem[] = [
     to: '/content-compass',
   },
   {
-    title: '1:1 Content Coaching',
-    description: '$2000/mo',
-    to: '/',
-  },
-  {
     title: '1of10 - YouTube Growth Tool',
     to: 'https://1of10.com/?via=ryan-sterling',
     external: true,
